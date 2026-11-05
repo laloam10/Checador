@@ -10,7 +10,8 @@ Sistema de registro electrónico de jornada laboral (entradas y salidas) para PY
 |---|---|
 | [docs/analisis-legal.md](docs/analisis-legal.md) | Requisitos legales, fuentes, discrepancias y preguntas abiertas |
 | [docs/mvp.md](docs/mvp.md) | Alcance propuesto del producto mínimo, riesgos y decisiones pendientes |
-| [docs/stack.md](docs/stack.md) | Stack técnico propuesto (ADR-001) |
+| [docs/stack.md](docs/stack.md) | Stack técnico (ADR-001) |
+| [supabase/README.md](supabase/README.md) | Base de datos: modelo, garantías y cómo conectarla |
 
 ## Próximos pasos
 
@@ -18,7 +19,9 @@ Sistema de registro electrónico de jornada laboral (entradas y salidas) para PY
 2. Vigilar en el DOF la publicación de las disposiciones generales de la STPS.
 3. Validar el análisis con un abogado laboralista.
 4. ~~Definir el stack técnico.~~ Hecho: ver `docs/stack.md`.
-5. Motor de cálculo (`packages/jornada`): primera versión con pruebas. Siguiente: esquema de base de datos.
+5. ~~Motor de cálculo (`packages/jornada`).~~ Hecho.
+6. ~~Esquema de base de datos en Supabase (`supabase/`).~~ Hecho. Pendientes en `supabase/README.md`.
+7. Aplicación web (Next.js): panel del empleador, PWA del trabajador y kiosco.
 
 ## Desarrollo
 

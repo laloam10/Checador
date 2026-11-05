@@ -24,10 +24,10 @@ Vienen de [analisis-legal.md](analisis-legal.md) y [mvp.md](mvp.md):
 | App del trabajador | **PWA** (no app nativa) | Sin tiendas de apps ni costo de publicación. Se instala desde el navegador. Con IndexedDB guarda registros sin conexión |
 | Base de datos | **PostgreSQL** | Row Level Security para aislar a cada cliente; permisos para que la bitácora solo acepte inserciones; transacciones fiables |
 | ORM | **Drizzle** | SQL explícito y migraciones legibles. Las políticas RLS y los triggers se escriben en SQL de todos modos |
-| Autenticación | **Auth.js** (o Supabase Auth si se usa Supabase) | Patrón con correo y contraseña; trabajador con código o enlace mágico, porque muchos no usan correo |
+| Autenticación | **Supabase Auth** | Patrón con correo y contraseña; trabajador con código o enlace mágico, porque muchos no usan correo |
 | Motor de cálculo | **Paquete TypeScript puro** (`packages/jornada`), sin dependencias, con pruebas en **Vitest** | Se prueba de forma aislada con casos tomados directamente de los arts. 59, 66 y 68 y de los transitorios |
 | PDF | **pdf-lib** o render del lado del servidor | Constancias y reportes con el hash SHA-256 impreso |
-| Hosting | **Vercel** para la app y **Neon o Supabase** para Postgres, con la región más cercana disponible | Costo casi cero al inicio. La LFPDPPP no obliga a guardar los datos en México, pero hay que declararlo en el aviso de privacidad |
+| Hosting | **Vercel** para la app y **Supabase** para Postgres, con la región más cercana disponible | Costo casi cero al inicio. La LFPDPPP no obliga a guardar los datos en México, pero hay que declararlo en el aviso de privacidad |
 | Notificaciones | Correo transaccional (Resend o similar) en el MVP. **WhatsApp** después | WhatsApp Business API tiene costo por conversación. Para empezar, el recordatorio de conformidad puede ser un correo o un aviso dentro de la app |
 
 ### Integridad de la bitácora
