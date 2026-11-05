@@ -8,6 +8,7 @@
 | `migrations/…02_rls.sql` | Funciones auxiliares, `crear_empresa()`, `vincular_mi_cuenta()`, `verificar_cadena()` y políticas RLS |
 | `migrations/…06…01_kiosco_pin.sql` | PIN (bcrypt) con bloqueo por intentos, `kiosco_identificar()`, `kiosco_checar()`, pausa según el centro |
 | `migrations/…07…01_panel_invitaciones.sql` | Invitaciones por correo (admin, supervisor, kiosco), `miembros_de_empresa()`, `trabajadores_con_pin()` |
+| `migrations/…09…01_exportaciones.sql` | Registro inmutable de exportaciones con huellas SHA-256 y estado de la cadena |
 | `migrations/…08…01_acuerdos_firma.sql` | Modalidades de firma (electrónica, PIN en kiosco, autógrafa), orden de firma, `acuerdo_vigente()`, `acuerdo_pendiente()`, `kiosco_firmar_acuerdo()` |
 
 ### Modelo

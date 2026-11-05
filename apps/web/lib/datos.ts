@@ -97,22 +97,24 @@ export async function trabajadorPorId(supabase: Cliente, id: string): Promise<Tr
  * Carga los eventos de un trabajador en una ventana de tiempo, más todos los
  * ajustes (correcciones y anulaciones) relacionados, aunque caigan fuera de ella.
  */
-export async function cargarFilasEventos(
+export async function cargarFilasEventos<F extends FilaEvento = FilaEvento>(
   supabase: Cliente,
   trabajadorId: string,
   desde: Date,
   hasta: Date,
-): Promise<FilaEvento[]> {
+  columnasExtra = "",
+): Promise<F[]> {
+  const COLUMNAS = columnasExtra ? `${COLUMNAS_EVENTO}, ${columnasExtra}` : COLUMNAS_EVENTO;
   const { data, error } = await supabase
     .from("eventos")
-    .select(COLUMNAS_EVENTO)
+    .select(COLUMNAS)
     .eq("trabajador_id", trabajadorId)
     .gte("hora_efectiva", desde.toISOString())
     .lt("hora_efectiva", hasta.toISOString());
   if (error) throw error;
 
-  const porId = new Map<number, FilaEvento>();
-  for (const e of (data ?? []) as FilaEvento[]) porId.set(e.id, e);
+  const porId = new Map<number, F>();
+  for (const e of (data ?? []) as unknown as F[]) porId.set(e.id, e);
 
   // Cierre transitivo: ajustes que apuntan a eventos cargados y eventos a los que apuntan los ajustes.
   for (let vuelta = 0; vuelta < 5; vuelta++) {
@@ -122,16 +124,16 @@ export async function cargarFilasEventos(
       .filter((id): id is number => id !== null && !porId.has(id));
     const [ajustes, faltantes] = await Promise.all([
       ids.length
-        ? supabase.from("eventos").select(COLUMNAS_EVENTO).eq("trabajador_id", trabajadorId).in("corrige_evento_id", ids)
+        ? supabase.from("eventos").select(COLUMNAS).eq("trabajador_id", trabajadorId).in("corrige_evento_id", ids)
         : Promise.resolve({ data: [], error: null }),
       objetivos.length
-        ? supabase.from("eventos").select(COLUMNAS_EVENTO).in("id", objetivos)
+        ? supabase.from("eventos").select(COLUMNAS).in("id", objetivos)
         : Promise.resolve({ data: [], error: null }),
     ]);
     if (ajustes.error) throw ajustes.error;
     if (faltantes.error) throw faltantes.error;
     const antes = porId.size;
-    for (const e of [...(ajustes.data ?? []), ...(faltantes.data ?? [])] as FilaEvento[]) porId.set(e.id, e);
+    for (const e of [...(ajustes.data ?? []), ...(faltantes.data ?? [])] as unknown as F[]) porId.set(e.id, e);
     if (porId.size === antes) break;
   }
 

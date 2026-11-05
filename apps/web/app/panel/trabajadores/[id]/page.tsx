@@ -30,6 +30,8 @@ export default async function FichaTrabajador({ params }: { params: Promise<{ id
       <h1>{t.nombre}{t.fecha_baja && <small className="ayuda"> · baja el {t.fecha_baja}</small>}</h1>
       <p>
         <Link href={`/panel/trabajadores/${t.id}/semana`}>Ver registros y corregir checadas →</Link>
+        {" · "}
+        <Link href={`/panel/exportar?trabajador=${t.id}`}>Exportar para inspección →</Link>
       </p>
       <p className="ayuda">
         App del celular: {t.user_id ? "vinculada" : t.email ? `pendiente (entrará con ${t.email})` : "sin correo"} ·

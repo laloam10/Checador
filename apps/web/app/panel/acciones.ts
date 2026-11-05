@@ -342,3 +342,30 @@ async function evidenciaAccion() {
     agente: h.get("user-agent")?.slice(0, 300) ?? null,
   };
 }
+
+// --- Verificación de archivos exportados ------------------------------------------------
+
+export type ResultadoVerificacion = { encontrado: boolean; mensaje: string };
+
+/** Busca una huella SHA-256 en el registro de exportaciones de la empresa. */
+export async function buscarExportacion(hashHex: string): Promise<ResultadoVerificacion> {
+  const ctx = await requierePanel();
+  if (!/^[0-9a-f]{64}$/.test(hashHex)) return { encontrado: false, mensaje: "Huella inválida." };
+  const { data } = await ctx.supabase
+    .from("exportaciones")
+    .select("id, formato, desde, hasta, generado_en, cadena_integra, trabajadores(nombre)")
+    .eq("empresa_id", ctx.empresa.id)
+    .eq("hash_archivo", `\\x${hashHex}`)
+    .maybeSingle();
+  if (!data) {
+    return {
+      encontrado: false,
+      mensaje: "Este archivo NO coincide con ninguna exportación emitida por la empresa: fue modificado o no proviene de Checador.",
+    };
+  }
+  const t = (Array.isArray(data.trabajadores) ? data.trabajadores[0] : data.trabajadores) as { nombre: string } | null;
+  return {
+    encontrado: true,
+    mensaje: `Archivo auténtico e íntegro: exportación ${data.id} (${data.formato}) de ${t?.nombre ?? "todos los trabajadores"}, periodo ${data.desde} al ${data.hasta}, emitida el ${aHoraLocal(data.generado_en, ctx.empresa.zonaHoraria).replace("T", " ")}.${data.cadena_integra ? "" : " ATENCIÓN: al emitirla la bitácora ya presentaba una alteración."}`,
+  };
+}

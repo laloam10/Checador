@@ -53,6 +53,15 @@ El registro hace **prueba plena** si se acredita que fue acordado entre las part
 
 La plantilla está en `lib/acuerdo.ts`. **Es una plantilla de referencia que debe revisar un abogado laboralista.** No incluye aceptación tácita (el silencio no implica conformidad), para no arriesgar la nulidad por renuncia de derechos (arts. 5 y 33 LFT). Cambiar la redacción exige incrementar `PLANTILLA_VERSION`.
 
+## Exportación para inspección o juicio (`/panel/exportar`)
+
+- **PDF por trabajador:** datos de la relación laboral, integridad de la bitácora al emitir, versiones del acuerdo con sus firmas, resumen semanal (con el acuerdo vigente y la conformidad de cada semana), registros incompletos y bitácora completa con la huella de cada registro.
+- **CSV bitácora:** una fila por registro (incluidas correcciones y anulaciones), con horas locales y UTC y la huella de cada registro.
+- **CSV resumen:** una fila por día y un total por semana, en minutos exactos y en h:mm.
+- El periodo se ajusta a **semanas completas** (lunes a domingo), porque el tiempo extra es semanal. Máximo 53 semanas; "todos" solo en CSV.
+- Incluye a trabajadores **dados de baja**: es el caso más común en un juicio.
+- Cada archivo queda en `exportaciones` (solo inserción) con la huella SHA-256 del archivo y de los datos, quién lo emitió y el estado de la cadena. En **Verificar un archivo**, la huella se calcula en el navegador y se compara con el registro: un cambio de un solo bit se detecta.
+
 ## Configuración
 
 ```bash
@@ -88,6 +97,7 @@ psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -f apps/web/e2e/s
 node apps/web/e2e/kiosco.e2e.mjs
 node apps/web/e2e/panel.e2e.mjs
 node apps/web/e2e/acuerdo.e2e.mjs
+node apps/web/e2e/exportar.e2e.mjs   # requiere pdftotext (poppler-utils)
 ```
 
 ## Limitaciones conocidas

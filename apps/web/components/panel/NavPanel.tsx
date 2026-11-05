@@ -7,6 +7,7 @@ const ENLACES = [
   { href: "/panel", etiqueta: "Tablero", exacto: true },
   { href: "/panel/trabajadores", etiqueta: "Trabajadores" },
   { href: "/panel/objeciones", etiqueta: "Objeciones" },
+  { href: "/panel/exportar", etiqueta: "Exportar" },
   { href: "/panel/centros", etiqueta: "Centros" },
   { href: "/panel/accesos", etiqueta: "Accesos" },
 ];
