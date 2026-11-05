@@ -24,7 +24,9 @@ Sistema de registro electrónico de jornada laboral (entradas y salidas) para PY
 6. ~~Esquema de base de datos en Supabase (`supabase/`).~~ Hecho. Pendientes en `supabase/README.md`.
 7. ~~PWA del trabajador (`apps/web`).~~ Hecho, con prueba de punta a punta.
 8. ~~Kiosco con PIN (`/kiosco`).~~ Hecho, con prueba de punta a punta.
-9. Panel del empleador: alta de trabajadores y PINs, kioscos, correcciones, acuerdos y revisión de objeciones.
+9. ~~Panel del empleador (`/panel`): alta de empresa, trabajadores, PINs, centros, accesos, correcciones y objeciones.~~ Hecho, con prueba de punta a punta.
+10. Acuerdo de registro electrónico con firma de ambas partes (prueba plena, art. 132 XXXIV).
+11. Exportación para inspección o juicio (PDF/CSV con hash).
 
 ## Desarrollo
 

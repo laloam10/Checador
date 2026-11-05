@@ -25,6 +25,21 @@ Seguridad:
 - El kiosco no muestra historial: en un dispositivo compartido solo aparece el nombre y la hora registrada.
 - Se pide a la pantalla que no se apague (Wake Lock).
 
+## Panel del empleador (`/panel`)
+
+1. **Alta de empresa** (`/alta-empresa`): el dueño entra con su correo, registra la razón social, el RFC opcional y su primer centro. Queda como propietario.
+2. **Tablero:** quién está trabajando o en pausa ahora, trabajadores activos, objeciones por atender y verificación de integridad de la bitácora.
+3. **Trabajadores:** alta, edición (incluida la jornada pactada por día, art. 58), PIN para el kiosco y baja. La baja nunca borra registros (art. 804).
+4. **Registros y correcciones:** la misma tabla semanal que ve el trabajador, más la bitácora completa con su origen (celular, kiosco o panel). Se puede **corregir una hora**, **anular** o **agregar una checada faltante**, siempre con motivo; el registro original se conserva y queda visible.
+5. **Objeciones:** semanas que el trabajador objetó y aún no vuelve a confirmar.
+6. **Centros:** zona horaria y si se puede salir durante la pausa (art. 64).
+7. **Accesos:** invitaciones por correo para administradores, supervisores y kioscos. Al entrar con ese correo, el acceso se activa solo.
+
+Permisos:
+- **Propietario:** todo.
+- **Administrador:** todo excepto invitar o quitar administradores.
+- **Supervisor:** consulta y corrige checadas, pero no da de alta trabajadores ni gestiona accesos.
+
 ## Configuración
 
 ```bash
@@ -58,6 +73,7 @@ npm run build -w @checador/web && npm run start -w @checador/web   # con .env.lo
 LUNES_PASADO=2026-10-26 node apps/web/e2e/pwa.e2e.mjs
 psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -f apps/web/e2e/semilla-kiosco.sql
 node apps/web/e2e/kiosco.e2e.mjs
+node apps/web/e2e/panel.e2e.mjs
 ```
 
 ## Limitaciones conocidas
@@ -67,5 +83,6 @@ node apps/web/e2e/kiosco.e2e.mjs
 - **Suplantación en el kiosco:** quien conozca el número y el PIN de un compañero puede checar por él. Para mitigarlo hace falta foto al checar o biometría (con consentimiento expreso, por la LFPDPPP).
 - **PINs en la cola sin conexión del kiosco:** las checadas pendientes guardan número y PIN en el dispositivo hasta enviarse; si una se rechaza, el PIN se borra. Mitigación: mantener el kiosco con la pantalla anclada y conexión estable.
 - **Cualquiera frente al kiosco podría cerrar la sesión** desde las herramientas del navegador. Conviene usar el modo de app fija de Android o el Acceso guiado de iPad.
-- Si un usuario está vinculado a varios empleadores, se muestra solo el primero.
+- Si un usuario pertenece a varias empresas, el panel y la PWA muestran solo la primera.
+- **El kiosco solo tiene teclado numérico:** los números de empleado con letras no podrán checar ahí (el panel lo advierte).
 - **La PWA pide correo.** Quien no tenga correo usa el kiosco con PIN. SMS o WhatsApp siguen como opción futura (con costo por mensaje).

@@ -126,3 +126,18 @@ describe("reconstruirTurnos", () => {
     expect(s.dias[0]).toMatchObject({ tipo: "nocturna", ordinariaMin: 7 * 60, extraDobleMin: 60 });
   });
 });
+
+import { localAInstante } from "../src/index.js";
+
+describe("localAInstante", () => {
+  it("es la inversa de aHoraLocal", () => {
+    expect(localAInstante("2027-01-04T08:00", "America/Mexico_City").toISOString()).toBe("2027-01-04T14:00:00.000Z");
+    expect(localAInstante("2027-01-04T22:30", "America/Tijuana").toISOString()).toBe("2027-01-05T06:30:00.000Z");
+    for (const local of ["2027-03-14T01:30", "2027-07-01T12:00", "2027-11-07T03:00"]) {
+      expect(aHoraLocal(localAInstante(local, "America/Tijuana"), "America/Tijuana")).toBe(local);
+    }
+  });
+  it("rechaza formatos inválidos", () => {
+    expect(() => localAInstante("2027-01-04 08:00", "America/Mexico_City")).toThrow(TypeError);
+  });
+});

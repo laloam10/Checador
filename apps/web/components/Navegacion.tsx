@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { leerPendientes } from "@/lib/cola";
 
-export function Navegacion() {
+export function Navegacion({ panel = false }: { panel?: boolean }) {
   const ruta = usePathname();
 
   async function salir() {
@@ -34,6 +34,7 @@ export function Navegacion() {
       <Link href="/pin" className={ruta.startsWith("/pin") ? "activo" : ""}>
         PIN
       </Link>
+      {panel && <Link href="/panel">Panel</Link>}
       <button className="enlace" onClick={salir}>
         Salir
       </button>

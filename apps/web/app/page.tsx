@@ -3,6 +3,8 @@ import { Checador } from "@/components/Checador";
 import { Navegacion } from "@/components/Navegacion";
 import { SinVinculo } from "@/components/SinVinculo";
 import { cargarEventos, misTrabajadores } from "@/lib/datos";
+import { miKiosco } from "@/lib/kiosco";
+import { membresiaPanel } from "@/lib/panel";
 import { crearClienteServidor, usuarioActual } from "@/lib/supabase/server";
 
 export default async function Inicio() {
@@ -12,7 +14,14 @@ export default async function Inicio() {
 
   const trabajadores = await misTrabajadores(supabase, userId);
   const trabajador = trabajadores[0];
-  if (!trabajador) return <SinVinculo />;
+  if (!trabajador) {
+    // No es trabajador: puede ser empleador o un kiosco.
+    if (await membresiaPanel(supabase, userId)) redirect("/panel");
+    if (await miKiosco(supabase, userId)) redirect("/kiosco");
+    return <SinVinculo />;
+  }
+
+  const esEmpleador = Boolean(await membresiaPanel(supabase, userId));
 
   // Últimas 36 h: suficiente para saber si hay un turno abierto (incluido uno nocturno).
   const ahora = new Date();
@@ -25,7 +34,7 @@ export default async function Inicio() {
 
   return (
     <main>
-      <Navegacion />
+      <Navegacion panel={esEmpleador} />
       <Checador
         trabajador={{
           id: trabajador.id,

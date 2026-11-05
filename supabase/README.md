@@ -7,6 +7,7 @@
 | `migrations/…01_esquema_inicial.sql` | Tablas, bitácora encadenada, acuerdos, firmas y conformidades |
 | `migrations/…02_rls.sql` | Funciones auxiliares, `crear_empresa()`, `vincular_mi_cuenta()`, `verificar_cadena()` y políticas RLS |
 | `migrations/…06…01_kiosco_pin.sql` | PIN (bcrypt) con bloqueo por intentos, `kiosco_identificar()`, `kiosco_checar()`, pausa según el centro |
+| `migrations/…07…01_panel_invitaciones.sql` | Invitaciones por correo (admin, supervisor, kiosco), `miembros_de_empresa()`, `trabajadores_con_pin()` |
 
 ### Modelo
 
@@ -61,5 +62,4 @@ PGHOST=localhost PGUSER=postgres ./supabase/tests/run-local.sh
 ## Pendientes conocidos
 
 - **Evidencia (IP y agente de usuario):** la PWA ya la llena desde el servidor (`/api/eventos`), pero la base todavía acepta inserciones directas con evidencia enviada por el cliente. Una opción es mover las inserciones a una función `SECURITY DEFINER` que solo pueda llamar el servidor.
-- **Invitaciones:** alta de supervisores y vinculación del trabajador con su cuenta.
 - **NOM-151:** constancias de conservación para acuerdos y cierres de periodo (fase 2).

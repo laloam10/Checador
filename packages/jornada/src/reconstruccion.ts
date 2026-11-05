@@ -224,3 +224,24 @@ function compararId(a: number | string, b: number | string): number {
   if (typeof a === "number" && typeof b === "number") return a - b;
   return String(a).localeCompare(String(b), "en", { numeric: true });
 }
+
+/**
+ * Convierte una hora local del centro de trabajo (`YYYY-MM-DDTHH:mm`) al instante
+ * correspondiente. Inversa de `aHoraLocal`. Si la hora no existe o es ambigua por un
+ * cambio de horario, se usa el primer instante válido.
+ */
+export function localAInstante(local: FechaHoraLocal, zonaHoraria: string): Date {
+  const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(local);
+  if (!m) throw new TypeError(`Hora local inválida: "${local}" (se espera YYYY-MM-DDTHH:mm)`);
+  const [, a, mes, d, h, min] = m.map(Number) as [number, number, number, number, number, number];
+  const comoUtc = Date.UTC(a, mes - 1, d, h, min);
+  // Diferencia entre la hora de pared en la zona y UTC para un instante dado.
+  const desfase = (instante: number) => {
+    const p = aHoraLocal(new Date(instante), zonaHoraria);
+    const [fa, fm, fd, fh, fmin] = p.split(/[-T:]/).map(Number) as [number, number, number, number, number];
+    return Date.UTC(fa, fm - 1, fd, fh, fmin) - instante;
+  };
+  let instante = comoUtc - desfase(comoUtc);
+  instante = comoUtc - desfase(instante); // segunda pasada para cambios de horario
+  return new Date(instante);
+}
