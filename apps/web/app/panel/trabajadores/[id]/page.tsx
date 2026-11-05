@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { aHoraLocal } from "@checador/jornada";
 import { FormAccion } from "@/components/panel/FormAccion";
 import { CamposTrabajador } from "@/components/panel/CamposTrabajador";
+import { SeccionAcuerdo } from "@/components/panel/SeccionAcuerdo";
 import { esGestor, requierePanel } from "@/lib/panel";
 import { asignarPin, darDeBaja, guardarTrabajador } from "../../acciones";
 
@@ -40,6 +41,8 @@ export default async function FichaTrabajador({ params }: { params: Promise<{ id
           Dado de baja el {t.fecha_baja}. Ya no puede checar; sus registros se conservan como exige el art. 804 de la LFT.
         </p>
       )}
+
+      {!t.fecha_baja && <SeccionAcuerdo ctx={ctx} trabajadorId={t.id} gestor={gestor} />}
 
       {gestor && !t.fecha_baja && (
         <>

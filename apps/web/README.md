@@ -40,6 +40,19 @@ Permisos:
 - **Administrador:** todo excepto invitar o quitar administradores.
 - **Supervisor:** consulta y corrige checadas, pero no da de alta trabajadores ni gestiona accesos.
 
+## Acuerdo de registro electrónico (art. 132 fr. XXXIV)
+
+El registro hace **prueba plena** si se acredita que fue acordado entre las partes. Flujo:
+
+1. En la ficha del trabajador, el empleador **revisa el texto** (generado desde los datos actuales: método de registro, jornada pactada, descanso, regla de pausa) y **firma primero**.
+2. La persona trabajadora lo firma de una de tres formas:
+   - **App:** aviso en su pantalla de inicio y sección **Acuerdo**, con su cuenta verificada por correo.
+   - **Kiosco:** tras su número y PIN aparece "Tienes un acuerdo por firmar" (4 minutos para leer).
+   - **Papel:** el empleador imprime el acuerdo (con folio y huella SHA-256) y registra la firma autógrafa indicando dónde resguarda el original.
+3. Con ambas firmas queda **vigente**. Si cambian la jornada, el descanso, la pausa o el método, el panel avisa y propone una nueva versión; la anterior sigue vigente hasta que ambos firmen la nueva.
+
+La plantilla está en `lib/acuerdo.ts`. **Es una plantilla de referencia que debe revisar un abogado laboralista.** No incluye aceptación tácita (el silencio no implica conformidad), para no arriesgar la nulidad por renuncia de derechos (arts. 5 y 33 LFT). Cambiar la redacción exige incrementar `PLANTILLA_VERSION`.
+
 ## Configuración
 
 ```bash
@@ -74,6 +87,7 @@ LUNES_PASADO=2026-10-26 node apps/web/e2e/pwa.e2e.mjs
 psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -f apps/web/e2e/semilla-kiosco.sql
 node apps/web/e2e/kiosco.e2e.mjs
 node apps/web/e2e/panel.e2e.mjs
+node apps/web/e2e/acuerdo.e2e.mjs
 ```
 
 ## Limitaciones conocidas

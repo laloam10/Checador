@@ -32,7 +32,8 @@ export async function miKiosco(supabase: Cliente, userId: string): Promise<Kiosc
 /** Respuesta de las funciones kiosco_* de la base. */
 export interface RespuestaKiosco {
   ok: boolean;
-  codigo?: "NO_ES_KIOSCO" | "KIOSCO_BLOQUEADO" | "TRABAJADOR_BLOQUEADO" | "CREDENCIALES" | "TIPO" | "RECHAZADO";
+  codigo?: "NO_ES_KIOSCO" | "KIOSCO_BLOQUEADO" | "TRABAJADOR_BLOQUEADO" | "CREDENCIALES" | "TIPO" | "RECHAZADO" | "SIN_ACUERDO";
+  acuerdo_pendiente?: { id: string; version: number; contenido: string; folio: string } | null;
   error?: string;
   nombre?: string;
   duplicado?: boolean;

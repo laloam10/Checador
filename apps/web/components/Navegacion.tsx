@@ -34,6 +34,9 @@ export function Navegacion({ panel = false }: { panel?: boolean }) {
       <Link href="/pin" className={ruta.startsWith("/pin") ? "activo" : ""}>
         PIN
       </Link>
+      <Link href="/acuerdo" className={ruta.startsWith("/acuerdo") ? "activo" : ""}>
+        Acuerdo
+      </Link>
       {panel && <Link href="/panel">Panel</Link>}
       <button className="enlace" onClick={salir}>
         Salir

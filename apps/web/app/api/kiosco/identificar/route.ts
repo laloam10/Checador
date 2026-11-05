@@ -45,6 +45,7 @@ export async function POST(request: NextRequest) {
     nombre: r.nombre,
     estado,
     desde: enCurso?.inicio.slice(11) ?? null,
+    acuerdoPendiente: r.acuerdo_pendiente ?? null,
     horaServidor: new Date().toISOString(),
   });
 }

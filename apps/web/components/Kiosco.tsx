@@ -17,7 +17,8 @@ type Paso =
   | { tipo: "numero" }
   | { tipo: "pin" }
   | { tipo: "verificando" }
-  | { tipo: "acciones"; nombre: string; estado: "fuera" | "trabajando" | "en_pausa"; desde: string | null }
+  | { tipo: "acciones"; nombre: string; estado: "fuera" | "trabajando" | "en_pausa"; desde: string | null; acuerdo: AcuerdoPendiente | null }
+  | { tipo: "acuerdo"; nombre: string; acuerdo: AcuerdoPendiente }
   | { tipo: "acciones-sin-red" }
   | { tipo: "listo"; titulo: string; detalle: string; aviso?: boolean };
 
@@ -28,7 +29,15 @@ const ETIQUETA: Record<TipoCaptura, string> = {
   fin_pausa: "Fin de pausa",
 };
 
+interface AcuerdoPendiente {
+  id: string;
+  version: number;
+  contenido: string;
+  folio: string;
+}
+
 const INACTIVIDAD_MS = 20_000;
+const LECTURA_ACUERDO_MS = 4 * 60_000;
 const CONFIRMACION_MS = 4_000;
 
 export function Kiosco({ empresa, centro, zonaHoraria }: { empresa: string; centro: string | null; zonaHoraria: string }) {
@@ -93,7 +102,7 @@ export function Kiosco({ empresa, centro, zonaHoraria }: { empresa: string; cent
   useEffect(() => {
     if (temporizador.current) clearTimeout(temporizador.current);
     if (paso.tipo === "numero" && !numero) return;
-    const espera = paso.tipo === "listo" ? CONFIRMACION_MS : INACTIVIDAD_MS;
+    const espera = paso.tipo === "listo" ? CONFIRMACION_MS : paso.tipo === "acuerdo" ? LECTURA_ACUERDO_MS : INACTIVIDAD_MS;
     temporizador.current = setTimeout(reiniciar, espera);
     return () => {
       if (temporizador.current) clearTimeout(temporizador.current);
@@ -120,6 +129,7 @@ export function Kiosco({ empresa, centro, zonaHoraria }: { empresa: string; cent
       nombre?: string;
       estado?: "fuera" | "trabajando" | "en_pausa";
       desde?: string | null;
+      acuerdoPendiente?: AcuerdoPendiente | null;
       error?: string;
       horaServidor?: string;
     };
@@ -135,7 +145,13 @@ export function Kiosco({ empresa, centro, zonaHoraria }: { empresa: string; cent
       setPaso({ tipo: "numero" });
       return;
     }
-    setPaso({ tipo: "acciones", nombre: c.nombre ?? "", estado: c.estado ?? "fuera", desde: c.desde ?? null });
+    setPaso({
+      tipo: "acciones",
+      nombre: c.nombre ?? "",
+      estado: c.estado ?? "fuera",
+      desde: c.desde ?? null,
+      acuerdo: c.acuerdoPendiente ?? null,
+    });
   }
 
   async function checar(tipo: TipoCaptura) {
@@ -165,6 +181,32 @@ export function Kiosco({ empresa, centro, zonaHoraria }: { empresa: string; cent
     setNumero("");
     setPin("");
     setEnviando(false);
+  }
+
+  async function firmarAcuerdo(acuerdo: AcuerdoPendiente, nombre: string) {
+    if (enviando) return;
+    setEnviando(true);
+    try {
+      const r = await fetch("/api/kiosco/firmar-acuerdo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ numero, pin, acuerdoId: acuerdo.id, acepto: true }),
+      });
+      const c = (await r.json().catch(() => ({}))) as { error?: string };
+      if (!r.ok) {
+        setError(c.error ?? "No se pudo registrar la firma.");
+        reiniciar();
+        return;
+      }
+      setPaso({ tipo: "listo", titulo: "Acuerdo firmado", detalle: `${nombre} · versión ${acuerdo.version} · folio ${acuerdo.folio}` });
+      setNumero("");
+      setPin("");
+    } catch {
+      setError("Sin conexión: el acuerdo solo se puede firmar con internet.");
+      reiniciar();
+    } finally {
+      setEnviando(false);
+    }
   }
 
   const rechazados = pendientes.filter((p) => p.rechazo);
@@ -224,7 +266,26 @@ export function Kiosco({ empresa, centro, zonaHoraria }: { empresa: string; cent
             {paso.estado === "en_pausa" && (
               <button className="principal" disabled={enviando} onClick={() => checar("fin_pausa")}>Terminar pausa</button>
             )}
+            {paso.acuerdo && (
+              <button className="secundario" onClick={() => setPaso({ tipo: "acuerdo", nombre: paso.nombre, acuerdo: paso.acuerdo! })}>
+                Tienes un acuerdo por firmar
+              </button>
+            )}
             <button className="enlace" onClick={reiniciar}>Cancelar</button>
+          </div>
+        </section>
+      )}
+
+      {paso.tipo === "acuerdo" && (
+        <section className="kiosco-paso">
+          <h1>Acuerdo de registro de jornada</h1>
+          <p className="ayuda">Versión {paso.acuerdo.version} · folio {paso.acuerdo.folio}. Léelo con calma.</p>
+          <pre className="texto-acuerdo">{paso.acuerdo.contenido}</pre>
+          <div className="acciones">
+            <button className="principal" disabled={enviando} onClick={() => firmarAcuerdo(paso.acuerdo, paso.nombre)}>
+              Leí el acuerdo y lo firmo con mi PIN
+            </button>
+            <button className="enlace" onClick={reiniciar}>Ahora no</button>
           </div>
         </section>
       )}

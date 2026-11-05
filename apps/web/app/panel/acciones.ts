@@ -1,8 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { localAInstante } from "@checador/jornada";
+import { aHoraLocal, localAInstante } from "@checador/jornada";
+import { generarTextoAcuerdo } from "@/lib/acuerdo";
+import { datosActuales } from "@/lib/acuerdosDatos";
 import { trabajadorPorId } from "@/lib/datos";
 import { requierePanel } from "@/lib/panel";
 import { crearClienteServidor, usuarioActual } from "@/lib/supabase/server";
@@ -271,4 +274,71 @@ export async function verificarIntegridad(_: Estado): Promise<Estado> {
   return data === null
     ? ok("La bitácora está íntegra: ningún registro ha sido alterado.")
     : fallo(`ALERTA: la bitácora fue alterada a partir del registro n.º ${data}. Contacta a soporte.`);
+}
+
+// --- Acuerdo de registro electrónico (art. 132 XXXIV) -------------------------------------
+
+/** Genera la siguiente versión del acuerdo con los datos actuales y la firma como empleador. */
+export async function generarYFirmarAcuerdo(_: Estado, fd: FormData): Promise<Estado> {
+  const ctx = await requierePanel();
+  const trabajadorId = texto(fd, "trabajador_id");
+  const datos = await datosActuales(ctx.supabase, trabajadorId);
+  if (!datos || datos.empresaId !== ctx.empresa.id) return fallo("Trabajador no encontrado.");
+  if (fd.get("confirmo") !== "on") return fallo("Confirma que revisaste el texto del acuerdo.");
+
+  const { data: ultima } = await ctx.supabase
+    .from("acuerdos").select("version").eq("trabajador_id", trabajadorId)
+    .order("version", { ascending: false }).limit(1).maybeSingle();
+  const version = (ultima?.version ?? 0) + 1;
+  const hoy = aHoraLocal(new Date(), datos.zonaHoraria).slice(0, 10);
+  const contenido = generarTextoAcuerdo(datos.base(version, hoy));
+
+  const { data: acuerdo, error } = await ctx.supabase
+    .from("acuerdos")
+    .insert({
+      empresa_id: ctx.empresa.id,
+      trabajador_id: trabajadorId,
+      version,
+      contenido,
+      dia_descanso: datos.diaDescanso,
+      jornada_pactada_min: datos.jornadaPactadaMin,
+    })
+    .select("id")
+    .single();
+  if (error) return fallo(traducir(error));
+  const { error: errFirma } = await ctx.supabase
+    .from("firmas_acuerdo")
+    .insert({ empresa_id: ctx.empresa.id, acuerdo_id: acuerdo.id, firmante: "empleador", evidencia: await evidenciaAccion() });
+  if (errFirma) return fallo(traducir(errFirma));
+  refrescar();
+  return ok(`Acuerdo v${version} firmado por la empresa. Falta la firma de la persona trabajadora.`);
+}
+
+/** Registra que la persona trabajadora firmó en papel el acuerdo pendiente. */
+export async function registrarFirmaAutografa(_: Estado, fd: FormData): Promise<Estado> {
+  const ctx = await requierePanel();
+  const resguardo = texto(fd, "resguardo");
+  const fecha = texto(fd, "fecha_firma");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return fallo("Indica la fecha en que se firmó.");
+  if (!resguardo) return fallo("Indica dónde se resguarda el original firmado.");
+  if (fd.get("confirmo") !== "on") return fallo("Confirma que el papel firmado tiene el mismo folio.");
+  const { error } = await ctx.supabase.from("firmas_acuerdo").insert({
+    empresa_id: ctx.empresa.id,
+    acuerdo_id: texto(fd, "acuerdo_id"),
+    firmante: "trabajador",
+    modalidad: "autografa",
+    evidencia: { ...(await evidenciaAccion()), resguardo, fecha_firma: fecha },
+  });
+  if (error) return fallo(traducir(error));
+  refrescar();
+  return ok("Firma autógrafa registrada. El acuerdo queda vigente.");
+}
+
+/** IP y agente de usuario de la petición de la Server Action. */
+async function evidenciaAccion() {
+  const h = await headers();
+  return {
+    ip: h.get("x-forwarded-for")?.split(",")[0]?.trim() ?? h.get("x-real-ip") ?? null,
+    agente: h.get("user-agent")?.slice(0, 300) ?? null,
+  };
 }
