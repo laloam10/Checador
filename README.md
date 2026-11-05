@@ -10,6 +10,7 @@ Sistema de registro electrónico de jornada laboral (entradas y salidas) para PY
 |---|---|
 | [docs/analisis-legal.md](docs/analisis-legal.md) | Requisitos legales, fuentes, discrepancias y preguntas abiertas |
 | [docs/mvp.md](docs/mvp.md) | Alcance propuesto del producto mínimo, riesgos y decisiones pendientes |
+| [docs/stack.md](docs/stack.md) | Stack técnico propuesto (ADR-001) |
 
 ## Próximos pasos
 

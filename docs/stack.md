@@ -1,0 +1,65 @@
+# Stack técnico (ADR-001)
+
+> **Estado:** propuesta, pendiente de confirmar. Depende de quién desarrollará y mantendrá el producto (ver "Supuestos").
+
+## Requisitos que deciden el stack
+
+Vienen de [analisis-legal.md](analisis-legal.md) y [mvp.md](mvp.md):
+
+1. **Multiempresa (SaaS):** muchas PYMEs en una sola instalación, con aislamiento estricto de datos entre clientes.
+2. **Captura desde celulares Android de gama baja y desde un kiosco compartido**, sin hardware propio.
+3. **Hora del servidor como fuente de verdad**, con captura sin conexión marcada como "diferida".
+4. **Bitácora inmutable** que se pueda verificar: si alguien altera un registro, debe detectarse.
+5. **Firma electrónica** del acuerdo y de las conformidades, con evidencia (prueba plena, art. 132 XXXIV).
+6. **Motor de cálculo** con las tablas de transición 2026 a 2030. Es la parte con más riesgo de errores.
+7. **Exportación PDF/CSV con hash** para inspección o juicio.
+8. **Costo bajo y equipo pequeño:** una o dos personas.
+
+## Decisión propuesta
+
+| Capa | Elección | Por qué |
+|---|---|---|
+| Lenguaje | **TypeScript** en todo el stack | Un solo lenguaje en frontend, backend y motor de cálculo; tipos estrictos para las reglas legales |
+| Web y API | **Next.js** (App Router) | Panel del patrón, portal del trabajador y kiosco en un solo proyecto |
+| App del trabajador | **PWA** (no app nativa) | Sin tiendas de apps ni costo de publicación. Se instala desde el navegador. Con IndexedDB guarda registros sin conexión |
+| Base de datos | **PostgreSQL** | Row Level Security para aislar a cada cliente; permisos para que la bitácora solo acepte inserciones; transacciones fiables |
+| ORM | **Drizzle** | SQL explícito y migraciones legibles. Las políticas RLS y los triggers se escriben en SQL de todos modos |
+| Autenticación | **Auth.js** (o Supabase Auth si se usa Supabase) | Patrón con correo y contraseña; trabajador con código o enlace mágico, porque muchos no usan correo |
+| Motor de cálculo | **Paquete TypeScript puro** (`packages/jornada`), sin dependencias, con pruebas en **Vitest** | Se prueba de forma aislada con casos tomados directamente de los arts. 59, 66 y 68 y de los transitorios |
+| PDF | **pdf-lib** o render del lado del servidor | Constancias y reportes con el hash SHA-256 impreso |
+| Hosting | **Vercel** para la app y **Neon o Supabase** para Postgres, con la región más cercana disponible | Costo casi cero al inicio. La LFPDPPP no obliga a guardar los datos en México, pero hay que declararlo en el aviso de privacidad |
+| Notificaciones | Correo transaccional (Resend o similar) en el MVP. **WhatsApp** después | WhatsApp Business API tiene costo por conversación. Para empezar, el recordatorio de conformidad puede ser un correo o un aviso dentro de la app |
+
+### Integridad de la bitácora
+
+- Tabla `eventos` de **solo inserción**: el rol de la aplicación no tiene permisos `UPDATE` ni `DELETE`.
+- Cada evento guarda `hash = SHA-256(evento + hash_anterior)` por empresa, formando una **cadena de hashes**. Si alguien altera un registro, la cadena se rompe y se detecta.
+- Las correcciones no modifican el evento original: se agrega un nuevo evento que lo corrige, con motivo, autor y valor anterior.
+- **Fase 2 (opcional):** obtener una constancia de conservación **NOM-151-SCFI-2016** con un Prestador de Servicios de Certificación para los acuerdos y los cierres periódicos. No lo exige la LFT, pero da un sello de tiempo de un tercero reconocido y refuerza la prueba. Tiene costo por constancia, así que podría ser una función del plan premium.
+
+### Captura sin conexión
+
+- El dispositivo guarda la hora local y la diferencia con la hora del servidor, medida en la última sincronización.
+- Al sincronizar, el servidor guarda **ambas horas** y marca el registro como "diferido". Nunca se reescribe la hora original.
+- Limitación: en iPhone, una PWA no sincroniza en segundo plano; lo hace al abrirse. Hay que documentarlo para el cliente.
+
+## Alternativas descartadas
+
+- **App nativa (React Native o Flutter):** dobla el trabajo de publicación y mantenimiento. Solo vale la pena si se vuelve indispensable la biometría o el GPS en segundo plano, y ninguno está en el MVP.
+- **Laravel (PHP):** buena opción **si quien desarrolla ya domina PHP**. Es la alternativa real a esta propuesta. Ver "Supuestos".
+- **Firebase:** NoSQL hace más difícil la integridad relacional y la bitácora con permisos de solo inserción. Además, depende de un solo proveedor.
+- **Bajo código (Bubble, AppSheet, etc.):** no permite garantizar inmutabilidad ni cadena de hashes, que son el núcleo del valor probatorio.
+
+## Supuestos (a confirmar)
+
+1. El desarrollo lo harán una o dos personas, con apoyo de Claude Code.
+2. Nadie del equipo tiene una experiencia fuerte en otro stack que justifique cambiarlo, por ejemplo PHP o Laravel.
+3. Presupuesto de infraestructura inicial menor a 50 USD al mes.
+
+## Orden de construcción sugerido
+
+1. `packages/jornada`: motor de cálculo con pruebas. No depende de la base de datos ni de la interfaz, y es donde un error cuesta más caro.
+2. Esquema de Postgres: empresas, trabajadores, eventos (solo inserción), acuerdos y conformidades; políticas RLS.
+3. Captura web (kiosco y PWA) y sincronización.
+4. Acuerdo y conformidad con firma.
+5. Reportes y exportación con hash.
