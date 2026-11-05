@@ -1,0 +1,18 @@
+{
+  "name": "@checador/jornada",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Motor de cálculo de jornada y tiempo extraordinario conforme a la LFT (reforma DOF 01-05-2026)",
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}

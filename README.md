@@ -17,4 +17,12 @@ Sistema de registro electrónico de jornada laboral (entradas y salidas) para PY
 1. ~~Verificar el texto literal del decreto y sus transitorios.~~ Hecho (2026-11-05).
 2. Vigilar en el DOF la publicación de las disposiciones generales de la STPS.
 3. Validar el análisis con un abogado laboralista.
-4. Definir el stack técnico, después de cerrar los puntos 1 a 3.
+4. ~~Definir el stack técnico.~~ Hecho: ver `docs/stack.md`.
+5. Motor de cálculo (`packages/jornada`): primera versión con pruebas. Siguiente: esquema de base de datos.
+
+## Desarrollo
+
+```bash
+npm install
+npm test
+```

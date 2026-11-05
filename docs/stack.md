@@ -1,6 +1,6 @@
 # Stack técnico (ADR-001)
 
-> **Estado:** propuesta, pendiente de confirmar. Depende de quién desarrollará y mantendrá el producto (ver "Supuestos").
+> **Estado:** aceptada (2026-11-05). Desarrollo a cargo del dueño del producto con Claude Code.
 
 ## Requisitos que deciden el stack
 
