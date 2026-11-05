@@ -31,6 +31,9 @@ export function Navegacion() {
       <Link href="/registros" className={ruta.startsWith("/registros") ? "activo" : ""}>
         Mis registros
       </Link>
+      <Link href="/pin" className={ruta.startsWith("/pin") ? "activo" : ""}>
+        PIN
+      </Link>
       <button className="enlace" onClick={salir}>
         Salir
       </button>

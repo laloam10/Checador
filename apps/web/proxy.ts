@@ -33,7 +33,7 @@ export async function proxy(request: NextRequest) {
   if (!data?.claims && !publica) {
     const url = request.nextUrl.clone();
     url.pathname = "/entrar";
-    url.search = "";
+    url.search = ruta === "/" ? "" : `?siguiente=${encodeURIComponent(ruta)}`;
     return NextResponse.redirect(url);
   }
   return response;

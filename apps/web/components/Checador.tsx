@@ -37,7 +37,6 @@ export function Checador({ trabajador, eventos }: { trabajador: TrabajadorClient
   const [pendientes, setPendientes] = useState<Pendiente[]>([]);
   const [enviando, setEnviando] = useState(false);
   const [mensaje, setMensaje] = useState<{ tipo: "ok" | "aviso" | "error"; texto: string } | null>(null);
-  const [puedeSalir, setPuedeSalir] = useState(true);
   const [reloj, setReloj] = useState<string>("");
   const [enLinea, setEnLinea] = useState(true);
 
@@ -83,7 +82,7 @@ export function Checador({ trabajador, eventos }: { trabajador: TrabajadorClient
         id: `p:${p.idCliente}`,
         tipo: p.tipo,
         horaEfectiva: p.horaDispositivo,
-        puedeSalir: p.puedeSalir ?? null,
+        puedeSalir: null,
         diferido: true,
         pendiente: true,
         ...(p.rechazo ? { rechazo: p.rechazo } : {}),
@@ -105,7 +104,6 @@ export function Checador({ trabajador, eventos }: { trabajador: TrabajadorClient
       idCliente: crypto.randomUUID(),
       trabajadorId: trabajador.id,
       tipo,
-      ...(tipo === "inicio_pausa" ? { puedeSalir } : {}),
     };
     const hora = ahoraServidor().toISOString();
     try {
@@ -169,10 +167,6 @@ export function Checador({ trabajador, eventos }: { trabajador: TrabajadorClient
             <button className="secundario" disabled={enviando} onClick={() => checar("inicio_pausa")}>
               Iniciar pausa
             </button>
-            <label className="casilla">
-              <input type="checkbox" checked={puedeSalir} onChange={(e) => setPuedeSalir(e.target.checked)} />
-              Puedo salir del lugar durante la pausa
-            </label>
             <button className="principal salida" disabled={enviando} onClick={() => checar("salida")}>
               Registrar salida
             </button>

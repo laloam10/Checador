@@ -44,7 +44,9 @@ export default function Entrar() {
       return;
     }
     await supabase.rpc("vincular_mi_cuenta");
-    window.location.href = "/";
+    const siguiente = new URLSearchParams(window.location.search).get("siguiente");
+    // Solo rutas internas (evita redirecciones abiertas a otros sitios).
+    window.location.href = siguiente && /^\/(?![/\\])/.test(siguiente) ? siguiente : "/";
   }
 
   return (

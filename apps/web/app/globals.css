@@ -72,3 +72,21 @@ input, textarea { font: inherit; padding: 0.75rem; border: 1px solid var(--borde
 .resumen { display: grid; grid-template-columns: 1fr auto; gap: 0.35rem 1rem; margin-top: 1rem; }
 .resumen dd { margin: 0; font-weight: 600; text-align: right; }
 .comprobante { font-family: ui-monospace, monospace; font-size: 0.8rem; word-break: break-all; }
+
+/* ---- Kiosco ---- */
+.kiosco { max-width: 30rem; text-align: center; min-height: 100dvh; display: flex; flex-direction: column; }
+.kiosco-cabecera { display: flex; justify-content: center; gap: 0.5rem; align-items: center; padding: 0.75rem 0; color: var(--gris); font-weight: 600; }
+.kiosco .reloj { margin-top: 0; }
+.kiosco-paso { display: grid; gap: 1rem; }
+.kiosco-paso h1 { margin: 0.5rem 0 0; font-size: 1.6rem; }
+.pantalla-numero { display: block; font-size: 2.4rem; letter-spacing: 0.4rem; min-height: 3.4rem; font-variant-numeric: tabular-nums; border-bottom: 2px solid var(--borde); }
+.teclado { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; }
+.tecla { background: white; border: 1px solid var(--borde); font-size: 1.8rem; padding: 1rem 0; font-weight: 600; touch-action: manipulation; }
+.tecla:active { background: var(--verde-claro); }
+.tecla-ok { background: var(--verde); color: white; }
+.tecla-borrar { color: var(--gris); }
+.acciones-2 { grid-template-columns: 1fr 1fr; }
+.kiosco-listo { padding: 2rem 0; color: var(--verde); }
+.kiosco-listo.listo-aviso { color: var(--ambar); }
+.palomita { font-size: 4rem; line-height: 1; }
+.kiosco-pie { margin-top: auto; padding: 1rem 0; font-size: 0.85rem; color: var(--gris); text-align: left; }

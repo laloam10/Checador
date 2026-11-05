@@ -8,7 +8,6 @@ const RE_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 interface Cuerpo {
   trabajadorId?: unknown;
   tipo?: unknown;
-  puedeSalir?: unknown;
   idCliente?: unknown;
   diferido?: unknown;
   horaDispositivo?: unknown;
@@ -26,11 +25,10 @@ export async function POST(request: NextRequest) {
   } catch {
     return error(400, "Solicitud inválida.");
   }
-  const { trabajadorId, tipo, puedeSalir, idCliente, diferido, horaDispositivo } = cuerpo;
+  const { trabajadorId, tipo, idCliente, diferido, horaDispositivo } = cuerpo;
   if (typeof trabajadorId !== "string" || !RE_UUID.test(trabajadorId)) return error(400, "Trabajador inválido.");
   if (typeof tipo !== "string" || !TIPOS.has(tipo)) return error(400, "Tipo de evento inválido.");
   if (typeof idCliente !== "string" || !RE_UUID.test(idCliente)) return error(400, "Identificador inválido.");
-  if (tipo === "inicio_pausa" && typeof puedeSalir !== "boolean") return error(400, "Indica si puedes salir durante la pausa.");
   const esDiferido = diferido === true;
   if (esDiferido && (typeof horaDispositivo !== "string" || Number.isNaN(Date.parse(horaDispositivo)))) {
     return error(400, "Hora del dispositivo inválida.");
@@ -50,7 +48,7 @@ export async function POST(request: NextRequest) {
     trabajador_id: trabajadorId,
     tipo,
     origen: "pwa",
-    puede_salir: tipo === "inicio_pausa" ? puedeSalir : null,
+    // puede_salir lo impone el centro de trabajo en la base (art. 64).
     diferido: esDiferido,
     hora_dispositivo: esDiferido ? horaDispositivo : null,
     id_cliente: idCliente,

@@ -16,7 +16,6 @@ export interface Pendiente {
   idCliente: string;
   trabajadorId: string;
   tipo: TipoCaptura;
-  puedeSalir?: boolean;
   horaDispositivo: string;
   /** Mensaje del servidor si la rechazó de forma definitiva. */
   rechazo?: string;

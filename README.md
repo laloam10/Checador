@@ -23,8 +23,8 @@ Sistema de registro electrónico de jornada laboral (entradas y salidas) para PY
 5. ~~Motor de cálculo (`packages/jornada`).~~ Hecho.
 6. ~~Esquema de base de datos en Supabase (`supabase/`).~~ Hecho. Pendientes en `supabase/README.md`.
 7. ~~PWA del trabajador (`apps/web`).~~ Hecho, con prueba de punta a punta.
-8. Panel del empleador: alta de trabajadores, correcciones, acuerdos y revisión de objeciones.
-9. Kiosco con PIN o QR.
+8. ~~Kiosco con PIN (`/kiosco`).~~ Hecho, con prueba de punta a punta.
+9. Panel del empleador: alta de trabajadores y PINs, kioscos, correcciones, acuerdos y revisión de objeciones.
 
 ## Desarrollo
 

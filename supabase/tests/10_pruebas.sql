@@ -73,12 +73,12 @@ select tests.debe_fallar(format(
 select tests.debe_fallar(format(
   $$insert into public.eventos (empresa_id, trabajador_id, tipo, origen, motivo, hora_efectiva) values (%L, %L, 'entrada', 'panel', 'x', now())$$,
   :'empresa_a', :'trab_a'), 'trabajador usa origen panel');
-select tests.debe_fallar(format(
-  $$insert into public.eventos (empresa_id, trabajador_id, tipo, origen) values (%L, %L, 'inicio_pausa', 'pwa')$$,
-  :'empresa_a', :'trab_a'), 'pausa sin indicar si puede salir (art. 64)');
-
-insert into public.eventos (empresa_id, trabajador_id, tipo, origen, puede_salir)
-  values (:'empresa_a', :'trab_a', 'inicio_pausa', 'pwa', true);
+-- La PWA no decide si puede salir durante la pausa: lo impone el centro (art. 64).
+insert into public.eventos (empresa_id, trabajador_id, tipo, origen)
+  values (:'empresa_a', :'trab_a', 'inicio_pausa', 'pwa');
+select tests.afirmar(
+  (select puede_salir from public.eventos where empresa_id = :'empresa_a' and secuencia = 2),
+  'la pausa toma la configuración del centro de trabajo (art. 64)');
 
 -- Captura diferida (sin conexión).
 insert into public.eventos (empresa_id, trabajador_id, tipo, origen, diferido, hora_dispositivo)
@@ -102,9 +102,16 @@ select tests.afirmar((select count(*) = 0 from public.eventos where trabajador_i
 
 -- =============================================================================
 \echo '--- Kiosco'
+-- El kiosco no inserta directo: solo con kiosco_checar() y el PIN del trabajador.
+select set_config('request.jwt.claim.sub', :'u_prop', false) \gset
+select public.asignar_pin(:'trab_a2', '2580');
 select set_config('request.jwt.claim.sub', :'u_kiosco', false) \gset
-insert into public.eventos (empresa_id, trabajador_id, tipo, origen)
-  values (:'empresa_a', :'trab_a2', 'entrada', 'kiosco');
+select tests.debe_fallar(format(
+  $$insert into public.eventos (empresa_id, trabajador_id, tipo, origen) values (%L, %L, 'entrada', 'kiosco')$$,
+  :'empresa_a', :'trab_a2'), 'el kiosco inserta eventos sin PIN');
+select tests.afirmar(
+  (public.kiosco_checar('002', '2580', 'entrada', gen_random_uuid()) ->> 'ok')::boolean,
+  'el kiosco registra con número de empleado y PIN');
 select tests.afirmar((select count(*) = 0 from public.eventos), 'el kiosco no puede consultar la bitácora');
 select tests.debe_fallar(format(
   $$insert into public.eventos (empresa_id, trabajador_id, tipo, origen, corrige_evento_id, motivo, hora_efectiva) values (%L, %L, 'correccion', 'panel', 1, 'x', now())$$,
@@ -125,8 +132,8 @@ select tests.debe_fallar(format(
   $$insert into public.eventos (empresa_id, trabajador_id, tipo, origen, motivo, hora_efectiva) values (%L, %L, 'salida', 'panel', 'olvidó checar', now() + interval '1 hour')$$,
   :'empresa_a', :'trab_a'), 'evento manual con hora futura');
 select tests.debe_fallar(format(
-  $$insert into public.eventos (empresa_id, trabajador_id, tipo, origen, corrige_evento_id, motivo, hora_efectiva) values (%L, %L, 'correccion', 'panel', 4, 'x', now())$$,
-  :'empresa_a', :'trab_a'), 'corregir un evento de otro trabajador');
+  $$insert into public.eventos (empresa_id, trabajador_id, tipo, origen, corrige_evento_id, motivo, hora_efectiva) values (%L, %L, 'correccion', 'panel', %s, 'x', now())$$,
+  :'empresa_a', :'trab_a', (select min(id) from public.eventos where trabajador_id = :'trab_a2')), 'corregir un evento de otro trabajador');
 select tests.debe_fallar(format(
   $$insert into public.trabajadores (empresa_id, centro_trabajo_id, nombre, fecha_ingreso) values (%L, %L, 'X', '2026-01-01')$$,
   :'empresa_a', :'centro_a'), 'el supervisor da de alta trabajadores');

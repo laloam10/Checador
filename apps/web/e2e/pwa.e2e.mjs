@@ -97,6 +97,10 @@ try {
     assert.equal(extra, "2:00", "tiempo extra de la semana sembrada");
     paso(`registros de la semana: ${total} trabajadas, ${extra} extra`);
 
+    // La bitácora no se borra: si una corrida anterior ya dio conformidad a esta semana, no hay nada que responder.
+    if (await page.getByText("Diste tu conformidad").isVisible()) {
+      paso("la semana ya tenía conformidad de una corrida anterior (se omite)");
+    } else {
     await page.getByRole("button", { name: "Algo no es correcto" }).click();
     await page.getByLabel("¿Qué no es correcto?").fill("El lunes salí a las 19:30");
     await page.getByRole("button", { name: "Enviar objeción" }).click();
@@ -108,6 +112,7 @@ try {
     const comprobante = await page.locator(".comprobante").innerText();
     assert.match(comprobante, /Comprobante: registro n\.º \d+ · [0-9a-f]{16}/);
     paso(`conformidad registrada con ${comprobante}`);
+    }
   }
 
   // 6. Salir

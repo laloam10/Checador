@@ -10,5 +10,5 @@ PSQL=(psql -X -q -v ON_ERROR_STOP=1 -d "$DB")
 "${PSQL[@]}" -f 00_shim_supabase.sql
 for f in ../migrations/*.sql; do "${PSQL[@]}" -f "$f"; done
 "${PSQL[@]}" -f 01_grants_supabase.sql
-"${PSQL[@]}" -f 10_pruebas.sql
+for f in [1-9]*_*.sql; do "${PSQL[@]}" -f "$f"; done
 echo "Todas las pruebas de base de datos pasaron."
