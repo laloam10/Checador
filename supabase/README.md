@@ -8,6 +8,8 @@
 | `migrations/…02_rls.sql` | Funciones auxiliares, `crear_empresa()`, `vincular_mi_cuenta()`, `verificar_cadena()` y políticas RLS |
 | `migrations/…06…01_kiosco_pin.sql` | PIN (bcrypt) con bloqueo por intentos, `kiosco_identificar()`, `kiosco_checar()`, pausa según el centro |
 | `migrations/…07…01_panel_invitaciones.sql` | Invitaciones por correo (admin, supervisor, kiosco), `miembros_de_empresa()`, `trabajadores_con_pin()` |
+| `migrations/…10…01_endurecimiento.sql` | Privilegios mínimos: el rol anónimo sin acceso; nadie con `TRUNCATE` |
+| `migrations/…10…02_vinculo_solo_codigo.sql` | Vincular cuentas solo si la sesión se inició con código (claim `amr`) |
 | `migrations/…09…01_exportaciones.sql` | Registro inmutable de exportaciones con huellas SHA-256 y estado de la cadena |
 | `migrations/…08…01_acuerdos_firma.sql` | Modalidades de firma (electrónica, PIN en kiosco, autógrafa), orden de firma, `acuerdo_vigente()`, `acuerdo_pendiente()`, `kiosco_firmar_acuerdo()` |
 
@@ -42,6 +44,8 @@ npx supabase start -x studio,imgproxy,edge-runtime,logflare,vector,storage-api,r
 
 ## Conectar con tu proyecto de Supabase
 
+> Para producción sigue la guía completa: [docs/publicacion.md](../docs/publicacion.md). Incluye la configuración de Auth, el SMTP obligatorio y la verificación de seguridad.
+
 1. Crea un proyecto en https://supabase.com/dashboard (región sugerida: la más cercana disponible).
 2. En la carpeta del repo:
 
@@ -52,6 +56,10 @@ npx supabase db push
 ```
 
 `config.toml` ya existe: omite `init` si no lo pide la CLI. Después, en el dashboard, en **Authentication → Email Templates**, copia `templates/codigo.html` en las plantillas **Magic Link** y **Confirm signup**.
+
+## Verificación de seguridad
+
+`verificar-seguridad.sql` debe devolver **cero filas**. Corre en cada ejecución de `tests/run-local.sh` (y en el CI) y en producción desde el SQL Editor.
 
 ## Pruebas
 

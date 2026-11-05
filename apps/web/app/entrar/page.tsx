@@ -24,7 +24,8 @@ export default function Entrar() {
       options: { shouldCreateUser: true },
     });
     setCargando(false);
-    if (error) setError("No se pudo enviar el código. Revisa el correo e intenta de nuevo.");
+    if (error?.status === 429) setError("Se pidieron demasiados códigos. Espera unos minutos y vuelve a intentarlo.");
+    else if (error) setError("No se pudo enviar el código. Revisa el correo e intenta de nuevo.");
     else setPaso("codigo");
   }
 
@@ -40,7 +41,7 @@ export default function Entrar() {
     });
     if (error) {
       setCargando(false);
-      setError("Código incorrecto o vencido.");
+      setError(error.status === 429 ? "Demasiados intentos. Espera unos minutos." : "Código incorrecto o vencido.");
       return;
     }
     await supabase.rpc("vincular_mi_cuenta");

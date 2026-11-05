@@ -4,6 +4,8 @@
 \set QUIET on
 \pset tuples_only on
 \pset format unaligned
+-- Las sesiones de prueba se iniciaron con código enviado al correo (claim amr = otp).
+select set_config('request.jwt.claims', '{"amr":[{"method":"otp"}]}', false) \gset
 
 \set u_prop  '00000000-0000-0000-0000-00000000000a'
 \set u_sup   '00000000-0000-0000-0000-00000000000b'
@@ -58,6 +60,24 @@ select tests.afirmar((public.kiosco_identificar('050', '9157') ->> 'ok')::boolea
 
 select set_config('request.jwt.claim.sub', :'u_nocf', false) \gset
 select tests.afirmar(public.vincular_mi_cuenta() = 0, 'un correo sin confirmar no acepta invitaciones');
+
+-- Sesión iniciada con contraseña y correo "confirmado" sin código (p. ej. con "Confirm email"
+-- apagado): no debe vincularse a un trabajador ni aceptar invitaciones.
+reset role;
+\set u_pass '00000000-0000-0000-0000-000000000023'
+insert into auth.users (id, email, email_confirmed_at, encrypted_password)
+  values (:'u_pass', 'jefe.invitado@empresa-a.mx', now(), '$2a$10$hashdeunacontrasena');
+set role authenticated;
+select set_config('request.jwt.claim.sub', :'u_prop', false) \gset
+insert into public.invitaciones (empresa_id, email, rol) values (:'empresa_a', 'jefe.invitado@empresa-a.mx', 'supervisor');
+select set_config('request.jwt.claim.sub', :'u_pass', false) \gset
+select set_config('request.jwt.claims', '{"amr":[{"method":"password"}]}', false) \gset
+select tests.afirmar(public.vincular_mi_cuenta() = 0, 'una sesión con contraseña no acepta invitaciones aunque el correo figure como confirmado');
+select tests.afirmar(public.mi_rol(:'empresa_a') is null, 'y no obtiene acceso a la empresa');
+select set_config('request.jwt.claims', '{}', false) \gset
+select tests.afirmar(public.vincular_mi_cuenta() = 0, 'una sesión sin método de autenticación tampoco');
+select set_config('request.jwt.claims', '{"amr":[{"method":"otp"}]}', false) \gset
+select tests.afirmar(public.vincular_mi_cuenta() = 1, 'la misma cuenta, entrando con código, sí acepta su invitación');
 
 \echo '--- Listar y quitar accesos'
 select set_config('request.jwt.claim.sub', :'u_prop', false) \gset

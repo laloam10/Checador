@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { connection } from "next/server";
 import { RegistrarServiceWorker } from "@/components/RegistrarServiceWorker";
 import "./globals.css";
 
@@ -15,7 +16,10 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // Renderizado dinámico en todas las páginas: necesario para que cada respuesta lleve
+  // el nonce de la Content Security Policy (ver proxy.ts).
+  await connection();
   return (
     <html lang="es-MX">
       <body>

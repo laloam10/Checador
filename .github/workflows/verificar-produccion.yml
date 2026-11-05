@@ -1,0 +1,22 @@
+name: Verificar producción
+
+# Revisa desde fuera la seguridad del despliegue: cabeceras, CSP, accesos anónimos y
+# configuración de Auth. Detecta, por ejemplo, que alguien apague la confirmación de correo.
+# Requiere las variables del repositorio (Settings → Secrets and variables → Actions → Variables):
+#   APP_URL, SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY  (la llave publicable no es secreta).
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 13 * * 1" # lunes 07:17 hora del centro de México
+
+jobs:
+  verificar:
+    if: vars.APP_URL != ''
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./scripts/verificar-despliegue.sh
+        env:
+          APP_URL: ${{ vars.APP_URL }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_PUBLISHABLE_KEY: ${{ vars.SUPABASE_PUBLISHABLE_KEY }}

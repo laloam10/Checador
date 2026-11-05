@@ -5,6 +5,8 @@
 \set QUIET on
 \pset tuples_only on
 \pset format unaligned
+-- Las sesiones de prueba se iniciaron con código enviado al correo (claim amr = otp).
+select set_config('request.jwt.claims', '{"amr":[{"method":"otp"}]}', false) \gset
 
 -- Utilidades de prueba ---------------------------------------------------------
 create schema tests;

@@ -23,6 +23,13 @@ Producto SaaS de registro electrónico de jornada para PYMEs en México (LFT art
 - Los imports internos de `packages/*` van **sin extensión** (Turbopack no resuelve `./x.js` → `x.ts` en `export *`).
 - Nada que use `window`, `localStorage` o `navigator` puede ejecutarse durante el render del servidor.
 
+## Seguridad
+
+- Toda tabla nueva necesita RLS y debe pasar `supabase/verificar-seguridad.sql` (cero hallazgos; corre en el CI).
+- Nunca usar la llave `secret`/`service_role` en la app.
+- La CSP vive en `apps/web/proxy.ts`: si agregas un servicio externo, añádelo a `connect-src` y corre `e2e/csp.e2e.mjs`.
+- Guía de producción: `docs/publicacion.md`.
+
 ## Comandos
 
 ```bash

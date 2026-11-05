@@ -32,7 +32,8 @@ export type CodigoIncidencia =
   | "SALIDA_SIN_ENTRADA"
   | "PAUSA_SIN_CIERRE"
   | "FIN_PAUSA_SIN_INICIO"
-  | "PAUSA_FUERA_DE_TURNO";
+  | "PAUSA_FUERA_DE_TURNO"
+  | "TURNO_SIN_DURACION";
 
 export interface Incidencia {
   codigo: CodigoIncidencia;
@@ -134,9 +135,10 @@ export function reconstruirTurnos(
 
   const cerrarPausa = (finMs: number) => {
     if (!abierto || !pausa) return;
-    if (finMs > pausa.ms) {
-      abierto.pausas.push({ inicio: local(pausa.ms), fin: local(finMs), puedeSalir: pausa.puedeSalir });
-    }
+    const inicio = local(pausa.ms);
+    const fin = local(finMs);
+    // Las horas se truncan al minuto: una pausa de menos de un minuto no dura nada y se omite.
+    if (fin > inicio) abierto.pausas.push({ inicio, fin, puedeSalir: pausa.puedeSalir });
     pausa = null;
   };
 
@@ -191,7 +193,14 @@ export function reconstruirTurnos(
           incidencias.push({ codigo: "PAUSA_SIN_CIERRE", eventoId: (pausa as Captura).id, mensaje: "Pausa sin cierre; se cerró a la hora de salida." });
           cerrarPausa(c.ms);
         }
-        if (c.ms > abierto.entrada.ms) {
+        if (local(c.ms) <= local(abierto.entrada.ms)) {
+          // Entrada y salida en el mismo minuto (p. ej. por error): no se contabiliza, pero queda a la vista.
+          incidencias.push({
+            codigo: "TURNO_SIN_DURACION",
+            eventoId: c.id,
+            mensaje: `Entrada y salida en el mismo minuto (${local(c.ms).replace("T", " ")}): no se contabiliza.`,
+          });
+        } else {
           turnos.push({
             inicio: local(abierto.entrada.ms),
             fin: local(c.ms),

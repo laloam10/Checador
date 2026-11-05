@@ -141,3 +141,33 @@ describe("localAInstante", () => {
     expect(() => localAInstante("2027-01-04 08:00", "America/Mexico_City")).toThrow(TypeError);
   });
 });
+
+describe("checadas en el mismo minuto", () => {
+  const seg = (local: string, s: number) => new Date(`${local}:${String(s).padStart(2, "0")}-06:00`).toISOString();
+  let k = 1000;
+  const e = (tipo: EventoBitacora["tipo"], iso: string): EventoBitacora => ({
+    id: ++k, tipo, horaEfectiva: iso, ...(tipo === "inicio_pausa" ? { puedeSalir: true } : {}),
+  });
+
+  it("entrada y salida en el mismo minuto: no se contabiliza y queda como incidencia", () => {
+    const r = reconstruirTurnos([e("entrada", seg("2027-01-04T12:02", 5)), e("salida", seg("2027-01-04T12:02", 40))], ZONA, AHORA);
+    expect(r.turnos).toEqual([]);
+    expect(r.incidencias.map((i) => i.codigo)).toEqual(["TURNO_SIN_DURACION"]);
+    expect(() => calcularSemana("2027-01-04", r.turnos, { diaDescanso: 0 })).not.toThrow();
+  });
+
+  it("pausa de menos de un minuto se omite sin romper el cálculo", () => {
+    const r = reconstruirTurnos(
+      [
+        e("entrada", seg("2027-01-04T08:00", 0)),
+        e("inicio_pausa", seg("2027-01-04T13:00", 10)),
+        e("fin_pausa", seg("2027-01-04T13:00", 50)),
+        e("salida", seg("2027-01-04T16:00", 0)),
+      ],
+      ZONA,
+      AHORA,
+    );
+    expect(r.turnos[0]?.pausas).toEqual([]);
+    expect(calcularSemana("2027-01-04", r.turnos, { diaDescanso: 0 }).totales.trabajadoMin).toBe(8 * 60);
+  });
+});

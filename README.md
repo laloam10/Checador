@@ -12,6 +12,7 @@ Sistema de registro electrónico de jornada laboral (entradas y salidas) para PY
 | [docs/mvp.md](docs/mvp.md) | Alcance propuesto del producto mínimo, riesgos y decisiones pendientes |
 | [docs/stack.md](docs/stack.md) | Stack técnico (ADR-001) |
 | [supabase/README.md](supabase/README.md) | Base de datos: modelo, garantías y cómo conectarla |
+| [docs/publicacion.md](docs/publicacion.md) | **Guía de publicación segura** (Supabase, Vercel, SMTP, dominio, verificación, respaldos, operación) |
 | [apps/web/README.md](apps/web/README.md) | PWA del trabajador: configuración, seguridad y prueba de punta a punta |
 
 ## Próximos pasos
@@ -28,7 +29,8 @@ Sistema de registro electrónico de jornada laboral (entradas y salidas) para PY
 10. ~~Acuerdo de registro electrónico con firma de ambas partes (prueba plena, art. 132 XXXIV).~~ Hecho, con prueba de punta a punta. **Pendiente: revisión de la plantilla por un abogado.**
 11. ~~Exportación para inspección o juicio (PDF/CSV con huella SHA-256 y verificación de archivos).~~ Hecho, con prueba de punta a punta.
 12. ~~Alta guiada: primeros pasos en el tablero, firma de acuerdos en lote, indicador de acuerdos vigentes.~~ Hecho, con prueba de punta a punta.
-13. Pendiente externo: disposiciones de la STPS (formato oficial, si lo hay) y revisión legal de la plantilla del acuerdo.
+13. ~~Endurecimiento y guía de publicación (`docs/publicacion.md`).~~ Hecho: CSP con nonce, privilegios mínimos, verificación automática de producción y respaldos.
+14. Pendiente externo: disposiciones de la STPS (formato oficial, si lo hay) y revisión legal de la plantilla del acuerdo.
 
 ## Desarrollo
 
