@@ -1,4 +1,4 @@
-import type { DiaSemana, FechaHoraLocal, FechaLocal } from "./tipos.js";
+import type { DiaSemana, FechaHoraLocal, FechaLocal } from "./tipos";
 
 const RE_FECHA_HORA = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/;
 const RE_FECHA = /^(\d{4})-(\d{2})-(\d{2})$/;

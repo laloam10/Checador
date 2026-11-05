@@ -1,0 +1,74 @@
+:root {
+  --verde: #0f5132;
+  --verde-claro: #d1e7dd;
+  --rojo: #842029;
+  --rojo-claro: #f8d7da;
+  --ambar: #664d03;
+  --ambar-claro: #fff3cd;
+  --gris: #6c757d;
+  --borde: #dee2e6;
+  --fondo: #f8f9fa;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: #212529;
+  background: var(--fondo);
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+main { max-width: 34rem; margin: 0 auto; padding: 0 1rem 3rem; }
+h1 { font-size: 1.4rem; }
+h2 { font-size: 1.1rem; margin-top: 2rem; }
+
+.nav { display: flex; gap: 1rem; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid var(--borde); margin-bottom: 1rem; }
+.nav a { color: var(--gris); text-decoration: none; font-weight: 600; }
+.nav a.activo { color: var(--verde); }
+.nav .enlace { margin-left: auto; }
+
+button { font: inherit; cursor: pointer; border-radius: 0.75rem; border: none; }
+button:disabled { opacity: 0.6; cursor: wait; }
+.principal { background: var(--verde); color: white; padding: 1.1rem; font-size: 1.2rem; font-weight: 700; width: 100%; }
+.principal.salida { background: #343a40; }
+.secundario { background: white; color: var(--verde); border: 2px solid var(--verde); padding: 0.9rem; font-size: 1.05rem; font-weight: 600; width: 100%; }
+.enlace { background: none; color: var(--verde); text-decoration: underline; padding: 0.25rem; }
+
+.checador { text-align: center; }
+.quien { font-weight: 700; margin: 0.5rem 0 0; }
+.quien span { display: block; font-weight: 400; color: var(--gris); font-size: 0.9rem; }
+.reloj { font-size: 3.5rem; font-variant-numeric: tabular-nums; font-weight: 300; margin: 1rem 0 0.25rem; }
+.estado { font-weight: 600; margin: 0 0 1.5rem; }
+.estado-trabajando { color: var(--verde); }
+.estado-en_pausa { color: var(--ambar); }
+.estado-fuera { color: var(--gris); }
+.acciones { display: grid; gap: 0.75rem; }
+.casilla { display: flex; gap: 0.5rem; align-items: center; justify-content: center; font-size: 0.9rem; color: var(--gris); }
+
+.aviso, .mensaje { border-radius: 0.5rem; padding: 0.75rem 1rem; text-align: left; margin: 1rem 0; }
+.aviso, .mensaje-aviso { background: var(--ambar-claro); color: var(--ambar); }
+.mensaje-ok { background: var(--verde-claro); color: var(--verde); }
+.mensaje-error { background: var(--rojo-claro); color: var(--rojo); }
+.mensaje ul { margin: 0.5rem 0; padding-left: 1.2rem; }
+
+.lista-eventos { list-style: none; padding: 0; text-align: left; }
+.lista-eventos li { display: flex; gap: 0.75rem; align-items: center; padding: 0.6rem 0; border-bottom: 1px solid var(--borde); }
+.hora { font-variant-numeric: tabular-nums; font-weight: 700; }
+.etiqueta { font-size: 0.75rem; background: var(--ambar-claro); color: var(--ambar); padding: 0.1rem 0.4rem; border-radius: 0.3rem; margin-left: 0.4rem; }
+.vacio { color: var(--gris); }
+
+.tarjeta { background: white; border: 1px solid var(--borde); border-radius: 0.75rem; padding: 1rem; display: grid; gap: 0.75rem; }
+label { display: grid; gap: 0.35rem; font-weight: 600; text-align: left; }
+input, textarea { font: inherit; padding: 0.75rem; border: 1px solid var(--borde); border-radius: 0.5rem; font-weight: 400; }
+
+.entrar { padding-top: 3rem; }
+.entrar h1 { font-size: 2rem; margin-bottom: 0; color: var(--verde); }
+.subtitulo { color: var(--gris); margin-top: 0.25rem; }
+.legal { font-size: 0.8rem; color: var(--gris); margin-top: 2rem; }
+
+.semana-nav { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
+.semana-nav a { color: var(--verde); }
+.tabla { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem; background: white; }
+.tabla th, .tabla td { border-bottom: 1px solid var(--borde); padding: 0.5rem 0.35rem; text-align: left; vertical-align: top; }
+.tabla td small { display: block; color: var(--gris); }
+.tabla tfoot td { font-weight: 700; }
+.resumen { display: grid; grid-template-columns: 1fr auto; gap: 0.35rem 1rem; margin-top: 1rem; }
+.resumen dd { margin: 0; font-weight: 600; text-align: right; }
+.comprobante { font-family: ui-monospace, monospace; font-size: 0.8rem; word-break: break-all; }

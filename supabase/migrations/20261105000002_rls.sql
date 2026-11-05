@@ -57,6 +57,27 @@ begin
 end;
 $$;
 
+-- Vincula la cuenta del usuario con los registros de trabajador que el empleador
+-- dio de alta con su correo. Solo correos confirmados (evita suplantación).
+-- Devuelve cuántos registros se vincularon.
+create function public.vincular_mi_cuenta() returns integer
+language plpgsql security definer set search_path = '' as $$
+declare
+  v_email text;
+  v_n     integer;
+begin
+  select email into v_email from auth.users where id = auth.uid() and email_confirmed_at is not null;
+  if v_email is null then
+    return 0;
+  end if;
+  update public.trabajadores
+     set user_id = auth.uid()
+   where lower(email) = lower(v_email) and user_id is null and fecha_baja is null;
+  get diagnostics v_n = row_count;
+  return v_n;
+end;
+$$;
+
 -- Verifica la integridad de la cadena de una empresa.
 -- Devuelve la primera secuencia inválida, o NULL si la cadena está íntegra.
 create function public.verificar_cadena(p_empresa uuid) returns bigint
@@ -90,7 +111,9 @@ $$;
 
 revoke execute on function public.crear_empresa(text, text) from public, anon;
 revoke execute on function public.verificar_cadena(uuid) from public, anon;
+revoke execute on function public.vincular_mi_cuenta() from public, anon;
 grant execute on function public.crear_empresa(text, text) to authenticated;
+grant execute on function public.vincular_mi_cuenta() to authenticated;
 grant execute on function public.verificar_cadena(uuid) to authenticated;
 
 -- -----------------------------------------------------------------------------

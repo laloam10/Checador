@@ -12,6 +12,7 @@ Sistema de registro electrónico de jornada laboral (entradas y salidas) para PY
 | [docs/mvp.md](docs/mvp.md) | Alcance propuesto del producto mínimo, riesgos y decisiones pendientes |
 | [docs/stack.md](docs/stack.md) | Stack técnico (ADR-001) |
 | [supabase/README.md](supabase/README.md) | Base de datos: modelo, garantías y cómo conectarla |
+| [apps/web/README.md](apps/web/README.md) | PWA del trabajador: configuración, seguridad y prueba de punta a punta |
 
 ## Próximos pasos
 
@@ -21,7 +22,9 @@ Sistema de registro electrónico de jornada laboral (entradas y salidas) para PY
 4. ~~Definir el stack técnico.~~ Hecho: ver `docs/stack.md`.
 5. ~~Motor de cálculo (`packages/jornada`).~~ Hecho.
 6. ~~Esquema de base de datos en Supabase (`supabase/`).~~ Hecho. Pendientes en `supabase/README.md`.
-7. Aplicación web (Next.js): panel del empleador, PWA del trabajador y kiosco.
+7. ~~PWA del trabajador (`apps/web`).~~ Hecho, con prueba de punta a punta.
+8. Panel del empleador: alta de trabajadores, correcciones, acuerdos y revisión de objeciones.
+9. Kiosco con PIN o QR.
 
 ## Desarrollo
 

@@ -220,4 +220,31 @@ update public.eventos set hora_efectiva = hora_efectiva - interval '1 hour' wher
 alter table public.eventos enable trigger eventos_solo_insercion;
 select tests.afirmar(public.verificar_cadena(:'empresa_a') = 2, 'la alteración del evento 2 se detecta');
 
+-- =============================================================================
+\echo '--- Vinculación de cuenta y reintentos'
+select set_config('request.jwt.claim.sub', :'u_prop', false) \gset
+set role authenticated;
+\set u_nuevo '00000000-0000-0000-0000-000000000010'
+\set u_falso '00000000-0000-0000-0000-000000000011'
+reset role;
+insert into auth.users (id, email, email_confirmed_at) values
+  (:'u_nuevo', 'carla@ejemplo.mx', now()),
+  (:'u_falso', 'Carla@Ejemplo.mx', null);
+set role authenticated;
+insert into public.trabajadores (empresa_id, centro_trabajo_id, nombre, email, fecha_ingreso)
+  values (:'empresa_a', :'centro_a', 'Carla Ruiz', 'CARLA@ejemplo.mx', '2026-03-01') returning id as trab_c \gset
+
+select set_config('request.jwt.claim.sub', :'u_falso', false) \gset
+select tests.afirmar(public.vincular_mi_cuenta() = 0, 'correo sin confirmar no vincula');
+
+select set_config('request.jwt.claim.sub', :'u_nuevo', false) \gset
+select tests.afirmar(public.vincular_mi_cuenta() = 1, 'correo confirmado vincula (sin distinguir mayúsculas)');
+select tests.afirmar(public.vincular_mi_cuenta() = 0, 'vincular dos veces no hace nada');
+
+insert into public.eventos (empresa_id, trabajador_id, tipo, origen, id_cliente)
+  values (:'empresa_a', :'trab_c', 'entrada', 'pwa', '11111111-1111-1111-1111-111111111111');
+select tests.debe_fallar(format(
+  $$insert into public.eventos (empresa_id, trabajador_id, tipo, origen, id_cliente) values (%L, %L, 'entrada', 'pwa', '11111111-1111-1111-1111-111111111111')$$,
+  :'empresa_a', :'trab_c'), 'reintento con el mismo id_cliente duplica el evento');
+
 \echo '--- Fin'

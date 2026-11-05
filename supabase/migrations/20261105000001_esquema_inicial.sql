@@ -105,6 +105,8 @@ create table public.trabajadores (
   user_id             uuid references auth.users (id) on delete set null,
   nombre              text not null check (length(btrim(nombre)) > 0),
   numero_empleado     text,
+  -- Correo con el que el trabajador entra a la PWA; vincula su cuenta (vincular_mi_cuenta()).
+  email               text check (email ~* '^[^@[:space:]]+@[^@[:space:]]+\.[^@[:space:]]+$'),
   curp                text check (curp ~ '^[A-Z][AEIOUX][A-Z]{2}[0-9]{6}[HMX][A-Z]{5}[A-Z0-9][0-9]$'),
   fecha_ingreso       date not null,
   fecha_baja          date check (fecha_baja is null or fecha_baja >= fecha_ingreso),
@@ -119,6 +121,7 @@ create table public.trabajadores (
   foreign key (empresa_id, centro_trabajo_id) references public.centros_trabajo (empresa_id, id)
 );
 create index trabajadores_user_idx on public.trabajadores (user_id) where user_id is not null;
+create unique index trabajadores_email_idx on public.trabajadores (empresa_id, lower(email)) where email is not null;
 
 -- Conservación (art. 804): nunca se borra un trabajador; se registra su fecha de baja.
 create function public.prohibir_borrado_trabajador() returns trigger
@@ -172,11 +175,14 @@ create table public.eventos (
   motivo             text,
   registrado_por     uuid,
   evidencia          jsonb not null default '{}'::jsonb,
+  -- UUID generado por el dispositivo: evita duplicados al reintentar un envío.
+  id_cliente         uuid,
   -- Cadena de hashes.
   secuencia          bigint not null,
   hash_anterior      bytea not null,
   hash               bytea not null,
   unique (empresa_id, secuencia),
+  unique (empresa_id, id_cliente),
   foreign key (empresa_id, trabajador_id) references public.trabajadores (empresa_id, id),
   constraint eventos_pausa_requiere_puede_salir
     check ((tipo = 'inicio_pausa') = (puede_salir is not null)),
@@ -215,6 +221,7 @@ language sql immutable parallel safe set search_path = '' as $$
     coalesce(e.motivo, ''),
     coalesce(e.registrado_por::text, ''),
     e.evidencia::text,
+    coalesce(e.id_cliente::text, ''),
     encode(e.hash_anterior, 'hex')
   )
 $$;

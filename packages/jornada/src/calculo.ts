@@ -6,7 +6,7 @@ import {
   MAX_TOTAL_DIARIO_MIN,
   jornadaSemanalMaxMin,
   topeExtraSemanalMin,
-} from "./limites.js";
+} from "./limites";
 import {
   aMinutos,
   anioDe,
@@ -14,7 +14,7 @@ import {
   fechaDe,
   minutosNocturnos,
   sumarDias,
-} from "./tiempo.js";
+} from "./tiempo";
 import type {
   Alerta,
   ConfigTrabajador,
@@ -23,7 +23,7 @@ import type {
   ResultadoSemana,
   TipoJornada,
   Turno,
-} from "./tipos.js";
+} from "./tipos";
 
 const MIN_NOCTURNOS_PARA_NOCTURNA = 3 * 60 + 30; // art. 60, 3.er párr.
 const ORDEN_RIGOR: Record<TipoJornada, number> = { diurna: 0, mixta: 1, nocturna: 2 };

@@ -16,6 +16,13 @@ Producto SaaS de registro electrónico de jornada para PYMEs en México (LFT art
 - Código, comentarios y mensajes en español.
 - La bitácora de eventos es de **solo inserción**: nunca se escribe código que haga `UPDATE` o `DELETE` sobre eventos; las correcciones son eventos nuevos.
 
+## Next.js 16
+
+`apps/web` usa Next.js 16, que cambió APIs respecto a versiones anteriores (`middleware` ahora es `proxy.ts`; `cookies()`, `params` y `searchParams` son asíncronos). **Antes de escribir código de Next, consulta `node_modules/next/dist/docs/`.**
+
+- Los imports internos de `packages/*` van **sin extensión** (Turbopack no resuelve `./x.js` → `x.ts` en `export *`).
+- Nada que use `window`, `localStorage` o `navigator` puede ejecutarse durante el render del servidor.
+
 ## Comandos
 
 ```bash

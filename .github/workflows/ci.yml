@@ -7,7 +7,7 @@ on:
 
 jobs:
   motor:
-    name: Motor de cálculo
+    name: Motor y PWA
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,8 +16,14 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run typecheck
       - run: npm test
+      - name: Build de la PWA (incluye revisión de tipos)
+        run: npm run build -w @checador/web
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+          NEXT_PUBLIC_SUPABASE_URL: https://ejemplo.supabase.co
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci
+      - run: npm run typecheck
 
   base-de-datos:
     name: Migraciones y RLS

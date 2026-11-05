@@ -5,7 +5,7 @@
  * y transitorios segundo y cuarto del decreto.
  */
 
-import type { TipoJornada } from "./tipos.js";
+import type { TipoJornada } from "./tipos";
 
 /** Fecha de entrada en vigor del decreto (transitorio primero). */
 export const INICIO_VIGENCIA = "2026-05-01";

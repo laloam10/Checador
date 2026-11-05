@@ -1,4 +1,5 @@
-export * from "./tipos.js";
-export * from "./limites.js";
-export { calcularSemana, clasificarJornada, minutosEfectivos, pagoTiempoExtraCentavos } from "./calculo.js";
-export { minutosNocturnos } from "./tiempo.js";
+export * from "./tipos";
+export * from "./limites";
+export { calcularSemana, clasificarJornada, minutosEfectivos, pagoTiempoExtraCentavos } from "./calculo";
+export { minutosNocturnos } from "./tiempo";
+export * from "./reconstruccion";
