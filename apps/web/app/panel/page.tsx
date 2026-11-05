@@ -1,35 +1,38 @@
 import Link from "next/link";
 import { aHoraLocal } from "@checador/jornada";
 import { FormAccion } from "@/components/panel/FormAccion";
+import { PrimerosPasos } from "@/components/panel/PrimerosPasos";
+import { estadosAcuerdosEmpresa } from "@/lib/acuerdosDatos";
 import { objecionesPendientes, presentesAhora, requierePanel } from "@/lib/panel";
 import { verificarIntegridad } from "./acciones";
 
 export default async function Tablero() {
   const ctx = await requierePanel();
   const hoy = aHoraLocal(new Date(), ctx.empresa.zonaHoraria).slice(0, 10);
-  const [presentes, objeciones, { count: activos }] = await Promise.all([
+  const [presentes, objeciones, estados] = await Promise.all([
     presentesAhora(ctx),
     objecionesPendientes(ctx),
-    ctx.supabase.from("trabajadores").select("id", { count: "exact", head: true })
-      .eq("empresa_id", ctx.empresa.id).is("fecha_baja", null),
+    estadosAcuerdosEmpresa(ctx.supabase, ctx.empresa.id),
   ]);
+  const activos = estados.length;
+  const vigentes = estados.filter((e) => e.clave === "vigente").length;
 
   return (
     <>
       <div className="tarjetas">
         <div className="tarjeta-dato"><strong>{presentes.length}</strong>trabajando ahora</div>
-        <div className="tarjeta-dato"><strong>{activos ?? 0}</strong>trabajadores activos</div>
+        <div className="tarjeta-dato"><strong>{activos}</strong>trabajadores activos</div>
+        <div className={`tarjeta-dato ${activos && vigentes < activos ? "tarjeta-alerta" : ""}`}>
+          <strong>{vigentes} de {activos}</strong>
+          <Link href="/panel/trabajadores#acuerdos">con acuerdo de registro vigente</Link>
+        </div>
         <div className="tarjeta-dato">
           <strong>{objeciones.length}</strong>
           {objeciones.length ? <Link href="/panel/objeciones">objeciones por atender</Link> : "objeciones por atender"}
         </div>
       </div>
 
-      {(activos ?? 0) === 0 && (
-        <p className="mensaje mensaje-aviso">
-          Empieza dando de alta a tus trabajadores en <Link href="/panel/trabajadores">Trabajadores</Link>.
-        </p>
-      )}
+      <PrimerosPasos ctx={ctx} estados={estados} />
 
       <h2>En turno ahora</h2>
       {presentes.length === 0 ? (

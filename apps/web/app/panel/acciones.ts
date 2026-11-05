@@ -5,7 +5,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { aHoraLocal, localAInstante } from "@checador/jornada";
 import { generarTextoAcuerdo } from "@/lib/acuerdo";
-import { datosActuales } from "@/lib/acuerdosDatos";
+import { datosActuales, estadosAcuerdosEmpresa } from "@/lib/acuerdosDatos";
 import { trabajadorPorId } from "@/lib/datos";
 import { requierePanel } from "@/lib/panel";
 import { crearClienteServidor, usuarioActual } from "@/lib/supabase/server";
@@ -50,13 +50,20 @@ export async function crearEmpresa(_: Estado, fd: FormData): Promise<Estado> {
   const rfc = texto(fd, "rfc").toUpperCase() || null;
   const centro = texto(fd, "centro") || "Matriz";
   const zona = texto(fd, "zona_horaria") || "America/Mexico_City";
+  const pausa = texto(fd, "pausa_puede_salir");
   if (!razon) return fallo("Escribe la razón social o nombre del negocio.");
+  if (pausa !== "si" && pausa !== "no") return fallo("Indica si tu personal puede salir del lugar durante la pausa de comida.");
 
   const { data: empresaId, error } = await supabase.rpc("crear_empresa", { p_razon_social: razon, p_rfc: rfc });
   if (error) return fallo(traducir(error));
   const [r1, r2] = await Promise.all([
     supabase.from("empresas").update({ zona_horaria: zona }).eq("id", empresaId),
-    supabase.from("centros_trabajo").insert({ empresa_id: empresaId, nombre: centro, zona_horaria: zona }),
+    supabase.from("centros_trabajo").insert({
+      empresa_id: empresaId,
+      nombre: centro,
+      zona_horaria: zona,
+      pausa_puede_salir: pausa === "si",
+    }),
   ]);
   if (r1.error) return fallo(traducir(r1.error));
   if (r2.error) return fallo(traducir(r2.error));
@@ -278,40 +285,68 @@ export async function verificarIntegridad(_: Estado): Promise<Estado> {
 
 // --- Acuerdo de registro electrónico (art. 132 XXXIV) -------------------------------------
 
-/** Genera la siguiente versión del acuerdo con los datos actuales y la firma como empleador. */
-export async function generarYFirmarAcuerdo(_: Estado, fd: FormData): Promise<Estado> {
-  const ctx = await requierePanel();
-  const trabajadorId = texto(fd, "trabajador_id");
-  const datos = await datosActuales(ctx.supabase, trabajadorId);
-  if (!datos || datos.empresaId !== ctx.empresa.id) return fallo("Trabajador no encontrado.");
-  if (fd.get("confirmo") !== "on") return fallo("Confirma que revisaste el texto del acuerdo.");
+/** Genera la siguiente versión del acuerdo con los datos actuales de la base y la firma como empleador. */
+type ResultadoGeneracion = { ok: true; version: number } | { ok: false; error: string };
 
+async function generarYFirmarPara(
+  ctx: Awaited<ReturnType<typeof requierePanel>>,
+  trabajadorId: string,
+  evidencia: object,
+): Promise<ResultadoGeneracion> {
+  const datos = await datosActuales(ctx.supabase, trabajadorId);
+  if (!datos || datos.empresaId !== ctx.empresa.id) return { ok: false, error: "Trabajador no encontrado." };
   const { data: ultima } = await ctx.supabase
     .from("acuerdos").select("version").eq("trabajador_id", trabajadorId)
     .order("version", { ascending: false }).limit(1).maybeSingle();
   const version = (ultima?.version ?? 0) + 1;
   const hoy = aHoraLocal(new Date(), datos.zonaHoraria).slice(0, 10);
-  const contenido = generarTextoAcuerdo(datos.base(version, hoy));
-
   const { data: acuerdo, error } = await ctx.supabase
     .from("acuerdos")
     .insert({
       empresa_id: ctx.empresa.id,
       trabajador_id: trabajadorId,
       version,
-      contenido,
+      contenido: generarTextoAcuerdo(datos.base(version, hoy)),
       dia_descanso: datos.diaDescanso,
       jornada_pactada_min: datos.jornadaPactadaMin,
     })
     .select("id")
     .single();
-  if (error) return fallo(traducir(error));
+  if (error) return { ok: false, error: traducir(error) };
   const { error: errFirma } = await ctx.supabase
     .from("firmas_acuerdo")
-    .insert({ empresa_id: ctx.empresa.id, acuerdo_id: acuerdo.id, firmante: "empleador", evidencia: await evidenciaAccion() });
-  if (errFirma) return fallo(traducir(errFirma));
+    .insert({ empresa_id: ctx.empresa.id, acuerdo_id: acuerdo.id, firmante: "empleador", evidencia });
+  if (errFirma) return { ok: false, error: traducir(errFirma) };
+  return { ok: true, version };
+}
+
+export async function generarYFirmarAcuerdo(_: Estado, fd: FormData): Promise<Estado> {
+  const ctx = await requierePanel();
+  if (fd.get("confirmo") !== "on") return fallo("Confirma que revisaste el texto del acuerdo.");
+  const r = await generarYFirmarPara(ctx, texto(fd, "trabajador_id"), await evidenciaAccion());
+  if (!r.ok) return fallo(r.error);
   refrescar();
-  return ok(`Acuerdo v${version} firmado por la empresa. Falta la firma de la persona trabajadora.`);
+  return ok(`Acuerdo v${r.version} firmado por la empresa. Falta la firma de la persona trabajadora.`);
+}
+
+/** Genera y firma (como empresa) el acuerdo de todos los trabajadores sin acuerdo o con acuerdo desactualizado. */
+export async function generarAcuerdosPendientes(_: Estado, fd: FormData): Promise<Estado> {
+  const ctx = await requierePanel();
+  if (fd.get("confirmo") !== "on") return fallo("Confirma que revisaste el texto del acuerdo.");
+  const estados = await estadosAcuerdosEmpresa(ctx.supabase, ctx.empresa.id);
+  const objetivo = estados.filter((e) => e.clave === "sin_acuerdo" || e.clave === "desactualizado");
+  if (!objetivo.length) return ok("Todos los trabajadores ya tienen un acuerdo al día.");
+  const evidencia = { ...(await evidenciaAccion()), lote: true };
+  const errores: string[] = [];
+  for (const e of objetivo) {
+    const r = await generarYFirmarPara(ctx, e.trabajadorId, evidencia);
+    if (!r.ok) errores.push(`${e.nombre}: ${r.error}`);
+  }
+  refrescar();
+  const hechos = objetivo.length - errores.length;
+  return errores.length
+    ? fallo(`Se firmaron ${hechos} de ${objetivo.length}. Errores: ${errores.join("; ")}`)
+    : ok(`Se generaron y firmaron ${hechos} acuerdo(s). Ahora cada persona debe firmar el suyo (app, kiosco o papel).`);
 }
 
 /** Registra que la persona trabajadora firmó en papel el acuerdo pendiente. */

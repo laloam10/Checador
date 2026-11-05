@@ -53,6 +53,19 @@ El registro hace **prueba plena** si se acredita que fue acordado entre las part
 
 La plantilla está en `lib/acuerdo.ts`. **Es una plantilla de referencia que debe revisar un abogado laboralista.** No incluye aceptación tácita (el silencio no implica conformidad), para no arriesgar la nulidad por renuncia de derechos (arts. 5 y 33 LFT). Cambiar la redacción exige incrementar `PLANTILLA_VERSION`.
 
+## Alta guiada
+
+El tablero muestra **Primeros pasos** hasta que todo está en orden. Cada paso se calcula con los datos reales, no se marca a mano:
+
+1. Centro de trabajo y regla de la pausa. Al registrar la empresa, la pregunta de la pausa es obligatoria, porque decide si la comida se paga (art. 64).
+2. Personal dado de alta.
+3. Cada persona tiene cómo checar: correo para la app, o número de empleado y PIN para el kiosco.
+4. Kiosco instalado. Solo se pide si hay personas sin correo; la invitación pendiente explica en qué dirección y con qué correo entrar en la tableta.
+5. Acuerdos firmados por la empresa. En **Trabajadores → Acuerdos de registro** se revisa el texto y se firman todos de una vez.
+6. Acuerdos firmados por cada persona.
+
+La tarjeta **"X de Y con acuerdo vigente"** es permanente. Si después cambia la jornada, el descanso, la pausa o el método de alguien, su acuerdo aparece como **Desactualizado** y la lista vuelve a mostrarse.
+
 ## Exportación para inspección o juicio (`/panel/exportar`)
 
 - **PDF por trabajador:** datos de la relación laboral, integridad de la bitácora al emitir, versiones del acuerdo con sus firmas, resumen semanal (con el acuerdo vigente y la conformidad de cada semana), registros incompletos y bitácora completa con la huella de cada registro.
@@ -98,6 +111,7 @@ node apps/web/e2e/kiosco.e2e.mjs
 node apps/web/e2e/panel.e2e.mjs
 node apps/web/e2e/acuerdo.e2e.mjs
 node apps/web/e2e/exportar.e2e.mjs   # requiere pdftotext (poppler-utils)
+node apps/web/e2e/alta-guiada.e2e.mjs
 ```
 
 ## Limitaciones conocidas

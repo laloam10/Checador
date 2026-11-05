@@ -23,6 +23,14 @@ export default async function AltaEmpresa() {
         <label>Razón social o nombre del negocio<input name="razon_social" required /></label>
         <label>RFC (opcional)<input name="rfc" maxLength={13} style={{ textTransform: "uppercase" }} /></label>
         <label>Nombre de tu primer centro de trabajo<input name="centro" placeholder="Matriz" /></label>
+        <fieldset className="pregunta">
+          <legend>¿Tu personal puede salir del lugar durante la pausa de comida?</legend>
+          <label className="casilla-linea"><input type="radio" name="pausa_puede_salir" value="si" required /> Sí, puede salir</label>
+          <label className="casilla-linea"><input type="radio" name="pausa_puede_salir" value="no" /> No, debe quedarse en el lugar</label>
+          <span className="ayuda">
+            Si no puede salir, el tiempo de comida cuenta como jornada pagada (art. 64 LFT). Puedes cambiarlo después por centro de trabajo.
+          </span>
+        </fieldset>
         <label>
           Zona horaria
           <select name="zona_horaria" defaultValue="America/Mexico_City">

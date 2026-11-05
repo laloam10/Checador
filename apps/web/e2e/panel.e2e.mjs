@@ -49,13 +49,14 @@ try {
   await dueno.waitForURL(`${APP}/alta-empresa`);
   await dueno.getByLabel("Razón social o nombre del negocio").fill(EMPRESA);
   await dueno.getByLabel("RFC (opcional)").fill("XXX");
+  await dueno.getByLabel("No, debe quedarse en el lugar").check();
   await dueno.getByRole("button", { name: "Crear empresa" }).click();
   await mensaje(dueno, "El RFC no tiene un formato válido.");
   paso("RFC inválido se rechaza con mensaje claro");
   await dueno.getByLabel("RFC (opcional)").fill("PET0101011A2");
   await dueno.getByRole("button", { name: "Crear empresa" }).click();
   await dueno.waitForURL(`${APP}/panel`);
-  await dueno.getByText("Empieza dando de alta a tus trabajadores").waitFor();
+  await dueno.getByText(/Primeros pasos \(\d de 6\)/).waitFor();
   paso("empresa creada; el dueño queda como propietario");
 
   // 2. Centro: la pausa cuenta como jornada

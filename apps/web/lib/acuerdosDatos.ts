@@ -31,17 +31,24 @@ export const MODALIDAD: Record<Firma["modalidad"], string> = {
   autografa: "firma autógrafa en papel",
 };
 
-/** Datos actuales del trabajador para generar el texto (siempre desde la base, nunca desde el navegador). */
-export async function datosActuales(supabase: Cliente, trabajadorId: string) {
-  const { data, error } = await supabase
-    .from("trabajadores")
-    .select(
-      "id, empresa_id, nombre, numero_empleado, curp, email, dia_descanso, jornada_pactada_min, empresas(razon_social, rfc), centros_trabajo(nombre, direccion, pausa_puede_salir, zona_horaria)",
-    )
-    .eq("id", trabajadorId)
-    .maybeSingle();
-  if (error) throw error;
-  if (!data) return null;
+const SELECT_DATOS =
+  "id, empresa_id, nombre, numero_empleado, curp, email, dia_descanso, jornada_pactada_min, empresas(razon_social, rfc), centros_trabajo(nombre, direccion, pausa_puede_salir, zona_horaria)";
+
+type FilaDatos = {
+  id: string;
+  empresa_id: string;
+  nombre: string;
+  numero_empleado: string | null;
+  curp: string | null;
+  email: string | null;
+  dia_descanso: number;
+  jornada_pactada_min: unknown;
+  empresas: unknown;
+  centros_trabajo: unknown;
+};
+
+/** Convierte una fila de trabajador en los datos con que se genera el texto del acuerdo. */
+function construirDatos(data: FilaDatos) {
   const e = (Array.isArray(data.empresas) ? data.empresas[0] : data.empresas) as { razon_social: string; rfc: string | null };
   const c = (Array.isArray(data.centros_trabajo) ? data.centros_trabajo[0] : data.centros_trabajo) as {
     nombre: string;
@@ -50,9 +57,13 @@ export async function datosActuales(supabase: Cliente, trabajadorId: string) {
     zona_horaria: string;
   };
   return {
-    empresaId: data.empresa_id as string,
+    trabajadorId: data.id,
+    nombre: data.nombre,
+    numeroEmpleado: data.numero_empleado,
+    email: data.email,
+    empresaId: data.empresa_id,
     zonaHoraria: c.zona_horaria,
-    diaDescanso: data.dia_descanso as number,
+    diaDescanso: data.dia_descanso,
     jornadaPactadaMin: data.jornada_pactada_min as Record<string, number> | null,
     base: (version: number, fecha: string): DatosAcuerdo => ({
       version,
@@ -69,6 +80,14 @@ export async function datosActuales(supabase: Cliente, trabajadorId: string) {
       },
     }),
   };
+}
+type Datos = ReturnType<typeof construirDatos>;
+
+/** Datos actuales del trabajador para generar el texto (siempre desde la base, nunca desde el navegador). */
+export async function datosActuales(supabase: Cliente, trabajadorId: string) {
+  const { data, error } = await supabase.from("trabajadores").select(SELECT_DATOS).eq("id", trabajadorId).maybeSingle();
+  if (error) throw error;
+  return data ? construirDatos(data as FilaDatos) : null;
 }
 
 export async function acuerdosDe(supabase: Cliente, trabajadorId: string): Promise<Acuerdo[]> {
@@ -91,26 +110,73 @@ export interface EstadoAcuerdo {
   siguienteVersion: number;
 }
 
-export async function estadoAcuerdo(supabase: Cliente, trabajadorId: string): Promise<EstadoAcuerdo & { textoPropuesto: string | null }> {
-  const [lista, datos] = await Promise.all([acuerdosDe(supabase, trabajadorId), datosActuales(supabase, trabajadorId)]);
+/** Reglas de estado (compartidas por la ficha individual y el resumen de la empresa). */
+function evaluar(lista: Acuerdo[], datos: Datos | null): EstadoAcuerdo {
   const vigente = lista.find((a) => firmaDe(a, "empleador") && firmaDe(a, "trabajador")) ?? null;
   const pendiente =
     lista.find((a) => firmaDe(a, "empleador") && !firmaDe(a, "trabajador") && a.version > (vigente?.version ?? 0)) ?? null;
-  const siguienteVersion = (lista[0]?.version ?? 0) + 1;
-  if (!datos) return { vigente, pendiente, desactualizado: false, siguienteVersion, textoPropuesto: null };
-
-  // ¿El vigente sigue reflejando los datos actuales? Se regenera con su misma versión y fecha y se compara.
+  const siguienteVersion = Math.max(0, ...lista.map((a) => a.version)) + 1;
+  if (!datos) return { vigente, pendiente, desactualizado: false, siguienteVersion };
+  // ¿El último acuerdo sigue reflejando los datos actuales? Se regenera con su misma versión y fecha y se compara.
   const referencia = pendiente ?? vigente;
   const desactualizado = referencia
     ? generarTextoAcuerdo(datos.base(referencia.version, aHoraLocal(referencia.creado_en, datos.zonaHoraria).slice(0, 10))) !==
       referencia.contenido
     : true;
-  const hoy = aHoraLocal(new Date(), datos.zonaHoraria).slice(0, 10);
-  return {
-    vigente,
-    pendiente,
-    desactualizado,
-    siguienteVersion,
-    textoPropuesto: generarTextoAcuerdo(datos.base(siguienteVersion, hoy)),
-  };
+  return { vigente, pendiente, desactualizado, siguienteVersion };
+}
+
+export async function estadoAcuerdo(supabase: Cliente, trabajadorId: string): Promise<EstadoAcuerdo & { textoPropuesto: string | null }> {
+  const [lista, datos] = await Promise.all([acuerdosDe(supabase, trabajadorId), datosActuales(supabase, trabajadorId)]);
+  const e = evaluar(lista, datos);
+  const textoPropuesto = datos
+    ? generarTextoAcuerdo(datos.base(e.siguienteVersion, aHoraLocal(new Date(), datos.zonaHoraria).slice(0, 10)))
+    : null;
+  return { ...e, textoPropuesto };
+}
+
+export type ClaveEstado = "vigente" | "pendiente" | "desactualizado" | "sin_acuerdo";
+
+export interface EstadoTrabajador {
+  trabajadorId: string;
+  nombre: string;
+  numeroEmpleado: string | null;
+  email: string | null;
+  clave: ClaveEstado;
+  version: number | null;
+}
+
+/**
+ * Estado del acuerdo de todos los trabajadores activos de la empresa, con dos consultas.
+ * "desactualizado" significa que hay acuerdo (vigente o pendiente) pero ya no refleja los datos actuales.
+ */
+export async function estadosAcuerdosEmpresa(supabase: Cliente, empresaId: string): Promise<EstadoTrabajador[]> {
+  const [{ data: trabajadores, error: e1 }, { data: acuerdos, error: e2 }] = await Promise.all([
+    supabase.from("trabajadores").select(SELECT_DATOS).eq("empresa_id", empresaId).is("fecha_baja", null).order("nombre"),
+    supabase
+      .from("acuerdos")
+      .select("id, empresa_id, trabajador_id, version, contenido, contenido_hash, creado_en, firmas_acuerdo(firmante, modalidad, firmado_en, user_id, evidencia)")
+      .eq("empresa_id", empresaId),
+  ]);
+  if (e1) throw e1;
+  if (e2) throw e2;
+  const porTrabajador = new Map<string, Acuerdo[]>();
+  for (const a of acuerdos ?? []) {
+    const ac = { ...a, firmas: (a.firmas_acuerdo ?? []) as Firma[] } as unknown as Acuerdo;
+    porTrabajador.set(ac.trabajador_id, [...(porTrabajador.get(ac.trabajador_id) ?? []), ac]);
+  }
+  return ((trabajadores ?? []) as FilaDatos[]).map((t) => {
+    const datos = construirDatos(t);
+    const lista = (porTrabajador.get(t.id) ?? []).sort((a, b) => b.version - a.version);
+    const e = evaluar(lista, datos);
+    const clave: ClaveEstado = !e.vigente && !e.pendiente ? "sin_acuerdo" : e.desactualizado ? "desactualizado" : e.pendiente ? "pendiente" : "vigente";
+    return {
+      trabajadorId: t.id,
+      nombre: t.nombre,
+      numeroEmpleado: t.numero_empleado,
+      email: t.email,
+      clave,
+      version: (e.pendiente ?? e.vigente)?.version ?? null,
+    };
+  });
 }
