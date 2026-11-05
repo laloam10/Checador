@@ -50,7 +50,13 @@ npx supabase link --project-ref TU_PROJECT_REF
 npx supabase db push
 ```
 
-Aplica las 9 migraciones de `supabase/migrations/`. Las dos últimas dejan los privilegios al mínimo: el rol anónimo sin acceso, y los usuarios sin permiso de modificar o borrar la evidencia.
+Aplica las 10 migraciones de `supabase/migrations/`. Las dos últimas dejan los privilegios al mínimo: el rol anónimo sin acceso, y los usuarios sin permiso de modificar o borrar la evidencia.
+
+**Alternativa sin la CLI** (solo HTTPS, sin conexión directa a la base): `scripts/migrar-api.py`. Usa la API de administración con un token (sección 1.6), registra las migraciones en el mismo historial que la CLI y corre la verificación de seguridad:
+
+```bash
+SUPABASE_ACCESS_TOKEN=sbp_... python3 scripts/migrar-api.py TU_PROJECT_REF --verificar
+```
 
 > ⚠️ **No uses `npx supabase config push`.** Subiría la configuración local de `supabase/config.toml` (por ejemplo, `site_url = http://127.0.0.1:3000`) a producción. La configuración de Auth se hace en el dashboard (paso 1.4).
 
@@ -79,7 +85,7 @@ Repite este paso **después de cada migración nueva**.
 - **Enable Email provider:** encendido.
 - **Confirm email:** **ENCENDIDO** (es el valor por omisión, no lo apagues). El script del paso 4 lo comprueba.
 - **Email OTP Expiration:** `900` segundos (15 minutos; la plantilla lo menciona).
-- **Email OTP Length:** `6`.
+- **Email OTP Length:** `6`. Ojo: los proyectos nuevos traen **8**.
 - Proveedores sociales (Google, etc.): apagados. Checador no los usa.
 
 > **Por qué importa "Confirm email":** Supabase permite registrarse con contraseña llamando a su API. Si la confirmación estuviera apagada, alguien podría crear una cuenta con el correo de un trabajador o de un administrador invitado sin demostrar que es suyo. La base de datos ya tiene una segunda defensa: `vincular_mi_cuenta()` solo vincula cuentas cuya sesión se inició **con un código enviado al correo** (claim `amr = otp`). Aun así, la confirmación debe quedar encendida.
@@ -90,6 +96,9 @@ Repite este paso **después de cada migración nueva**.
 3. La contraseña SMTP vive solo en Supabase y en tu gestor de contraseñas.
 
 **Emails → Templates**
+
+> Supabase **no permite cambiar las plantillas** en proyectos gratuitos que usan su correo integrado: primero configura el SMTP propio (o sube a Pro).
+
 En **Magic Link** y en **Confirm signup**:
 - **Asunto:** `Tu código para Checador`
 - **Cuerpo:** el contenido de [`supabase/templates/codigo.html`](../supabase/templates/codigo.html). Debe incluir `{{ .Token }}`: si la plantilla solo trae el enlace, nadie podrá entrar desde la app instalada.
@@ -100,10 +109,41 @@ En **Magic Link** y en **Confirm signup**:
 
 > **CAPTCHA: NO lo actives todavía.** La pantalla de entrada no envía el token de CAPTCHA: activarlo bloquearía todos los accesos. Está anotado como mejora para cuando haya más clientes (sección 6).
 
+**Todo lo anterior, salvo el SMTP, se aplica con un comando** y cada valor se verifica después de guardarse:
+
+```bash
+SUPABASE_ACCESS_TOKEN=sbp_... python3 scripts/configurar-auth.py TU_PROJECT_REF --site-url https://checador.tuempresa.mx
+```
+
+(Añade `--sin-plantillas` mientras no haya SMTP propio.)
+
 ### 1.5 Base de datos (Project Settings → Database)
 
 - **Enforce SSL on incoming connections:** encendido.
 - **Network restrictions:** permite conexiones directas a la base solo desde tus IPs de administración. La app y el CI no las necesitan: usan la API.
+- **Llaves heredadas (Project Settings → API Keys):** desactiva las llaves *legacy* `anon` y `service_role` en formato JWT. Checador usa las llaves nuevas (*publishable*); la `service_role` heredada da acceso total y no caduca.
+
+### 1.6 Token de administración (para automatizar la configuración)
+
+Crea un token **con alcance** en *Account → Access Tokens*: tipo **Project**, solo los dos proyectos, preset **No access** y caducidad corta (no "Never"). Permisos mínimos:
+
+| Categoría | Permiso | Nivel |
+|---|---|---|
+| Project | Project Settings (Supabase lo llama `project_admin_write`; lo exige la configuración de Auth) | Read-write |
+| Project | Advisors · Logs | Read |
+| Database | Database · Migrations · SSL Enforcement | Read-write |
+| Application services | API Keys | Read |
+| Application services | Auth Config | Read-write |
+
+Todo lo demás en **None**, en especial: Backups (permite restaurar y sobrescribir la base), API Key Secrets, Database/Platform Webhooks (envían datos a terceros), Billing y Members. **Revócalo al terminar.**
+
+### 1.7 Asesor de seguridad de Supabase
+
+*Advisors → Security Advisor* reporta **16 avisos esperados**, que se aceptan a propósito:
+- 1 informativo: `pines_trabajador` tiene RLS sin políticas, para que nadie pueda leer los PINs por la API.
+- 15 de "función SECURITY DEFINER ejecutable por `authenticated`": son la API de la app (`crear_empresa`, `vincular_mi_cuenta`, `verificar_cadena`, `asignar_pin`, `establecer_mi_pin`, `kiosco_identificar`, `kiosco_checar`, `kiosco_firmar_acuerdo`, `miembros_de_empresa`, `trabajadores_con_pin`), que validan por dentro quién las llama, y los auxiliares de RLS (`mi_rol`, `es_gestor`, `puede_consultar`, `soy_trabajador`, `trabajo_en`).
+
+**Cualquier otro aviso es nuevo y debe revisarse.** `verificar-seguridad.sql` contiene esa misma lista y marca como hallazgo cualquier función privilegiada ejecutable que no esté en ella.
 
 ---
 

@@ -68,4 +68,14 @@ select 'ALTO', 'Privilegio ' || privilege_type || ' para ' || grantee || ' en ta
  where table_schema = 'public' and grantee in ('anon', 'authenticated', 'PUBLIC')
    and privilege_type in ('UPDATE', 'DELETE')
    and table_name in ('eventos', 'acuerdos', 'firmas_acuerdo', 'conformidades', 'exportaciones', 'cadena_estado')
+union all
+-- 10. Solo las funciones diseñadas como API (o auxiliares de RLS) pueden ejecutarse con sesión.
+--     Una función SECURITY DEFINER nueva y ejecutable que no esté en esta lista es un hallazgo.
+select 'ALTO', 'Función privilegiada ejecutable por authenticated sin estar en la lista permitida', proname || '(' || args || ')'
+  from funciones
+ where prosecdef and has_function_privilege('authenticated', oid, 'EXECUTE')
+   and proname not in (
+     'crear_empresa', 'vincular_mi_cuenta', 'verificar_cadena', 'asignar_pin', 'establecer_mi_pin',
+     'kiosco_identificar', 'kiosco_checar', 'kiosco_firmar_acuerdo', 'miembros_de_empresa',
+     'trabajadores_con_pin', 'mi_rol', 'es_gestor', 'puede_consultar', 'soy_trabajador', 'trabajo_en')
 order by 1, 2, 3;

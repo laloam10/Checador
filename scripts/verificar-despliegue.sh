@@ -9,17 +9,20 @@
 #   ./scripts/verificar-despliegue.sh
 #
 # Para probar en local sin HTTPS: LOCAL=1 (omite las verificaciones de HTTPS/HSTS).
+# Para revisar solo Supabase (antes de publicar la app): SOLO_SUPABASE=1 (no requiere APP_URL).
 # Sale con código 1 si alguna verificación falla.
 # =============================================================================
 set -uo pipefail
-: "${APP_URL:?Falta APP_URL}" "${SUPABASE_URL:?Falta SUPABASE_URL}" "${SUPABASE_PUBLISHABLE_KEY:?Falta SUPABASE_PUBLISHABLE_KEY}"
-APP_URL=${APP_URL%/}; SUPABASE_URL=${SUPABASE_URL%/}; K=$SUPABASE_PUBLISHABLE_KEY
+: "${SUPABASE_URL:?Falta SUPABASE_URL}" "${SUPABASE_PUBLISHABLE_KEY:?Falta SUPABASE_PUBLISHABLE_KEY}"
+[ "${SOLO_SUPABASE:-0}" = 1 ] || : "${APP_URL:?Falta APP_URL (o usa SOLO_SUPABASE=1)}"
+APP_URL=${APP_URL:-}; APP_URL=${APP_URL%/}; SUPABASE_URL=${SUPABASE_URL%/}; K=$SUPABASE_PUBLISHABLE_KEY
 FALLAS=0
 ok()    { printf '  \033[32m✓\033[0m %s\n' "$1"; }
 falla() { printf '  \033[31m✗ %s\033[0m\n' "$1"; FALLAS=$((FALLAS + 1)); }
 revisa() { if eval "$2"; then ok "$1"; else falla "$1"; fi; }
 cabecera() { grep -i "^$1:" <<<"$CABECERAS" | head -1 | cut -d' ' -f2- | tr -d '\r'; }
 
+if [ "${SOLO_SUPABASE:-0}" != 1 ]; then
 echo "== Aplicación: $APP_URL"
 if [ "${LOCAL:-0}" != 1 ]; then
   revisa "se sirve por HTTPS" '[[ $APP_URL == https://* ]]'
@@ -46,6 +49,8 @@ revisa "sin sesión, kiosco → 401" '[[ $(curl -s -o /dev/null -w "%{http_code}
 HORA=$(curl -s "$APP_URL/api/hora" | python3 -c "import sys,json,datetime; print(json.load(sys.stdin)['horaServidor'])" 2>/dev/null)
 revisa "reloj del servidor a menos de 60 s de este equipo" 'python3 -c "import datetime,sys; d=abs((datetime.datetime.fromisoformat(\"$HORA\".replace(\"Z\",\"+00:00\"))-datetime.datetime.now(datetime.timezone.utc)).total_seconds()); sys.exit(0 if d<60 else 1)"'
 revisa "el service worker no se guarda en caché" '[[ $(curl -sI "$APP_URL/sw.js" | grep -i "^cache-control" | tr -d "\r") == *no-store* ]]'
+
+fi
 
 echo "== Supabase: $SUPABASE_URL"
 AJUSTES=$(curl -s -H "apikey: $K" "$SUPABASE_URL/auth/v1/settings")

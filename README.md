@@ -12,6 +12,7 @@ Sistema de registro electrónico de jornada laboral (entradas y salidas) para PY
 | [docs/mvp.md](docs/mvp.md) | Alcance propuesto del producto mínimo, riesgos y decisiones pendientes |
 | [docs/stack.md](docs/stack.md) | Stack técnico (ADR-001) |
 | [supabase/README.md](supabase/README.md) | Base de datos: modelo, garantías y cómo conectarla |
+| [docs/estado-supabase.md](docs/estado-supabase.md) | Estado de la configuración de los proyectos en la nube |
 | [docs/publicacion.md](docs/publicacion.md) | **Guía de publicación segura** (Supabase, Vercel, SMTP, dominio, verificación, respaldos, operación) |
 | [apps/web/README.md](apps/web/README.md) | PWA del trabajador: configuración, seguridad y prueba de punta a punta |
 
