@@ -93,9 +93,11 @@ select tests.debe_fallar(format(
   $$insert into public.eventos (empresa_id, trabajador_id, tipo, origen, diferido, hora_dispositivo) values (%L, %L, 'salida', 'pwa', true, now() - interval '10 days')$$,
   :'empresa_a', :'trab_a'), 'captura diferida con más de 7 días de antigüedad');
 
--- Inmutabilidad para el usuario: sin política UPDATE/DELETE, no afecta filas.
-update public.eventos set motivo = 'alterado' where empresa_id = :'empresa_a';
-delete from public.eventos where empresa_id = :'empresa_a';
+-- Inmutabilidad para el usuario: ni siquiera existe el privilegio de modificar o borrar eventos.
+select tests.debe_fallar(format($$update public.eventos set motivo = 'alterado' where empresa_id = %L$$, :'empresa_a'),
+  'el trabajador modifica eventos (sin privilegio UPDATE)');
+select tests.debe_fallar(format($$delete from public.eventos where empresa_id = %L$$, :'empresa_a'),
+  'el trabajador borra eventos (sin privilegio DELETE)');
 select tests.afirmar((select count(*) = 3 and count(motivo) = 0 from public.eventos where empresa_id = :'empresa_a'),
   'el trabajador no puede modificar ni borrar eventos');
 
@@ -193,8 +195,9 @@ select tests.afirmar(
 -- =============================================================================
 \echo '--- Bajas y conservación (art. 804)'
 select set_config('request.jwt.claim.sub', :'u_prop', false) \gset
-delete from public.trabajadores where id = :'trab_a2';
-select tests.afirmar((select count(*) = 1 from public.trabajadores where id = :'trab_a2'), 'el propietario no puede borrar trabajadores');
+select tests.debe_fallar(format($$delete from public.trabajadores where id = %L$$, :'trab_a2'),
+  'el propietario borra trabajadores (sin privilegio DELETE, art. 804)');
+select tests.afirmar((select count(*) = 1 from public.trabajadores where id = :'trab_a2'), 'el trabajador sigue existiendo');
 update public.trabajadores set fecha_baja = current_date where id = :'trab_a2';
 
 select set_config('request.jwt.claim.sub', :'u_trab2', false) \gset

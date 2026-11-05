@@ -25,7 +25,7 @@ select tests.debe_fallar(format($$select public.asignar_pin(%L, '1234')$$, :'tra
 select tests.debe_fallar(format($$select public.asignar_pin(%L, '12a4')$$, :'trab_a'), 'PIN con letras');
 select tests.debe_fallar(format($$select public.asignar_pin(%L, '123')$$, :'trab_a'), 'PIN de 3 dígitos');
 select public.asignar_pin(:'trab_a', '7391');
-select tests.afirmar((select count(*) = 0 from public.pines_trabajador), 'nadie puede leer los PINs por la API (ni el propietario)');
+select tests.debe_fallar($$select count(*) from public.pines_trabajador$$, 'leer los PINs por la API (ni el propietario tiene el privilegio)');
 
 select set_config('request.jwt.claim.sub', :'u_sup', false) \gset
 select tests.debe_fallar(format($$select public.asignar_pin(%L, '5823')$$, :'trab_a'), 'el supervisor asigna PIN');

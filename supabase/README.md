@@ -9,6 +9,7 @@
 | `migrations/…06…01_kiosco_pin.sql` | PIN (bcrypt) con bloqueo por intentos, `kiosco_identificar()`, `kiosco_checar()`, pausa según el centro |
 | `migrations/…07…01_panel_invitaciones.sql` | Invitaciones por correo (admin, supervisor, kiosco), `miembros_de_empresa()`, `trabajadores_con_pin()` |
 | `migrations/…10…01_endurecimiento.sql` | Privilegios mínimos: el rol anónimo sin acceso; nadie con `TRUNCATE` |
+| `migrations/…11…01_privilegios_explicitos.sql` | Permisos explícitos por tabla: no depende de "Automatically expose new tables"; sin UPDATE/DELETE sobre la evidencia |
 | `migrations/…10…02_vinculo_solo_codigo.sql` | Vincular cuentas solo si la sesión se inició con código (claim `amr`) |
 | `migrations/…09…01_exportaciones.sql` | Registro inmutable de exportaciones con huellas SHA-256 y estado de la cadena |
 | `migrations/…08…01_acuerdos_firma.sql` | Modalidades de firma (electrónica, PIN en kiosco, autógrafa), orden de firma, `acuerdo_vigente()`, `acuerdo_pendiente()`, `kiosco_firmar_acuerdo()` |
@@ -66,7 +67,8 @@ npx supabase db push
 Las pruebas corren en GitHub Actions en cada `push` (`.github/workflows/ci.yml`). Para correrlas en local hace falta un PostgreSQL 15 o superior vacío, sin Supabase:
 
 ```bash
-PGHOST=localhost PGUSER=postgres ./supabase/tests/run-local.sh
+PGHOST=localhost PGUSER=postgres ./supabase/tests/run-local.sh                    # exposición automática activada
+EXPONER_TABLAS=0 PGHOST=localhost PGUSER=postgres ./supabase/tests/run-local.sh   # desactivada
 ```
 
 ## Pendientes conocidos

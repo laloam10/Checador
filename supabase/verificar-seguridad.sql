@@ -61,4 +61,11 @@ union all
 select 'CRITICO', 'TRUNCATE (no lo cubre RLS) para ' || grantee, table_name::text
   from information_schema.role_table_grants
  where table_schema = 'public' and privilege_type = 'TRUNCATE' and grantee in ('anon', 'authenticated', 'PUBLIC')
+union all
+-- 9. Las tablas de evidencia no deben otorgar UPDATE ni DELETE a los roles de la API.
+select 'ALTO', 'Privilegio ' || privilege_type || ' para ' || grantee || ' en tabla de evidencia', table_name::text
+  from information_schema.role_table_grants
+ where table_schema = 'public' and grantee in ('anon', 'authenticated', 'PUBLIC')
+   and privilege_type in ('UPDATE', 'DELETE')
+   and table_name in ('eventos', 'acuerdos', 'firmas_acuerdo', 'conformidades', 'exportaciones', 'cadena_estado')
 order by 1, 2, 3;

@@ -25,11 +25,20 @@ Crea **dos** proyectos de Supabase: `checador-produccion` y `checador-pruebas`. 
 
 ### 1.1 Crear el proyecto
 
-1. En https://supabase.com/dashboard, crea el proyecto **en tu organización con plan Pro**.
-2. **Región:** no hay región en México. Elige una de EE. UU. (p. ej. `us-east-1` o `us-west-1`) y **anota cuál**: Vercel debe ejecutarse en la misma (paso 2.3).
-3. **Contraseña de la base de datos:** genera una larga y aleatoria y guárdala **solo** en un gestor de contraseñas. Nunca en el repositorio, en un correo ni en un chat.
+**Organización:** crea una exclusiva para el producto (p. ej. `Checador`) y súbela a **Pro**. No reutilices una organización que ya tenga otros proyectos: en Pro, **cada proyecto activo de la organización genera cargo de cómputo** (unos 10 USD/mes cada uno después del crédito incluido), y además mantienes separados la facturación y los accesos del producto.
 
-> **Datos personales:** los datos quedarán en servidores fuera de México. La LFPDPPP lo permite, pero el aviso de privacidad debe informarlo (sección 7).
+Crea dos proyectos con esta configuración (pantalla *Create a new project*):
+
+| Campo | Producción | Pruebas | Por qué |
+|---|---|---|---|
+| Project name | `checador-produccion` | `checador-pruebas` | |
+| GitHub (optional) | **No conectar** | **No conectar** | Aplicaría migraciones de `main` a producción automáticamente, sin pasar antes por pruebas ni por la verificación de seguridad. |
+| Database password | **Generate a password** y guárdala en tu gestor de contraseñas | igual (otra distinta) | Supabase no te la vuelve a mostrar. |
+| Region | *Need a specific region?* → **East US (North Virginia)** `us-east-1` | la misma | Vercel ejecuta la app por omisión en `iad1`, la misma zona. |
+| Enable Data API | ✅ Activado | ✅ | La app usa la API de Supabase. |
+| Automatically expose new tables | ❌ **Desactivado** | ❌ | Recomendación de Supabase. Las migraciones otorgan permisos explícitos tabla por tabla (`…11…01_privilegios_explicitos.sql`); el CI prueba ambos modos. |
+| Enable automatic RLS | ✅ Activado | ✅ | Red de seguridad extra: cualquier tabla nueva nace con RLS. Las migraciones ya lo activan. |
+| Advanced configuration | Valores por omisión | igual | |
 
 ### 1.2 Aplicar las migraciones
 
@@ -41,7 +50,7 @@ npx supabase link --project-ref TU_PROJECT_REF
 npx supabase db push
 ```
 
-Aplica las 8 migraciones de `supabase/migrations/`, incluida `…10…01_endurecimiento.sql`, que retira los privilegios que Supabase otorga por omisión al rol anónimo.
+Aplica las 9 migraciones de `supabase/migrations/`. Las dos últimas dejan los privilegios al mínimo: el rol anónimo sin acceso, y los usuarios sin permiso de modificar o borrar la evidencia.
 
 > ⚠️ **No uses `npx supabase config push`.** Subiría la configuración local de `supabase/config.toml` (por ejemplo, `site_url = http://127.0.0.1:3000`) a producción. La configuración de Auth se hace en el dashboard (paso 1.4).
 

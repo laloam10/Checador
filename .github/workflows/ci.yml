@@ -43,4 +43,11 @@ jobs:
       PGPASSWORD: postgres
     steps:
       - uses: actions/checkout@v4
-      - run: ./supabase/tests/run-local.sh
+      - name: Pruebas con "Automatically expose new tables" activada (valor por omisión de Supabase)
+        run: ./supabase/tests/run-local.sh
+        env:
+          EXPONER_TABLAS: 1
+      - name: Pruebas con "Automatically expose new tables" desactivada (recomendado por Supabase)
+        run: ./supabase/tests/run-local.sh
+        env:
+          EXPONER_TABLAS: 0
