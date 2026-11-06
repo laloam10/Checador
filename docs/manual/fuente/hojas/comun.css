@@ -1,0 +1,19 @@
+@page { size: A4; margin: 12mm 13mm; }
+* { box-sizing: border-box; }
+body { font-family: "DejaVu Sans", Arial, sans-serif; color: #212529; margin: 0; line-height: 1.4; }
+.cab { display: flex; align-items: center; gap: 4mm; border-bottom: 3px solid #0f5132; padding-bottom: 3mm; margin-bottom: 4mm; }
+.cab img { width: 14mm; height: 14mm; }
+.cab h1 { margin: 0; color: #0f5132; font-size: 22pt; line-height: 1.1; }
+.cab .sub { color: #6c757d; font-size: 10.5pt; }
+.boton { display: inline-block; background: #0f5132; color: #fff; border-radius: 4px; padding: 0 5px; font-weight: 700; white-space: nowrap; }
+.paso { display: flex; gap: 3mm; align-items: flex-start; }
+.num { flex: none; width: 9mm; height: 9mm; border-radius: 50%; background: #0f5132; color: #fff; font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 13pt; }
+h2 { color: #0f5132; margin: 0 0 1.5mm; font-size: 12.5pt; }
+p { margin: 0 0 1.5mm; }
+ul { margin: 0; padding-left: 5mm; } li { margin: 0.6mm 0; }
+img.capt { border: 1px solid #dee2e6; border-radius: 6px; display: block; }
+.caja { border-radius: 5px; padding: 2.5mm 3.5mm; margin-top: 3mm; }
+.azul { background: #eef4ff; border-left: 4px solid #3d6fd6; }
+.rojo { background: #f8d7da; border-left: 4px solid #842029; }
+.verde { background: #d1e7dd; border-left: 4px solid #0f5132; }
+.pie { margin-top: 3mm; font-size: 8pt; color: #6c757d; text-align: center; }

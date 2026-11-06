@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<title>Checador · Manual de usuario</title>
+<style>
+  @page { size: A4; margin: 22mm 18mm 20mm 18mm; }
+  :root { --verde: #0f5132; --verde-claro: #d1e7dd; --ambar: #664d03; --ambar-claro: #fff3cd; --rojo: #842029; --rojo-claro: #f8d7da; --gris: #6c757d; --borde: #dee2e6; }
+  * { box-sizing: border-box; }
+  body { font-family: "DejaVu Sans", "Segoe UI", Arial, sans-serif; font-size: 10.5pt; line-height: 1.5; color: #212529; margin: 0; }
+  h1 { font-size: 22pt; color: var(--verde); margin: 0 0 6mm; page-break-before: always; border-bottom: 2px solid var(--verde); padding-bottom: 2mm; }
+  h2 { font-size: 14pt; color: var(--verde); margin: 7mm 0 2mm; page-break-after: avoid; }
+  h3 { font-size: 11.5pt; margin: 5mm 0 1.5mm; page-break-after: avoid; }
+  p, li { orphans: 3; widows: 3; }
+  ol, ul { padding-left: 6mm; margin: 1.5mm 0; }
+  li { margin: 0.8mm 0; }
+  .boton { display: inline-block; background: var(--verde); color: white; border-radius: 4px; padding: 0 6px; font-weight: 600; font-size: 9.5pt; white-space: nowrap; }
+  .menu { font-weight: 600; color: var(--verde); }
+  code, .dir { font-family: "DejaVu Sans Mono", monospace; font-size: 9pt; background: #f1f3f5; padding: 0 3px; border-radius: 3px; }
+  .nota, .importante, .consejo { border-radius: 5px; padding: 3mm 4mm; margin: 3mm 0; page-break-inside: avoid; font-size: 10pt; }
+  .nota { background: #eef4ff; border-left: 4px solid #3d6fd6; }
+  .importante { background: var(--rojo-claro); border-left: 4px solid var(--rojo); }
+  .consejo { background: var(--verde-claro); border-left: 4px solid var(--verde); }
+  .nota b:first-child, .importante b:first-child, .consejo b:first-child { display: block; margin-bottom: 1mm; }
+  figure { margin: 4mm 0; text-align: center; page-break-inside: avoid; }
+  figure img { max-width: 100%; border: 1px solid var(--borde); border-radius: 4px; }
+  figure.celular img { max-width: 50mm; border-radius: 10px; }
+  figure.tableta img { max-width: 95mm; }
+  figure.media img { max-width: 120mm; }
+  figcaption { font-size: 8.5pt; color: var(--gris); margin-top: 1.5mm; }
+  .fila { display: flex; gap: 6mm; justify-content: center; align-items: flex-start; page-break-inside: avoid; }
+  .fila figure { flex: 1; margin: 2mm 0; }
+  table { width: 100%; border-collapse: collapse; margin: 3mm 0; font-size: 9.5pt; page-break-inside: avoid; }
+  th, td { border: 1px solid var(--borde); padding: 1.6mm 2.2mm; text-align: left; vertical-align: top; }
+  th { background: #f1f3f5; }
+  td.si { color: var(--verde); font-weight: 700; text-align: center; }
+  td.no { color: var(--gris); text-align: center; }
+  /* Portada */
+  .portada { height: 250mm; display: flex; flex-direction: column; justify-content: center; text-align: center; }
+  .portada .logo { width: 34mm; height: 34mm; margin: 0 auto 8mm; }
+  .portada h1 { page-break-before: avoid; border: none; font-size: 34pt; margin: 0; }
+  .portada .sub { font-size: 15pt; color: var(--gris); margin: 3mm 0 18mm; }
+  .portada .datos { font-size: 10.5pt; color: #495057; line-height: 1.9; }
+  /* Índice */
+  .indice { page-break-before: always; }
+  .indice h1 { page-break-before: avoid; }
+  .indice ol { list-style: none; padding: 0; }
+  .indice > ol > li { font-weight: 700; margin-top: 3mm; }
+  .indice li li { font-weight: 400; padding-left: 6mm; margin: 0.6mm 0; }
+  .indice a { color: inherit; text-decoration: none; }
+  .roles { display: flex; gap: 4mm; margin: 4mm 0; }
+  .rol { flex: 1; border: 1px solid var(--borde); border-radius: 6px; padding: 3mm 4mm; font-size: 9.5pt; }
+  .rol strong { display: block; color: var(--verde); font-size: 11pt; margin-bottom: 1mm; }
+</style>
+</head>
+<body>
+
+<!-- ======================= PORTADA ======================= -->
+<section class="portada">
+  <img class="logo" src="../../../apps/web/public/icon-512.png" alt="">
+  <h1>Checador</h1>
+  <div class="sub">Manual de usuario</div>
+  <div class="datos">
+    Registro electrónico de la jornada de trabajo<br>
+    conforme al artículo 132, fracción XXXIV, de la Ley Federal del Trabajo<br><br>
+    <b>Aplicación:</b> https://checador.jemba.mx<br>
+    Versión 1.0 · noviembre de 2026
+  </div>
+</section>
+
+<!-- ======================= ÍNDICE ======================= -->
+<section class="indice">
+<h1>Contenido</h1>
+<ol>
+  <li><a href="#intro">1. Qué es Checador</a></li>
+  <li><a href="#entrar">2. Entrar a Checador (todos)</a></li>
+  <li><a href="#empleador">3. Guía del empleador</a>
+    <ol>
+      <li>3.1 Registrar tu empresa · 3.2 Primeros pasos · 3.3 Dar de alta a tu personal</li>
+      <li>3.4 PIN para el kiosco · 3.5 Acuerdos de registro · 3.6 Instalar el kiosco</li>
+      <li>3.7 Centros de trabajo · 3.8 Tablero · 3.9 Registros semanales</li>
+      <li>3.10 Corregir checadas · 3.11 Objeciones · 3.12 Exportar para inspección o juicio</li>
+      <li>3.13 Accesos y roles · 3.14 Dar de baja a un trabajador</li>
+    </ol>
+  </li>
+  <li><a href="#trabajador">4. Guía del trabajador (app en el celular)</a></li>
+  <li><a href="#kiosco">5. Guía del kiosco</a></li>
+  <li><a href="#faq">6. Preguntas frecuentes y solución de problemas</a></li>
+  <li><a href="#glosario">7. Glosario</a></li>
+</ol>
+</section>
+
+<!-- ======================= 1. INTRODUCCIÓN ======================= -->
+<h1 id="intro">1. Qué es Checador</h1>
+<p>Checador es un sistema para <b>registrar electrónicamente la hora de entrada y salida</b> de cada persona trabajadora, como exige la reforma a la Ley Federal del Trabajo (artículo 132, fracción XXXIV). Además de registrar, calcula las horas trabajadas y el tiempo extra, permite al trabajador revisar y confirmar sus horarios, y genera la documentación para una inspección de la STPS o un juicio laboral.</p>
+
+<h2>Tres formas de usarlo</h2>
+<div class="roles">
+  <div class="rol"><strong>Empleador</strong>Dueño, administrador o supervisor. Usa el <b>panel</b> desde la computadora: da de alta al personal, firma acuerdos, corrige checadas y exporta reportes.</div>
+  <div class="rol"><strong>Trabajador</strong>Usa la <b>app en su celular</b>: registra entrada, pausas y salida, revisa sus horarios, da su conformidad y firma su acuerdo.</div>
+  <div class="rol"><strong>Kiosco</strong>Una <b>tableta fija</b> en el centro de trabajo, para quien no tiene celular o correo: se checa con número de empleado y PIN.</div>
+</div>
+
+<h2>Cinco reglas que conviene conocer desde el inicio</h2>
+<ol>
+  <li><b>Nada se borra.</b> Cada checada queda guardada para siempre en una bitácora protegida. Si hay un error, se <b>corrige con un motivo</b>, y el registro original sigue visible. Así el registro tiene valor como prueba.</li>
+  <li><b>La hora la pone el servidor</b>, no el celular. Cambiar la hora del teléfono no altera la checada.</li>
+  <li><b>El acuerdo da valor de prueba plena.</b> La ley indica que el registro hace prueba plena si se acredita que fue <b>acordado</b> entre empleador y trabajador. Por eso cada trabajador firma un acuerdo de registro.</li>
+  <li><b>El acuerdo no es retroactivo.</b> Solo cubre los registros a partir de que ambas partes lo firman. Fírmalo el primer día.</li>
+  <li><b>Cada semana, el trabajador revisa sus horarios</b> y da su conformidad o los objeta. Si no responde, no significa que esté de acuerdo.</li>
+</ol>
+
+<!-- ======================= 2. ENTRAR ======================= -->
+<h1 id="entrar">2. Entrar a Checador (todos)</h1>
+<p>Checador <b>no usa contraseñas</b>. Para entrar recibes un código de 6 dígitos en tu correo.</p>
+<div class="fila">
+  <figure class="celular"><img src="img/01-entrar-correo.png"><figcaption>Paso 1: escribe tu correo.</figcaption></figure>
+  <figure class="celular"><img src="img/02-entrar-codigo.png"><figcaption>Paso 2: escribe el código que llegó.</figcaption></figure>
+</div>
+<ol>
+  <li>Abre <span class="dir">https://checador.jemba.mx</span> en el navegador de tu celular o computadora.</li>
+  <li>Escribe tu correo y presiona <span class="boton">Enviarme un código</span>.</li>
+  <li>Revisa tu correo: llega un mensaje de <b>Reloj Checador</b> con el asunto <i>"Tu código para Checador"</i>.</li>
+  <li>Escribe el código de 6 dígitos y presiona <span class="boton">Entrar</span>.</li>
+</ol>
+<div class="nota"><b>Ten en cuenta</b>El código vence en <b>15 minutos</b> y sirve una sola vez. Si no llega en un par de minutos, revisa la carpeta de <b>spam</b> o "promociones". Si pides demasiados códigos seguidos, el sistema te pedirá esperar unos minutos.</div>
+
+<h2>Instalar la app en el celular</h2>
+<p>Checador funciona desde el navegador, pero conviene agregarlo a la pantalla de inicio para abrirlo como una app:</p>
+<table>
+  <tr><th style="width:22%">Teléfono</th><th>Pasos</th></tr>
+  <tr><td><b>Android</b> (Chrome)</td><td>Abre Checador → menú <b>⋮</b> → <b>Agregar a la pantalla principal</b> (o <b>Instalar app</b>).</td></tr>
+  <tr><td><b>iPhone</b> (Safari)</td><td>Abre Checador → botón <b>Compartir</b> (cuadro con flecha) → <b>Agregar a inicio</b>.</td></tr>
+</table>
+<p>Al entrar, Checador te lleva automáticamente a tu lugar: al <b>panel</b> si eres empleador, a la pantalla para <b>checar</b> si eres trabajador, o al <b>kiosco</b> si es la cuenta de la tableta.</p>
+
+<!-- ======================= 3. EMPLEADOR ======================= -->
+<h1 id="empleador">3. Guía del empleador</h1>
+
+<h2>3.1 Registrar tu empresa</h2>
+<p>La primera vez que entras sin estar vinculado a ninguna empresa, Checador te pide registrarla. Quien la registra queda como <b>propietario</b>.</p>
+<figure class="media"><img src="img/03-alta-empresa.png"><figcaption>Registro de la empresa.</figcaption></figure>
+<ol>
+  <li>Escribe la <b>razón social</b> o el nombre del negocio y, si quieres, el <b>RFC</b>.</li>
+  <li>Escribe el nombre de tu primer <b>centro de trabajo</b> (por ejemplo, "Matriz").</li>
+  <li>Responde si tu personal <b>puede salir del lugar durante la pausa de comida</b>. Esta respuesta es obligatoria y tiene efecto legal: si <b>no</b> puede salir, el tiempo de comida cuenta como jornada pagada (artículo 64 de la LFT).</li>
+  <li>Elige la <b>zona horaria</b> y presiona <span class="boton">Crear empresa</span>.</li>
+</ol>
+
+<h2>3.2 Primeros pasos</h2>
+<p>El <span class="menu">Tablero</span> muestra una lista de <b>Primeros pasos</b> que se marcan solos conforme avanzas y desaparece cuando todo está en orden. Cada paso tiene un enlace para resolverlo.</p>
+<figure><img src="img/04-tablero-primeros-pasos.png"><figcaption>Tablero de una empresa recién registrada, con la lista de primeros pasos.</figcaption></figure>
+<p>Si más adelante cambias la jornada, el día de descanso o la regla de la pausa de alguien, su acuerdo queda <b>desactualizado</b> y la lista vuelve a aparecer para que firmen una nueva versión.</p>
+
+<h2>3.3 Dar de alta a tu personal</h2>
+<p>En <span class="menu">Trabajadores</span>, al final de la página, está el formulario <b>Dar de alta</b>.</p>
+<figure><img src="img/05-alta-trabajador.png"><figcaption>Formulario para dar de alta a una persona trabajadora.</figcaption></figure>
+<table>
+  <tr><th style="width:28%">Campo</th><th>Para qué sirve</th></tr>
+  <tr><td>Nombre completo</td><td>Aparece en los registros, acuerdos y reportes.</td></tr>
+  <tr><td>Número de empleado</td><td>Lo usa para checar en el <b>kiosco</b>. Usa <b>solo dígitos</b>: el teclado del kiosco es numérico.</td></tr>
+  <tr><td>Correo (opcional)</td><td>Si lo pones, la persona podrá usar la <b>app en su celular</b>. Al entrar por primera vez con ese correo, su cuenta se vincula sola.</td></tr>
+  <tr><td>CURP (opcional)</td><td>Identificación adicional en el acuerdo y en los reportes.</td></tr>
+  <tr><td>Centro, fecha de ingreso, día de descanso</td><td>Necesarios para el cálculo de jornada y para el acuerdo.</td></tr>
+  <tr><td>Jornada pactada por día (opcional)</td><td>Si acordaron repartir las horas de otra forma (artículo 58 de la LFT), por ejemplo 9.6 horas de lunes a viernes. Si lo dejas vacío, se usa la jornada legal (8 h diurna, 7 h nocturna, 7.5 h mixta).</td></tr>
+</table>
+<div class="consejo"><b>¿App o kiosco?</b>Cada persona necesita al menos una forma de checar: <b>correo</b> (app en el celular) o <b>número de empleado con PIN</b> (kiosco). Puede tener las dos.</div>
+
+<h2>3.4 PIN para el kiosco</h2>
+<p>En la ficha de cada trabajador está la sección <b>PIN para el kiosco</b>. Escribe un PIN de 4 a 6 dígitos y presiona <span class="boton">Asignar PIN</span>. Entrégalo a la persona <b>en privado</b>.</p>
+<figure class="media"><img src="img/06-pin-trabajador.png"><figcaption>Asignación del PIN.</figcaption></figure>
+<ul>
+  <li>No se aceptan PIN obvios como <code>0000</code> o <code>1234</code>.</li>
+  <li>Nadie puede ver un PIN después de asignarlo, ni siquiera el propietario. Si se olvida, asigna uno nuevo.</li>
+  <li>El trabajador que usa la app puede elegir su propio PIN desde la sección <b>PIN</b> de su celular.</li>
+</ul>
+
+<h2>3.5 Acuerdos de registro</h2>
+<p>El acuerdo establece cómo se registra la jornada: el método (app o kiosco), la jornada y el descanso, la regla de la pausa, cómo se corrigen errores y qué datos personales se tratan. <b>Primero firma la empresa y después el trabajador.</b></p>
+<h3>Firmar todos los acuerdos de una vez</h3>
+<figure><img src="img/08-acuerdos-en-lote.png"><figcaption>Sección "Acuerdos de registro" en la lista de trabajadores.</figcaption></figure>
+<ol>
+  <li>Ve a <span class="menu">Trabajadores</span> y baja a <b>Acuerdos de registro</b>.</li>
+  <li>Abre <b>Ver el texto</b> y léelo. Cada acuerdo se genera con los datos de su trabajador.</li>
+  <li>Marca <b>"Revisé el texto y firmo estos acuerdos…"</b> y presiona <span class="boton">Generar y firmar … acuerdo(s) como empresa</span>.</li>
+</ol>
+<p>La columna <b>Acuerdo</b> de la lista muestra el estado de cada persona:</p>
+<figure><img src="img/07-lista-trabajadores.png"><figcaption>Estado del acuerdo por trabajador.</figcaption></figure>
+<table>
+  <tr><th style="width:25%">Estado</th><th>Qué significa</th></tr>
+  <tr><td><b>Sin acuerdo</b></td><td>Aún no se ha generado. Sus registros no tienen el respaldo de un acuerdo firmado.</td></tr>
+  <tr><td><b>Falta su firma</b></td><td>La empresa ya firmó; falta la persona trabajadora.</td></tr>
+  <tr><td><b>Vigente</b></td><td>Firmado por ambas partes.</td></tr>
+  <tr><td><b>Desactualizado</b></td><td>Cambió algún dato (jornada, descanso, pausa, método). Hay que firmar una versión nueva; la anterior sigue vigente mientras tanto.</td></tr>
+</table>
+<h3>Cómo firma el trabajador</h3>
+<ul>
+  <li><b>En su app</b>: le aparece un aviso al entrar (ver sección 4).</li>
+  <li><b>En el kiosco</b>: al teclear su número y PIN aparece "Tienes un acuerdo por firmar" (ver sección 5).</li>
+  <li><b>En papel</b>: en la ficha del trabajador, abre <b>ver / imprimir</b>, imprime el acuerdo (lleva un folio y una huella digital) y, ya firmado, registra la firma en <b>Registrar firma en papel</b> indicando la fecha y dónde guardas el original.</li>
+</ul>
+<figure><img src="img/26-acuerdo-pendiente-papel.png"><figcaption>Acuerdo pendiente de firma del trabajador, con la opción de registrar la firma en papel.</figcaption></figure>
+<div class="importante"><b>El acuerdo no es retroactivo</b>Solo cubre los registros desde que ambas partes lo firman. Nadie puede ser obligado a firmar: si alguien no firma, sus registros siguen siendo prueba, pero no prueba plena.</div>
+
+<h2>3.6 Instalar el kiosco</h2>
+<p>El kiosco es una tableta o un teléfono fijo donde checan las personas sin celular o sin correo.</p>
+<ol>
+  <li>En <span class="menu">Accesos</span>, invita un correo de la empresa (por ejemplo <code>kiosco.matriz@tuempresa.mx</code>) con el rol <b>Kiosco</b> y, si quieres, limitado a un centro de trabajo.</li>
+  <li>En la tableta, abre <span class="dir">https://checador.jemba.mx/kiosco</span> y entra con ese correo y el código que le llegue.</li>
+  <li>La tableta queda lista: mostrará el teclado para el número de empleado.</li>
+</ol>
+<figure><img src="img/09-accesos.png"><figcaption>Invitación de un kiosco en Accesos.</figcaption></figure>
+<div class="consejo"><b>Recomendaciones para la tableta</b>Déjala conectada a la corriente y a internet, y usa el modo de app fija: <i>Fijar pantalla</i> en Android o <i>Acceso guiado</i> en iPad. Así nadie puede salir de Checador ni cerrar la sesión.</div>
+
+<h2>3.7 Centros de trabajo</h2>
+<p>En <span class="menu">Centros</span> defines cada sucursal: nombre, dirección, zona horaria y si el personal <b>puede salir durante la pausa de comida</b>. Esta regla se aplica automáticamente a todas las checadas del celular y del kiosco.</p>
+<figure class="media"><img src="img/10-centro.png"><figcaption>Configuración de un centro de trabajo.</figcaption></figure>
+
+<h2>3.8 Tablero</h2>
+<figure><img src="img/21-tablero.png"><figcaption>Tablero: quién está en turno, acuerdos vigentes y objeciones.</figcaption></figure>
+<ul>
+  <li><b>En turno ahora</b>: quién está trabajando o en pausa y desde qué hora.</li>
+  <li><b>X de Y con acuerdo de registro vigente</b>: si no están todos, se marca en amarillo.</li>
+  <li><b>Objeciones por atender</b>: semanas que algún trabajador marcó como incorrectas.</li>
+  <li><b>Integridad de la bitácora</b> → <span class="boton">Verificar ahora</span>: comprueba que ningún registro haya sido alterado. Hazlo de vez en cuando y antes de entregar información a una autoridad.</li>
+</ul>
+
+<h2>3.9 Registros semanales</h2>
+<p>En <span class="menu">Trabajadores</span> → <b>Registros</b> (o desde el nombre en el tablero) ves la semana de cada persona: turnos, pausas, horas trabajadas y tiempo extra. Usa <b>Anterior</b> y <b>Siguiente</b> para cambiar de semana.</p>
+<figure><img src="img/22-semana-tabla.png"><figcaption>Semana de un trabajador: el jueves trabajó 11 horas, 3 de ellas extra.</figcaption></figure>
+<p>Checador calcula automáticamente:</p>
+<ul>
+  <li><b>Jornada ordinaria</b> frente al <b>máximo legal semanal</b> del año: 48 h en 2026, 46 h en 2027, hasta 40 h en 2030.</li>
+  <li><b>Extra al doble</b>: hasta el tope semanal del año, máximo 4 horas al día y 4 días por semana.</li>
+  <li><b>Extra al triple</b>: lo que exceda lo anterior.</li>
+  <li><b>Alertas</b>: más de 12 horas en un día, trabajo en el día de descanso o en domingo (prima dominical), semana sin descanso.</li>
+</ul>
+
+<h2>3.10 Corregir checadas</h2>
+<p>En la parte de abajo de la semana está la <b>Bitácora</b> con cada checada y su origen (celular, kiosco o panel). En cada registro, <b>Corregir o anular</b> permite:</p>
+<ul>
+  <li><b>Corregir la hora</b>: escribe la hora correcta y el motivo.</li>
+  <li><b>Anular la checada</b>: por ejemplo, si se registró dos veces. Requiere motivo.</li>
+</ul>
+<p>Para una checada que nunca se hizo (por ejemplo, olvidó checar su salida), usa <b>Agregar checada faltante</b>, al final de la página.</p>
+<figure><img src="img/23-bitacora-correccion.png"><figcaption>Una entrada corregida: se ven la hora nueva, el motivo y la hora original.</figcaption></figure>
+<div class="importante"><b>El motivo es obligatorio y queda a la vista</b>Las correcciones nunca borran el registro original: muestran quién corrigió, cuándo y por qué. El trabajador también las ve. Escribe motivos claros y verdaderos; en un juicio son evidencia.</div>
+
+<h2>3.11 Objeciones</h2>
+<p>Cuando un trabajador marca una semana como incorrecta, aparece en <span class="menu">Objeciones</span> con su comentario.</p>
+<figure><img src="img/24-objeciones.png"><figcaption>Objeción pendiente de una trabajadora.</figcaption></figure>
+<ol>
+  <li>Abre la semana desde el nombre del trabajador.</li>
+  <li>Revisa su comentario y, si tiene razón, corrige las checadas con el motivo correspondiente.</li>
+  <li>Pídele que revise de nuevo y dé su conformidad desde su app. La objeción sale de la lista cuando lo hace.</li>
+</ol>
+
+<h2>3.12 Exportar para inspección o juicio</h2>
+<p>En <span class="menu">Exportar</span> generas los documentos que pide la STPS en una inspección o que se presentan en un juicio laboral.</p>
+<figure><img src="img/25-exportar.png"><figcaption>Exportación, verificación de archivos e historial.</figcaption></figure>
+<table>
+  <tr><th style="width:30%">Formato</th><th>Contenido</th></tr>
+  <tr><td><b>PDF</b> (por trabajador)</td><td>Constancia completa: datos laborales, integridad de la bitácora, acuerdos y firmas, resumen semanal con conformidades y bitácora completa.</td></tr>
+  <tr><td><b>CSV bitácora</b></td><td>Cada registro, incluidas correcciones y anulaciones. Se abre en Excel.</td></tr>
+  <tr><td><b>CSV resumen</b></td><td>Horas por día y por semana, con tiempo extra.</td></tr>
+</table>
+<ul>
+  <li>El periodo se ajusta a <b>semanas completas</b> (lunes a domingo), porque el tiempo extra se calcula por semana.</li>
+  <li>Se pueden exportar trabajadores <b>dados de baja</b>.</li>
+  <li>Cada archivo queda registrado con su <b>huella digital</b>. En <b>Verificar un archivo</b> puedes comprobar después que un archivo entregado no fue modificado.</li>
+</ul>
+
+<h2>3.13 Accesos y roles</h2>
+<p>En <span class="menu">Accesos</span> invitas a otras personas por correo. Al entrar con ese correo obtienen su acceso automáticamente.</p>
+<table>
+  <tr><th>Puede…</th><th>Propietario</th><th>Administrador</th><th>Supervisor</th><th>Kiosco</th></tr>
+  <tr><td>Ver tablero, registros y objeciones</td><td class="si">✓</td><td class="si">✓</td><td class="si">✓</td><td class="no">—</td></tr>
+  <tr><td>Corregir, anular o agregar checadas</td><td class="si">✓</td><td class="si">✓</td><td class="si">✓</td><td class="no">—</td></tr>
+  <tr><td>Exportar</td><td class="si">✓</td><td class="si">✓</td><td class="si">✓</td><td class="no">—</td></tr>
+  <tr><td>Dar de alta y de baja, asignar PIN, firmar acuerdos</td><td class="si">✓</td><td class="si">✓</td><td class="no">—</td><td class="no">—</td></tr>
+  <tr><td>Configurar centros, invitar supervisores y kioscos</td><td class="si">✓</td><td class="si">✓</td><td class="no">—</td><td class="no">—</td></tr>
+  <tr><td>Invitar o quitar administradores</td><td class="si">✓</td><td class="no">—</td><td class="no">—</td><td class="no">—</td></tr>
+  <tr><td>Registrar checadas con número y PIN</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="si">✓</td></tr>
+</table>
+
+<h2>3.14 Dar de baja a un trabajador</h2>
+<p>En la ficha del trabajador, sección <b>Baja</b>: indica la fecha, escribe <code>BAJA</code> para confirmar y presiona <span class="boton">Registrar baja</span>. La persona ya no podrá checar, pero <b>sus registros se conservan</b>, como exige el artículo 804 de la LFT (durante la relación laboral y un año después), y se pueden seguir exportando.</p>
+
+<!-- ======================= 4. TRABAJADOR ======================= -->
+<h1 id="trabajador">4. Guía del trabajador (app en el celular)</h1>
+<p>Entra con tu correo como se explica en la sección 2. La primera vez, tu cuenta se vincula sola con el registro que hizo tu empleador. Si te dice "Tu cuenta aún no está vinculada", pide a tu empleador que te dé de alta con ese mismo correo.</p>
+
+<h2>4.1 Firmar tu acuerdo de registro</h2>
+<p>Cuando tu empleador te envía el acuerdo, aparece un aviso amarillo al entrar. Tócalo o ve a la sección <b>Acuerdo</b>.</p>
+<div class="fila">
+  <figure class="celular"><img src="img/11-app-inicio-aviso.png"><figcaption>Aviso de acuerdo pendiente.</figcaption></figure>
+  <figure class="celular"><img src="img/12-app-acuerdo.png"><figcaption>Texto del acuerdo.</figcaption></figure>
+</div>
+<ol>
+  <li>Lee el acuerdo completo.</li>
+  <li>Marca <b>"Leí el acuerdo completo… y estoy de acuerdo"</b> y presiona <span class="boton">Firmar acuerdo</span>.</li>
+</ol>
+<p>No estás obligado a firmar en ese momento. Si algo no es correcto, coméntalo con tu empleador antes de firmar.</p>
+
+<h2>4.2 Checar entrada, pausa y salida</h2>
+<div class="fila">
+  <figure class="celular"><img src="img/13-app-trabajando.png"><figcaption>Después de registrar la entrada.</figcaption></figure>
+  <div style="flex:1.3; font-size:10pt">
+    <p>La pantalla <b>Checar</b> muestra la hora y solo los botones que corresponden:</p>
+    <ul>
+      <li><b>Fuera de turno</b> → <span class="boton">Registrar entrada</span></li>
+      <li><b>Trabajando</b> → <span class="boton">Iniciar pausa</span> o <span class="boton">Registrar salida</span></li>
+      <li><b>En pausa</b> → <span class="boton">Terminar pausa</span></li>
+    </ul>
+    <p>Abajo aparecen tus registros del día.</p>
+    <div class="nota"><b>Sin internet</b>Si no hay conexión, la checada se guarda en tu teléfono y se envía sola cuando vuelva la señal. Queda marcada como <i>"sin conexión"</i> con la hora en que la hiciste. En iPhone se envía la próxima vez que abras la app.</div>
+  </div>
+</div>
+
+<h2>4.3 Revisar tus registros y dar tu conformidad</h2>
+<p>En <b>Mis registros</b> ves cada semana: turnos, pausas, horas y tiempo extra. Cuando termina la semana puedes confirmarla:</p>
+<div class="fila">
+  <figure class="celular"><img src="img/14-app-registros.png"><figcaption>Semana terminada, lista para confirmar.</figcaption></figure>
+  <figure class="celular"><img src="img/14b-app-objetar.png"><figcaption>Explicar qué no es correcto.</figcaption></figure>
+</div>
+<ul>
+  <li>Si todo es correcto: <span class="boton">Estoy de acuerdo con mis registros</span>.</li>
+  <li>Si algo no coincide: <b>Algo no es correcto</b> → explica qué está mal → <span class="boton">Enviar objeción</span>. Tu empleador deberá revisarlo y podrás confirmar después.</li>
+</ul>
+<p>Al responder recibes un <b>comprobante</b> con un número de registro. Guárdalo: sirve para demostrar qué semana confirmaste.</p>
+
+<h2>4.4 Elegir tu PIN para el kiosco</h2>
+<figure class="celular"><img src="img/15-app-pin.png"><figcaption>Sección PIN.</figcaption></figure>
+<p>Si en tu centro hay kiosco, en la sección <b>PIN</b> puedes elegir tu propio PIN de 4 a 6 dígitos. <b>No lo compartas</b>: quien lo conozca puede checar por ti.</p>
+
+<!-- ======================= 5. KIOSCO ======================= -->
+<h1 id="kiosco">5. Guía del kiosco</h1>
+<p>Para checar en la tableta del centro de trabajo solo necesitas tu <b>número de empleado</b> y tu <b>PIN</b>.</p>
+<div class="fila">
+  <figure class="tableta"><img src="img/16-kiosco-numero.png"><figcaption>1. Teclea tu número de empleado y presiona OK.</figcaption></figure>
+  <figure class="tableta"><img src="img/17-kiosco-pin.png"><figcaption>2. Teclea tu PIN y presiona OK.</figcaption></figure>
+</div>
+<div class="fila">
+  <figure class="tableta"><img src="img/18-kiosco-acciones.png"><figcaption>3. Elige la acción que aparece.</figcaption></figure>
+  <figure class="tableta"><img src="img/20-kiosco-listo.png"><figcaption>4. Confirmación. La pantalla vuelve sola al inicio.</figcaption></figure>
+</div>
+<ul>
+  <li>El kiosco solo muestra tu nombre y la acción que te corresponde, sin historial: es un dispositivo compartido.</li>
+  <li>Si nadie toca la pantalla, vuelve sola al inicio en unos segundos.</li>
+  <li>Si tienes un acuerdo pendiente, aparece el botón <b>"Tienes un acuerdo por firmar"</b>. Al tocarlo puedes leerlo (tienes 4 minutos) y firmarlo con <span class="boton">Leí el acuerdo y lo firmo con mi PIN</span>.</li>
+</ul>
+<figure class="tableta"><img src="img/19-kiosco-acuerdo.png"><figcaption>Firma del acuerdo en el kiosco.</figcaption></figure>
+<div class="nota"><b>PIN incorrecto o bloqueado</b>Después de <b>5 intentos fallidos</b> el PIN se bloquea <b>15 minutos</b>. Si lo olvidaste, pide a tu empleador que te asigne uno nuevo.</div>
+<div class="nota"><b>Sin internet</b>El kiosco guarda la checada y verifica tu PIN cuando vuelve la conexión. Si el PIN era incorrecto, la checada se rechaza y aparece abajo en la pantalla para que el supervisor la capture con su motivo.</div>
+
+<!-- ======================= 6. FAQ ======================= -->
+<h1 id="faq">6. Preguntas frecuentes y solución de problemas</h1>
+<table>
+  <tr><th style="width:36%">Situación</th><th>Qué hacer</th></tr>
+  <tr><td>No me llega el código</td><td>Espera un par de minutos y revisa spam o promociones. Verifica que el correo esté bien escrito. Si pediste muchos códigos, espera unos minutos.</td></tr>
+  <tr><td>"Código incorrecto o vencido"</td><td>El código dura 15 minutos y se usa una vez. Pide uno nuevo.</td></tr>
+  <tr><td>"Tu cuenta aún no está vinculada"</td><td>Tu empleador debe darte de alta con el mismo correo con el que entraste. Después sal y vuelve a entrar.</td></tr>
+  <tr><td>Olvidé checar mi salida</td><td>Avisa a tu empleador: la agrega desde el panel con <b>Agregar checada faltante</b> y un motivo.</td></tr>
+  <tr><td>Checé dos veces por error</td><td>El empleador anula la checada duplicada con motivo. Si entrada y salida quedaron en el mismo minuto, ese turno no se cuenta y aparece como incidencia.</td></tr>
+  <tr><td>Mis horas de la semana no son correctas</td><td>En <b>Mis registros</b>, al terminar la semana, presiona <b>Algo no es correcto</b> y explica qué está mal.</td></tr>
+  <tr><td>¿Se puede borrar un registro?</td><td>No. Para que el registro sea válido como prueba, nada se borra: se corrige o se anula con motivo y el original queda visible.</td></tr>
+  <tr><td>Cambié de celular</td><td>Abre Checador en el nuevo y entra con tu correo. Tus registros están en el servidor, no en el teléfono.</td></tr>
+  <tr><td>Un trabajador no quiere firmar el acuerdo</td><td>No se le puede obligar. Sus registros siguen siendo prueba, aunque no prueba plena. Conviene aclarar sus dudas sobre el texto.</td></tr>
+  <tr><td>Cambié la jornada o el día de descanso de alguien</td><td>Su acuerdo queda <b>desactualizado</b>: firma la nueva versión y pídele que la firme. La anterior sigue vigente mientras tanto.</td></tr>
+  <tr><td>El kiosco dice "Este dispositivo no está configurado"</td><td>La cuenta con la que se entró en la tableta no tiene el rol de kiosco. Invítala desde <b>Accesos</b> y vuelve a cargar la página.</td></tr>
+  <tr><td>"Verificar ahora" muestra una alerta de alteración</td><td>No corrijas nada. Exporta los registros y contacta a soporte de inmediato.</td></tr>
+</table>
+
+<!-- ======================= 7. GLOSARIO ======================= -->
+<h1 id="glosario">7. Glosario</h1>
+<table>
+  <tr><th style="width:28%">Término</th><th>Significado</th></tr>
+  <tr><td>Bitácora</td><td>Lista de todas las checadas, correcciones y anulaciones, en el orden en que ocurrieron. No se puede borrar ni modificar.</td></tr>
+  <tr><td>Checada</td><td>Registro de entrada, salida, inicio o fin de pausa.</td></tr>
+  <tr><td>Acuerdo de registro</td><td>Documento firmado por empleador y trabajador que establece cómo se registra la jornada. Da al registro valor de prueba plena (art. 132, fr. XXXIV, LFT).</td></tr>
+  <tr><td>Conformidad</td><td>Confirmación semanal del trabajador de que sus horarios son correctos.</td></tr>
+  <tr><td>Objeción</td><td>Aviso del trabajador de que algo en su semana no es correcto, con su explicación.</td></tr>
+  <tr><td>Corrección / anulación</td><td>Ajuste a una checada hecho por el empleador con un motivo. El registro original se conserva.</td></tr>
+  <tr><td>Sin conexión (diferida)</td><td>Checada hecha sin internet y enviada después. Se guardan la hora del dispositivo y la hora en que llegó.</td></tr>
+  <tr><td>Kiosco</td><td>Tableta compartida donde se checa con número de empleado y PIN.</td></tr>
+  <tr><td>Jornada ordinaria / tiempo extra</td><td>Horas normales de trabajo y horas adicionales. El extra se paga al doble y, por encima de los límites, al triple (arts. 66 y 68 LFT).</td></tr>
+  <tr><td>Huella digital (SHA-256)</td><td>Código que identifica de forma única el contenido de un registro o archivo. Cualquier cambio produce una huella distinta.</td></tr>
+</table>
+<p style="margin-top:10mm; font-size:9pt; color:#6c757d">Checador es una herramienta de registro y no sustituye la asesoría legal. Las referencias a la Ley Federal del Trabajo corresponden al texto vigente tras la reforma publicada en el DOF el 1 de mayo de 2026.</p>
+
+</body>
+</html>

@@ -17,6 +17,7 @@ Sistema de registro electrónico de jornada laboral (entradas y salidas) para PY
 | [apps/web/README.md](apps/web/README.md) | PWA del trabajador: configuración, seguridad y prueba de punta a punta |
 | [docs/manual/manual-de-usuario.pdf](docs/manual/manual-de-usuario.pdf) | **Manual de usuario** (empleador, trabajador y kiosco) |
 | [docs/manual/hoja-trabajador.pdf](docs/manual/hoja-trabajador.pdf) · [docs/manual/hoja-kiosco.pdf](docs/manual/hoja-kiosco.pdf) | Hojas de una página: para entregar al trabajador y para pegar junto al kiosco |
+| [docs/manual/fuente/](docs/manual/fuente/README.md) | Fuentes del manual y las hojas: cómo cambiar el texto, retomar capturas y regenerar los PDF |
 
 ## Próximos pasos
 
