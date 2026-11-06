@@ -10,7 +10,10 @@ Uso:
   Sin --site-url no se tocan la URL del sitio ni las URLs permitidas.
   --sin-plantillas: Supabase no permite cambiar las plantillas en proyectos gratuitos con el
   correo integrado; úsalo hasta configurar el SMTP propio (o subir a Pro) y vuelve a correrlo sin él.
-  El SMTP y su contraseña se configuran aparte: la contraseña nunca pasa por este script.
+  --smtp-correo no-responder@checador.tudominio.mx: configura el SMTP de Resend (smtp.resend.com:465,
+  usuario "resend") con ese remitente. La CONTRASEÑA (una llave de envío de Resend) nunca pasa por
+  este script: se escribe a mano en Authentication → Emails → SMTP Settings.
+  --limite-correos N: correos de Auth por hora (solo con SMTP propio; no exceder el límite del proveedor).
 """
 import json
 import os
@@ -69,6 +72,17 @@ def main() -> int:
     if "--sin-plantillas" in sys.argv:
         for clave in [k for k in deseado if k.startswith("mailer_subjects_") or k.startswith("mailer_templates_")]:
             del deseado[clave]
+    if "--smtp-correo" in sys.argv:
+        correo = sys.argv[sys.argv.index("--smtp-correo") + 1]
+        deseado.update({
+            "smtp_host": "smtp.resend.com",
+            "smtp_port": "465",
+            "smtp_user": "resend",
+            "smtp_admin_email": correo,
+            "smtp_sender_name": "Checador",
+        })
+    if "--limite-correos" in sys.argv:
+        deseado["rate_limit_email_sent"] = int(sys.argv[sys.argv.index("--limite-correos") + 1])
     if "--site-url" in sys.argv:
         url = sys.argv[sys.argv.index("--site-url") + 1].rstrip("/")
         if not url.startswith("https://"):
