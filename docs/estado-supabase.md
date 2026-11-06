@@ -17,23 +17,33 @@ Bitácora de lo aplicado en los proyectos en la nube. No contiene secretos.
 | Plantillas en español con el código | ✅ | ✅ |
 | Límite de correos de Auth | ✅ 60/hora | ✅ 60/hora |
 | Prueba real de envío | ✅ entregado (Resend: `delivered`) | — |
-| Site URL y URLs permitidas | ⏳ pendiente (dominio de Vercel) | ⏳ pendiente |
+| Site URL y URLs permitidas | — (las vistas previas no usan enlaces de correo) | ✅ `https://checador.jemba.mx` |
 | Llaves heredadas (legacy) desactivadas | ⏳ manual, en el dashboard | ⏳ manual |
 | Network restrictions | ⏳ manual, en el dashboard | ⏳ manual |
 | Token de administración | `checador-configuracion-2` activo → **revocar al terminar** | |
+
+## Aplicación (Vercel, equipo Checador · Pro)
+
+- Proyecto `checador` (`prj_lYlK4rLpOFR3xU2i0bRWd7YIUaln`), Root Directory `apps/web`, Node.js 22.x, región `iad1`.
+- **Producción:** https://checador.jemba.mx → `checador-produccion`. **Vistas previas y desarrollo** → `checador-pruebas`.
+- Protección: `all_except_custom_domains` (las vistas previas y `*.vercel.app` piden iniciar sesión en Vercel).
+- DNS: `CNAME checador → c072d25b9226339a.vercel-dns-016.com` en Cloudflare, **sin proxy** (Vercel emite el certificado).
+- `verificar-despliegue.sh` contra producción: **sin fallas** (la redirección HTTP→HTTPS se comprueba desde GitHub Actions).
+- Verificación semanal: `.github/workflows/verificar-produccion.yml` (lunes).
 
 ## Correo (Resend + Cloudflare)
 
 - Dominio de envío **`checador.jemba.mx`** verificado en Resend (región us-east-1), separado de `jemba.mx`.
 - Registros creados en Cloudflare (sin proxy), sin modificar ningún registro existente de `jemba.mx`:
   `resend._domainkey.checador` (DKIM) · `send.checador` (MX y SPF) · `rsend.checador` (CNAME) · `_dmarc.checador` (`p=quarantine`).
-- `jemba.mx` **no tiene DMARC** (afecta también al correo de Google Workspace); se recomienda agregar uno con `p=none` para empezar. Pendiente de decisión.
+- `_dmarc.jemba.mx` creado con `p=none` (monitoreo; no cambia la entrega). Endurecer a `p=quarantine` cuando todo el correo legítimo pase la autenticación.
 - Plan gratuito de Resend: ~100 correos/día.
 
 ## Tokens temporales que hay que revocar al terminar
 
 | Token | Dónde | Hace falta todavía para |
 |---|---|---|
-| `checador-configuracion-2` | Supabase → Account → Access Tokens | Site URL (al publicar en Vercel) |
-| `Checador` (DNS · Editar · jemba.mx, caduca en 7 días) | Cloudflare → My Profile → API Tokens | Registro de `checador.jemba.mx` para Vercel |
-| `checador-configuracion` (Full access) | Resend → API Keys | **Ya no**: revócala ahora |
+| `checador-configuracion-2` | Supabase → Account → Access Tokens | **Ya no**: revócalo |
+| `Checador` (DNS · Editar · jemba.mx) | Cloudflare → My Profile → API Tokens | **Ya no**: revócalo |
+| `checador-configuracion` (Full access) | Resend → API Keys | **Ya no**: revócala |
+| `checador-configuracion` | Vercel → Account Settings → Tokens | **Ya no**: revócalo |

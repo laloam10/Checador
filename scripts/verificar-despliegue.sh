@@ -26,7 +26,12 @@ if [ "${SOLO_SUPABASE:-0}" != 1 ]; then
 echo "== Aplicación: $APP_URL"
 if [ "${LOCAL:-0}" != 1 ]; then
   revisa "se sirve por HTTPS" '[[ $APP_URL == https://* ]]'
-  revisa "HTTP redirige a HTTPS" '[[ $(curl -s -o /dev/null -w "%{redirect_url}" "${APP_URL/https:/http:}/entrar") == https://* ]]'
+  REDIR=$(curl -s -o /dev/null --max-time 15 -w "%{http_code} %{redirect_url}" "${APP_URL/https:/http:}/entrar")
+  if [[ $REDIR == 000* ]]; then
+    printf '  \033[33m⚠\033[0m %s\n' "HTTP → HTTPS no verificable desde este equipo (sin salida HTTP; p. ej. un proxy solo HTTPS)"
+  else
+    revisa "HTTP redirige a HTTPS" '[[ ${REDIR#* } == https://* ]]'
+  fi
 fi
 CABECERAS=$(curl -sI "$APP_URL/entrar")
 CSP=$(cabecera content-security-policy)

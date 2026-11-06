@@ -2,8 +2,9 @@ name: Verificar producción
 
 # Revisa desde fuera la seguridad del despliegue: cabeceras, CSP, accesos anónimos y
 # configuración de Auth. Detecta, por ejemplo, que alguien apague la confirmación de correo.
-# Requiere las variables del repositorio (Settings → Secrets and variables → Actions → Variables):
-#   APP_URL, SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY  (la llave publicable no es secreta).
+# Usa las variables del repositorio si existen (Settings → Secrets and variables → Actions → Variables);
+# si no, los valores de producción de abajo. Ninguno es secreto: la llave publishable viaja en el
+# código que descarga cualquier navegador; la seguridad la dan RLS y los privilegios de la base.
 on:
   workflow_dispatch:
   schedule:
@@ -11,12 +12,11 @@ on:
 
 jobs:
   verificar:
-    if: vars.APP_URL != ''
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - run: ./scripts/verificar-despliegue.sh
         env:
-          APP_URL: ${{ vars.APP_URL }}
-          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
-          SUPABASE_PUBLISHABLE_KEY: ${{ vars.SUPABASE_PUBLISHABLE_KEY }}
+          APP_URL: ${{ vars.APP_URL || 'https://checador.jemba.mx' }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL || 'https://ajfplcfirscvxhrmqhhr.supabase.co' }}
+          SUPABASE_PUBLISHABLE_KEY: ${{ vars.SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_xdc3NAU5Q7w1QKxOyWKr5Q_vp0RNPxY' }}
