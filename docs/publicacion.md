@@ -235,6 +235,18 @@ SUPABASE_PUBLISHABLE_KEY=sb_publishable_... \
 ## 5. Operación
 
 ### Publicar cambios
+
+Hay dos ramas con dirección fija:
+
+| Rama | Dirección | Base de datos |
+|---|---|---|
+| `pruebas` | https://checador-pruebas.vercel.app (privada: pide iniciar sesión en Vercel) | `checador-pruebas` |
+| `main` | https://checador.jemba.mx | `checador-produccion` |
+
+Los datos de producción no se pueden borrar de la bitácora, así que **todo se prueba primero en `pruebas`**: sube el cambio a esa rama, revísalo en la dirección de pruebas y, solo entonces, llévalo a `main`.
+
+> Si una rama apunta a un commit que Vercel ya desplegó (por ejemplo, al crearla igual a `main`), no se compila sola: lanza el despliegue desde el panel de Vercel o con un commit nuevo.
+
 1. Si hay migraciones nuevas: aplícalas primero en **pruebas**, después en producción (`npx supabase db push`) y corre de nuevo `verificar-seguridad.sql`.
 2. Después haz `git push` a `main`: Vercel publica solo, y el CI corre las pruebas.
 3. Corre `verificar-despliegue.sh`.

@@ -17,7 +17,7 @@ Bitácora de lo aplicado en los proyectos en la nube. No contiene secretos.
 | Plantillas en español con el código | ✅ | ✅ |
 | Límite de correos de Auth | ✅ 60/hora | ✅ 60/hora |
 | Prueba real de envío | ✅ entregado (Resend: `delivered`) | — |
-| Site URL y URLs permitidas | — (las vistas previas no usan enlaces de correo) | ✅ `https://checador.jemba.mx` |
+| Site URL y URLs permitidas | ✅ `https://checador-pruebas.vercel.app` | ✅ `https://checador.jemba.mx` |
 | Llaves heredadas (legacy) desactivadas | ⏳ manual, en el dashboard | ⏳ manual |
 | Network restrictions | ⏳ manual, en el dashboard | ⏳ manual |
 | Token de administración | `checador-configuracion-2` activo → **revocar al terminar** | |
@@ -25,7 +25,9 @@ Bitácora de lo aplicado en los proyectos en la nube. No contiene secretos.
 ## Aplicación (Vercel, equipo Checador · Pro)
 
 - Proyecto `checador` (`prj_lYlK4rLpOFR3xU2i0bRWd7YIUaln`), Root Directory `apps/web`, Node.js 22.x, región `iad1`.
-- **Producción:** https://checador.jemba.mx → `checador-produccion`. **Vistas previas y desarrollo** → `checador-pruebas`.
+- **Producción:** https://checador.jemba.mx (rama `main`) → `checador-produccion`.
+- **Pruebas:** https://checador-pruebas.vercel.app (rama `pruebas`) → `checador-pruebas`. Privada: pide iniciar sesión en Vercel.
+- Demás vistas previas y desarrollo → `checador-pruebas`.
 - Protección: `all_except_custom_domains` (las vistas previas y `*.vercel.app` piden iniciar sesión en Vercel).
 - DNS: `CNAME checador → c072d25b9226339a.vercel-dns-016.com` en Cloudflare, **sin proxy** (Vercel emite el certificado).
 - `verificar-despliegue.sh` contra producción: **sin fallas** (la redirección HTTP→HTTPS se comprueba desde GitHub Actions).
