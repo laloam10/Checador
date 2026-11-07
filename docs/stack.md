@@ -50,6 +50,30 @@ Vienen de [analisis-legal.md](analisis-legal.md) y [mvp.md](mvp.md):
 - **Firebase:** NoSQL hace más difícil la integridad relacional y la bitácora con permisos de solo inserción. Además, depende de un solo proveedor.
 - **Bajo código (Bubble, AppSheet, etc.):** no permite garantizar inmutabilidad ni cadena de hashes, que son el núcleo del valor probatorio.
 
+### Cloudflare en lugar de Vercel y Supabase (revisado el 2026-11-07)
+
+**Decisión:** seguir con Vercel y Supabase. Cloudflare se usa solo para el DNS de `jemba.mx`, con los registros de Vercel **sin proxy** (nube gris). Vercel no recomienda poner su proxy delante.
+
+**Supabase no tiene reemplazo en Cloudflare.** La seguridad de Checador vive en Postgres: RLS, roles, la bitácora de solo inserción con cadena de hashes (triggers y funciones `security definer`), la entrada con código por correo y la revisión del claim `amr`. Todo eso está cubierto por las pruebas de `supabase/tests` y por `verificar-seguridad.sql`. D1 es SQLite, sin roles ni RLS. Cloudflare tampoco tiene autenticación para usuarios finales: Access es para empleados. Mudarse obligaría a pasar esas protecciones al código de la app, donde un error sí podría saltárselas. Si algún día se cambia algo, sería solo el hosting de la app (Workers conectado al mismo Supabase), no la base.
+
+**Vercel frente a Cloudflare Workers para la app:**
+
+| | Vercel | Cloudflare Workers |
+|---|---|---|
+| Next.js 16 (`proxy.ts`, Server Actions, CSP con nonce por petición) | Soporte nativo | Por el adaptador OpenNext, que suele ir detrás de las versiones nuevas de Next; el entorno no es Node completo |
+| Distancia a la base | Funciones en `iad1`, junto a Supabase `us-east-1` | Corre en el punto más cercano al usuario; cada consulta viaja a Virginia salvo con Smart Placement |
+| Ambiente por rama (`pruebas`) | Ya configurado | Hay que configurarlo |
+| Precio | Pro: 20 USD por miembro al mes más consumo | Del orden de 5 USD al mes, sin cobro por tráfico de salida |
+| Firewall y protección contra ataques | Básico en Pro | Más completo e incluido |
+
+**Volver a evaluar si se cumple alguno de estos criterios:**
+
+1. La factura de Vercel por consumo pasa de unos 50 USD al mes, o crece más rápido que el número de clientes.
+2. Se necesitan reglas de firewall o protección contra ataques más allá de lo que da Vercel.
+3. OpenNext soporta Next 16 completo, sobre todo `proxy.ts`, Server Actions y el render dinámico con nonce. Sin esto, migrar pone en riesgo la parte más delicada.
+
+**Un cambio de proveedor no resuelve la residencia de datos.** Si un cliente pide los datos en México, lo que cambia es la región de Supabase (y la de las funciones, para que sigan juntas), no el proveedor. Mientras tanto, la ubicación (Virginia, EE. UU.) se declara en el aviso de privacidad.
+
 ## Supuestos (a confirmar)
 
 1. El desarrollo lo harán una o dos personas, con apoyo de Claude Code.
