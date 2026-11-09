@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Isotipo } from "@/components/Marca";
 import { leerPendientes } from "@/lib/cola";
 
 export function Navegacion({ panel = false }: { panel?: boolean }) {
@@ -25,6 +26,9 @@ export function Navegacion({ panel = false }: { panel?: boolean }) {
 
   return (
     <nav className="nav">
+      <Link href="/" className="marca-enlace" aria-label="Checador: inicio">
+        <Isotipo tamano={28} />
+      </Link>
       <Link href="/" className={ruta === "/" ? "activo" : ""}>
         Checar
       </Link>

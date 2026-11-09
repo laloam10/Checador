@@ -1,5 +1,6 @@
 "use client";
 
+import { Marca } from "@/components/Marca";
 import { useState } from "react";
 import { crearClienteNavegador } from "@/lib/supabase/client";
 
@@ -52,8 +53,9 @@ export default function Entrar() {
 
   return (
     <main className="entrar">
-      <h1>Checador</h1>
-      <p className="subtitulo">Registro de jornada</p>
+      <Marca tamano={52} subtitulo="Registro de jornada" />
+      <h1 className="entrar-titulo">Entra con tu correo</h1>
+      <p className="subtitulo">Te enviaremos un código; no necesitas contraseña.</p>
 
       {paso === "correo" ? (
         <form onSubmit={pedirCodigo} className="tarjeta">

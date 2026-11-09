@@ -40,6 +40,11 @@ const tablero = async () => {
   await p.goto(`${APP}/panel`);
   await p.getByRole("heading", { name: "En turno ahora" }).waitFor();
 };
+// Indicador "Acuerdos vigentes" del tablero ("0 de 2", con "de 2" en otra etiqueta).
+const acuerdosVigentes = (valor) =>
+  p.locator(".indicador", { hasText: "Acuerdos vigentes" })
+    .locator(".indicador-valor", { hasText: new RegExp(`^\\s*${valor.replace(" de ", "\\s*de\\s*")}\\s*$`) })
+    .waitFor();
 const pasoHecho = (titulo) => p.locator(".primeros-pasos li.hecho", { hasText: titulo });
 const pasoPendiente = (titulo) => p.locator(".primeros-pasos li:not(.hecho)", { hasText: titulo });
 
@@ -123,7 +128,7 @@ try {
   await tablero();
   await pasoHecho("Firma los acuerdos de registro como empresa").waitFor();
   await pasoPendiente("Cada persona firma su acuerdo").getByText(/Esperando a: .*Lucía Gómez.*Mario Díaz/).waitFor();
-  await p.getByText("0 de 2").waitFor();
+  await acuerdosVigentes("0 de 2");
   paso("la empresa firmó los 2 acuerdos de una vez, tras revisar el texto y confirmar");
 
   // 5. Firmas del personal (en papel, para esta prueba)
@@ -138,7 +143,7 @@ try {
     await p.getByText(/Vigente: versión 1/).waitFor();
   }
   await tablero();
-  await p.getByText("2 de 2").waitFor();
+  await acuerdosVigentes("2 de 2");
   if (await p.locator(".primeros-pasos").count()) throw new Error("La lista de primeros pasos debía desaparecer");
   paso("con todo firmado, la lista de primeros pasos desaparece y el tablero muestra 2 de 2");
 
@@ -151,7 +156,7 @@ try {
   await p.getByRole("row", { name: /Mario Díaz/ }).getByText("Desactualizado").waitFor();
   await tablero();
   await pasoPendiente("Firma los acuerdos de registro como empresa").getByText(/Faltan 1: Mario Díaz/).waitFor();
-  await p.getByText("1 de 2").waitFor();
+  await acuerdosVigentes("1 de 2");
   paso("al cambiar el día de descanso de Mario, su acuerdo queda desactualizado y el tablero lo vuelve a pedir");
 
   console.log("\nPrueba del alta guiada: OK");

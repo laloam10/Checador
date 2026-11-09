@@ -109,7 +109,7 @@ try {
   // 6. Tablero
   await dueno.getByRole("link", { name: "Tablero" }).click();
   await dueno.getByRole("heading", { name: "En turno ahora" }).waitFor();
-  await dueno.getByRole("row", { name: /Carla Ruiz Trabajando/ }).waitFor();
+  await dueno.locator(".en-turno li", { hasText: "Carla Ruiz" }).getByText("Trabajando").waitFor();
   paso("el tablero muestra a Carla trabajando");
 
   // 7. Corrección, checada faltante y anulación

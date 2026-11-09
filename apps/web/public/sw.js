@@ -2,7 +2,7 @@
 // - Estáticos (/_next/static, íconos): cache primero.
 // - Páginas: red primero; sin red, la última versión guardada.
 // - /api: nunca se guarda (las checadas sin conexión las maneja la cola en IndexedDB).
-const VERSION = "v1";
+const VERSION = "v2"; // súbela cuando cambien los íconos (se guardan con el mismo nombre)
 const CACHE = `checador-${VERSION}`;
 
 self.addEventListener("install", () => self.skipWaiting());

@@ -1,5 +1,6 @@
 "use client";
 
+import { Isotipo } from "@/components/Marca";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { aHoraLocal } from "@checador/jornada";
 import { ahoraServidor, registrarHoraServidor, sincronizarReloj, type TipoCaptura } from "@/lib/cola";
@@ -215,6 +216,7 @@ export function Kiosco({ empresa, centro, zonaHoraria }: { empresa: string; cent
   return (
     <main className="kiosco">
       <header className="kiosco-cabecera">
+        <Isotipo tamano={26} />
         <span>
           {empresa}
           {centro ? ` · ${centro}` : ""}

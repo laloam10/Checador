@@ -3,18 +3,25 @@ import { headers } from "next/headers";
 import type { EstadoTrabajador } from "@/lib/acuerdosDatos";
 import type { ContextoPanel } from "@/lib/panel";
 
-interface Paso {
+export interface Paso {
   hecho: boolean;
   titulo: string;
   detalle?: React.ReactNode;
   enlace?: { href: string; texto: string };
 }
 
+export interface AltaGuiada {
+  pasos: Paso[];
+  hechos: number;
+  completa: boolean;
+  origen: string;
+}
+
 /**
  * Alta guiada: los pasos se calculan con los datos reales (no se marcan a mano)
  * y la tarjeta desaparece cuando todo está completo.
  */
-export async function PrimerosPasos({ ctx, estados }: { ctx: ContextoPanel; estados: EstadoTrabajador[] }) {
+export async function calcularAlta(ctx: ContextoPanel, estados: EstadoTrabajador[]): Promise<AltaGuiada> {
   const [{ count: centros }, { data: conPin }, { count: kioscos }, { data: invitacionesKiosco }] = await Promise.all([
     ctx.supabase.from("centros_trabajo").select("id", { count: "exact", head: true }).eq("empresa_id", ctx.empresa.id),
     ctx.supabase.rpc("trabajadores_con_pin", { p_empresa: ctx.empresa.id }),
@@ -75,15 +82,22 @@ export async function PrimerosPasos({ ctx, estados }: { ctx: ContextoPanel; esta
     },
   ];
   const hechos = pasos.filter((p) => p.hecho).length;
-  if (hechos === pasos.length) return null;
+  return { pasos, hechos, completa: hechos === pasos.length, origen };
+}
 
+export function PrimerosPasos({ alta }: { alta: AltaGuiada }) {
+  const { pasos, hechos, origen } = alta;
+  if (alta.completa) return null;
   return (
     <section className="primeros-pasos">
       <h2>Primeros pasos ({hechos} de {pasos.length})</h2>
+      <div className="progreso" role="progressbar" aria-valuemin={0} aria-valuemax={pasos.length} aria-valuenow={hechos}>
+        <span style={{ width: `${(hechos / pasos.length) * 100}%` }} />
+      </div>
       <ol>
         {pasos.map((p) => (
           <li key={p.titulo} className={p.hecho ? "hecho" : ""}>
-            <span aria-hidden>{p.hecho ? "✓" : "○"}</span>
+            <span aria-hidden>{p.hecho ? "✓" : ""}</span>
             <div>
               <strong>{p.titulo}</strong>
               {!p.hecho && p.detalle && <p className="ayuda">{p.detalle}</p>}
