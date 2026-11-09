@@ -1,6 +1,6 @@
 # Stack técnico (ADR-001)
 
-> **Estado:** aceptada (2026-11-05). Desarrollo a cargo del dueño del producto con Claude Code.
+> **Estado:** aceptada (2026-11-05) y construida. La tabla de abajo describe lo que está en el código (actualizada el 2026-11-09). Desarrollo a cargo del dueño del producto con Claude Code.
 
 ## Requisitos que deciden el stack
 
@@ -15,7 +15,7 @@ Vienen de [analisis-legal.md](analisis-legal.md) y [mvp.md](mvp.md):
 7. **Exportación PDF/CSV con hash** para inspección o juicio.
 8. **Costo bajo y equipo pequeño:** una o dos personas.
 
-## Decisión propuesta
+## Decisión
 
 | Capa | Elección | Por qué |
 |---|---|---|
@@ -23,12 +23,12 @@ Vienen de [analisis-legal.md](analisis-legal.md) y [mvp.md](mvp.md):
 | Web y API | **Next.js** (App Router) | Panel del patrón, portal del trabajador y kiosco en un solo proyecto |
 | App del trabajador | **PWA** (no app nativa) | Sin tiendas de apps ni costo de publicación. Se instala desde el navegador. Con IndexedDB guarda registros sin conexión |
 | Base de datos | **PostgreSQL** | Row Level Security para aislar a cada cliente; permisos para que la bitácora solo acepte inserciones; transacciones fiables |
-| ORM | **Drizzle** | SQL explícito y migraciones legibles. Las políticas RLS y los triggers se escriben en SQL de todos modos |
-| Autenticación | **Supabase Auth** | Patrón con correo y contraseña; trabajador con código o enlace mágico, porque muchos no usan correo |
+| Acceso a datos | **Cliente de Supabase** (`@supabase/supabase-js` y `@supabase/ssr`), sin ORM. Esquema en **migraciones SQL** (`supabase/migrations`) | Las políticas RLS, los triggers de la bitácora y las funciones `security definer` se escriben en SQL de todos modos; un ORM no aportaba. La lógica sensible (PIN del kiosco, firma de acuerdos, alta de empresa) vive en funciones de Postgres, no en la app. *Se había propuesto Drizzle; se descartó al construir.* |
+| Autenticación | **Supabase Auth** con **código de 6 dígitos por correo** para todos (dueño, administradores, supervisores, trabajadores y kiosco). Sin contraseñas | Una sola forma de entrar, sin contraseñas que olvidar o reutilizar. Quien no tiene correo checa en el **kiosco** con número de empleado y PIN (bcrypt en Postgres). La vinculación de cuenta exige haber entrado con código (claim `amr`). *Se había propuesto contraseña para el patrón; se descartó.* |
 | Motor de cálculo | **Paquete TypeScript puro** (`packages/jornada`), sin dependencias, con pruebas en **Vitest** | Se prueba de forma aislada con casos tomados directamente de los arts. 59, 66 y 68 y de los transitorios |
-| PDF | **pdf-lib** o render del lado del servidor | Constancias y reportes con el hash SHA-256 impreso |
-| Hosting | **Vercel** para la app y **Supabase** para Postgres, con la región más cercana disponible | Costo casi cero al inicio. La LFPDPPP no obliga a guardar los datos en México, pero hay que declararlo en el aviso de privacidad |
-| Notificaciones | Correo transaccional (Resend o similar) en el MVP. **WhatsApp** después | WhatsApp Business API tiene costo por conversación. Para empezar, el recordatorio de conformidad puede ser un correo o un aviso dentro de la app |
+| PDF | **pdf-lib**, generado en el servidor | Constancias y reportes con el hash SHA-256 impreso |
+| Hosting | **Vercel** para la app (funciones en `iad1`) y **Supabase** para Postgres (`us-east-1`), en la misma zona | Costo bajo al inicio y poca latencia entre la app y la base. La LFPDPPP no obliga a guardar los datos en México, pero hay que declararlo en el aviso de privacidad. Ver la revisión de Cloudflare más abajo |
+| Correo | **Resend** como SMTP de Supabase Auth, remitente `no-responder@checador.jemba.mx` | Hoy solo envía los códigos de entrada. **No hay recordatorios**: la conformidad semanal se ve en la app del trabajador. Recordatorios por correo o **WhatsApp** quedan para después (WhatsApp Business API cobra por conversación) |
 
 ### Integridad de la bitácora
 
