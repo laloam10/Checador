@@ -46,10 +46,15 @@ set role authenticated;
 select set_config('request.jwt.claim.sub', :'u_prop', false) \gset
 select public.crear_empresa('Empresa A SA de CV', 'AAA010101AAA') as empresa_a \gset
 insert into public.centros_trabajo (empresa_id, nombre) values (:'empresa_a', 'Matriz') returning id as centro_a \gset
-insert into public.trabajadores (empresa_id, centro_trabajo_id, user_id, nombre, numero_empleado, fecha_ingreso)
-  values (:'empresa_a', :'centro_a', :'u_trab', 'Ana Pérez', '001', '2026-01-15') returning id as trab_a \gset
-insert into public.trabajadores (empresa_id, centro_trabajo_id, user_id, nombre, numero_empleado, fecha_ingreso)
-  values (:'empresa_a', :'centro_a', :'u_trab2', 'Beto López', '002', '2026-02-01') returning id as trab_a2 \gset
+insert into public.trabajadores (empresa_id, centro_trabajo_id, nombre, numero_empleado, fecha_ingreso)
+  values (:'empresa_a', :'centro_a', 'Ana Pérez', '001', '2026-01-15') returning id as trab_a \gset
+insert into public.trabajadores (empresa_id, centro_trabajo_id, nombre, numero_empleado, fecha_ingreso)
+  values (:'empresa_a', :'centro_a', 'Beto López', '002', '2026-02-01') returning id as trab_a2 \gset
+-- La cuenta de cada trabajador solo se liga con vincular_mi_cuenta(); en la preparación se liga directamente.
+reset role;
+update public.trabajadores set user_id = :'u_trab' where id = :'trab_a';
+update public.trabajadores set user_id = :'u_trab2' where id = :'trab_a2';
+set role authenticated;
 insert into public.miembros (empresa_id, user_id, rol) values (:'empresa_a', :'u_sup', 'supervisor'), (:'empresa_a', :'u_kiosco', 'kiosco');
 
 -- Preparación: empresa B ----------------------------------------------------------

@@ -25,7 +25,11 @@ export function CamposTrabajador({ t, centros }: { t?: DatosTrabajador; centros:
         <label>
           Correo (opcional)
           <input name="email" type="email" defaultValue={t?.email ?? ""} />
-          <span className="ayuda">Para entrar a la app desde su celular.</span>
+          <span className="ayuda">
+            {t?.id
+              ? "Si lo cambias, la cuenta del correo anterior pierde el acceso y la persona entra con el nuevo."
+              : "Para entrar a la app desde su celular."}
+          </span>
         </label>
         <label>CURP (opcional)<input name="curp" maxLength={18} defaultValue={t?.curp ?? ""} /></label>
         <label>

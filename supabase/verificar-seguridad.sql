@@ -78,4 +78,11 @@ select 'ALTO', 'Función privilegiada ejecutable por authenticated sin estar en 
      'crear_empresa', 'vincular_mi_cuenta', 'verificar_cadena', 'asignar_pin', 'establecer_mi_pin',
      'kiosco_identificar', 'kiosco_checar', 'kiosco_firmar_acuerdo', 'kiosco_semana', 'kiosco_conformidad', 'miembros_de_empresa',
      'trabajadores_con_pin', 'mi_rol', 'es_gestor', 'puede_consultar', 'soy_trabajador', 'trabajo_en')
+union all
+-- 11. Solo vincular_mi_cuenta() liga una ficha de trabajador a una cuenta (si no, el empleador
+--     podría firmar o dar conformidades como si fuera el trabajador).
+select 'CRITICO', 'Sin protección del vínculo trabajador ↔ cuenta', 'trabajadores'
+ where not exists (
+   select 1 from pg_trigger g join pg_proc p on p.oid = g.tgfoid
+    where g.tgrelid = 'public.trabajadores'::regclass and p.proname = 'trabajadores_proteger_vinculo' and not g.tgisinternal)
 order by 1, 2, 3;

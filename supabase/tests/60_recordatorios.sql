@@ -22,8 +22,11 @@ select public.crear_empresa('Empresa R SA de CV') as empresa_r \gset
 insert into public.centros_trabajo (empresa_id, nombre, zona_horaria) values (:'empresa_r', 'Matriz', 'America/Mexico_City')
   returning id as centro_r \gset
 
-insert into public.trabajadores (empresa_id, centro_trabajo_id, user_id, nombre, numero_empleado, email, fecha_ingreso)
-  values (:'empresa_r', :'centro_r', :'u_rana', 'Ana <b>Ruiz</b>', 'r1', 'ana@r.mx', '2026-01-01') returning id as ana \gset
+insert into public.trabajadores (empresa_id, centro_trabajo_id, nombre, numero_empleado, email, fecha_ingreso)
+  values (:'empresa_r', :'centro_r', 'Ana <b>Ruiz</b>', 'r1', 'ana@r.mx', '2026-01-01') returning id as ana \gset
+reset role;
+update public.trabajadores set user_id = :'u_rana' where id = :'ana';
+set role authenticated;
 insert into public.trabajadores (empresa_id, centro_trabajo_id, nombre, numero_empleado, fecha_ingreso)
   values (:'empresa_r', :'centro_r', 'Beto Sin Correo', 'r2', '2026-01-01') returning id as beto \gset
 insert into public.trabajadores (empresa_id, centro_trabajo_id, nombre, numero_empleado, email, fecha_ingreso)
