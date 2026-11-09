@@ -112,6 +112,7 @@ node apps/web/e2e/panel.e2e.mjs
 node apps/web/e2e/acuerdo.e2e.mjs
 node apps/web/e2e/exportar.e2e.mjs   # requiere pdftotext (poppler-utils)
 node apps/web/e2e/alta-guiada.e2e.mjs
+node apps/web/e2e/recordatorios.e2e.mjs   # no necesita la app: pg_net envía a un Resend simulado
 ```
 
 ## Limitaciones conocidas

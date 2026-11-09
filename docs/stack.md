@@ -28,7 +28,7 @@ Vienen de [analisis-legal.md](analisis-legal.md) y [mvp.md](mvp.md):
 | Motor de cálculo | **Paquete TypeScript puro** (`packages/jornada`), sin dependencias, con pruebas en **Vitest** | Se prueba de forma aislada con casos tomados directamente de los arts. 59, 66 y 68 y de los transitorios |
 | PDF | **pdf-lib**, generado en el servidor | Constancias y reportes con el hash SHA-256 impreso |
 | Hosting | **Vercel** para la app (funciones en `iad1`) y **Supabase** para Postgres (`us-east-1`), en la misma zona | Costo bajo al inicio y poca latencia entre la app y la base. La LFPDPPP no obliga a guardar los datos en México, pero hay que declararlo en el aviso de privacidad. Ver la revisión de Cloudflare más abajo |
-| Correo | **Resend** como SMTP de Supabase Auth, remitente `no-responder@checador.jemba.mx` | Hoy solo envía los códigos de entrada. **No hay recordatorios**: la conformidad semanal se ve en la app del trabajador. Recordatorios por correo o **WhatsApp** quedan para después (WhatsApp Business API cobra por conversación) |
+| Correo | **Resend**, remitente `no-responder@checador.jemba.mx`: como SMTP de Supabase Auth para los códigos de entrada, y por su API para los **recordatorios de conformidad** de los lunes | Los recordatorios salen desde la base (pg_cron + pg_net, llave en Supabase Vault), porque leen a todas las empresas y la app nunca usa la llave `service_role`. **WhatsApp** queda para después (WhatsApp Business API cobra por conversación) |
 
 ### Integridad de la bitácora
 

@@ -46,6 +46,7 @@ button:disabled { opacity: 0.6; cursor: wait; }
 .aviso, .mensaje-aviso { background: var(--ambar-claro); color: var(--ambar); }
 .mensaje-ok { background: var(--verde-claro); color: var(--verde); }
 .mensaje-error { background: var(--rojo-claro); color: var(--rojo); }
+.texto-error { color: var(--rojo); }
 .mensaje ul { margin: 0.5rem 0; padding-left: 1.2rem; }
 
 .lista-eventos { list-style: none; padding: 0; text-align: left; }

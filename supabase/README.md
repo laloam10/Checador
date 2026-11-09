@@ -14,6 +14,7 @@
 | `migrations/…10…02_vinculo_solo_codigo.sql` | Vincular cuentas solo si la sesión se inició con código (claim `amr`) |
 | `migrations/…09…01_exportaciones.sql` | Registro inmutable de exportaciones con huellas SHA-256 y estado de la cadena |
 | `migrations/…08…01_acuerdos_firma.sql` | Modalidades de firma (electrónica, PIN en kiosco, autógrafa), orden de firma, `acuerdo_vigente()`, `acuerdo_pendiente()`, `kiosco_firmar_acuerdo()` |
+| `migrations/…12…01_recordatorios_conformidad.sql` | Recordatorios semanales por correo: `conformidades_por_recordar()`, envío con pg_net y llave en Vault, tareas de pg_cron, registro `recordatorios_conformidad`. Configuración: `docs/publicacion.md`, sección 1.8 |
 
 ### Modelo
 
@@ -35,6 +36,7 @@ empresas ─┬─ miembros (propietario | admin | supervisor | kiosco)
 - **Kiosco:** solo registra con número de empleado y PIN, verificados en la base. Hay bloqueo por intentos y los PINs no son legibles por la API.
 - **Pausa (art. 64):** si se puede salir o no lo impone el centro de trabajo, no quien checa.
 - **Prueba plena (art. 132 XXXIV):** cada firma guarda el hash del texto firmado, y cada conformidad queda anclada al estado de la cadena al momento de responder.
+- **Recordatorios (`tests/60_recordatorios.sql`):** solo semanas terminadas con checadas y sin respuesta, o objetadas y corregidas después; máximo un correo cada 6 días; nombres escapados en el HTML; ninguna función de envío es ejecutable por la API.
 
 ## Supabase local
 

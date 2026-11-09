@@ -145,6 +145,42 @@ Todo lo demás en **None**, en especial: Backups (permite restaurar y sobrescrib
 
 **Cualquier otro aviso es nuevo y debe revisarse.** `verificar-seguridad.sql` contiene esa misma lista y marca como hallazgo cualquier función privilegiada ejecutable que no esté en ella.
 
+### 1.8 Recordatorios de conformidad por correo
+
+La migración `20261112000001_recordatorios_conformidad.sql` programa en **pg_cron** dos tareas cada lunes: el envío a las 16:00 UTC (10:00 en el centro de México) y, a las 16:20, la revisión de lo que respondió Resend. El correo sale desde la base con **pg_net**; la llave vive en **Supabase Vault**, nunca en la app ni en Vercel. **Sin los tres secretos de abajo no se envía nada.**
+
+Qué se envía: un correo por persona con correo registrado que tenga semanas terminadas sin revisar (de las últimas 8) o semanas que objetó y que el empleador ya corrigió. Como máximo uno cada 6 días. Cada empresa puede apagarlos en el panel (**Objeciones → Recordatorios por correo**), donde también ve el resultado de cada envío.
+
+1. **Llave de Resend solo para esto:** *API Keys → Create API Key*, permiso **Sending access**, dominio `checador.jemba.mx`. Una por proyecto: `checador-recordatorios-pruebas` y `checador-recordatorios-produccion`. No reutilices las llaves SMTP: si una se filtra, la revocas sin cortar los códigos de entrada.
+2. **Secretos en cada proyecto:** *SQL Editor* → ejecuta con tus valores. La llave la escribes tú directamente ahí; no la pegues en chats ni en archivos.
+
+   ```sql
+   select vault.create_secret('re_...', 'checador_resend_llave');
+   select vault.create_secret('https://checador.jemba.mx', 'checador_url_app');  -- pruebas: https://checador-pruebas.vercel.app
+   select vault.create_secret('Reloj Checador <no-responder@checador.jemba.mx>', 'checador_remitente');
+   ```
+
+   Para cambiar uno después: `select vault.update_secret(id, 'nuevo valor') from vault.secrets where name = 'checador_resend_llave';`
+3. **Comprueba:**
+
+   ```sql
+   select jobname, schedule from cron.job where jobname like 'checador-%';      -- 2 tareas
+   select name from vault.secrets where name like 'checador_%';                 -- 3 secretos
+   ```
+
+4. **Prueba solo en `checador-pruebas`** (envía correos reales a quien tenga semanas pendientes):
+
+   ```sql
+   select public.enviar_recordatorios_conformidad();
+   -- espera un minuto
+   select public.revisar_envios_recordatorios();
+   select enviado_en, correo, estado, detalle from public.recordatorios_conformidad order by id desc limit 10;
+   ```
+
+   `estado = 'enviado'` significa que Resend lo aceptó; en *Resend → Emails* ves si se entregó. En producción no lo corras a mano: espera al lunes.
+
+**Límite de Resend:** el plan gratuito permite unos **100 correos al día**, y el lunes se suman a los códigos de entrada de ese día. Si un lunes hay más personas pendientes, Resend rechaza el lote completo: el panel muestra "no se pudo enviar" y se reintenta el lunes siguiente (con el mismo problema). Sube a un plan de pago **antes** de tener ~80 trabajadores con correo en total.
+
 ---
 
 ## 2. Vercel
@@ -291,7 +327,7 @@ Las migraciones van **antes** que el código que depende de ellas. Nunca modifiq
 
 No son tareas de código, pero sin ellas no deberías dar acceso a un cliente:
 
-1. **Aviso de privacidad.** El empleador es el *responsable* de los datos de su personal y tú eres el *encargado*. Debe decir qué datos se tratan (los de la cláusula novena del acuerdo), para qué, y que se almacenan en servidores fuera de México. La app remite al aviso del empleador.
+1. **Aviso de privacidad.** El empleador es el *responsable* de los datos de su personal y tú eres el *encargado*. Debe decir qué datos se tratan (los de la cláusula novena del acuerdo), para qué (incluidos los recordatorios semanales por correo), y que se almacenan en servidores fuera de México. La app remite al aviso del empleador.
 2. **Contrato de servicio con cada cliente**, que incluya la **cláusula de encargado del tratamiento** (qué haces con los datos, confidencialidad, qué pasa al terminar el contrato) y deje claro que el sistema es una herramienta, no asesoría legal.
 3. **Revisión de la plantilla del acuerdo** (`apps/web/lib/acuerdo.ts`) y de `docs/analisis-legal.md` por un abogado laboralista.
 4. **Disposiciones de la STPS:** entran en vigor el 1 de enero de 2027. Al publicarse, revisa si piden un formato de entrega o eximen a algún tamaño de empresa.

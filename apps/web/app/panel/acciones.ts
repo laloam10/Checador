@@ -90,6 +90,23 @@ export async function guardarCentro(_: Estado, fd: FormData): Promise<Estado> {
   return ok(id ? "Centro actualizado." : "Centro creado.");
 }
 
+// --- Recordatorios de conformidad -------------------------------------------------
+
+export async function guardarRecordatorios(_: Estado, fd: FormData): Promise<Estado> {
+  const ctx = await requierePanel();
+  const activar = fd.get("activar") === "on";
+  // RLS: solo el propietario o un administrador pueden modificar la empresa.
+  const { data, error } = await ctx.supabase
+    .from("empresas")
+    .update({ recordatorios_conformidad: activar })
+    .eq("id", ctx.empresa.id)
+    .select("id");
+  if (error) return fallo(traducir(error));
+  if (!data?.length) return fallo("No tienes permiso para hacer esto.");
+  refrescar();
+  return ok(activar ? "Recordatorios activados." : "Recordatorios desactivados.");
+}
+
 // --- Trabajadores -------------------------------------------------------------------
 
 export async function guardarTrabajador(_: Estado, fd: FormData): Promise<Estado> {

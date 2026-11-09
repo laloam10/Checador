@@ -224,7 +224,7 @@ const estado = (p, t) => p.getByRole("status").filter({ hasText: t }).first().wa
   await shotEl(d.locator(".bitacora"), "23-bitacora-correccion");
   await d.goto(`${APP}/panel/objeciones`);
   await d.getByRole("heading", { name: "Objeciones por atender" }).waitFor();
-  await shot(d, "24-objeciones");
+  await shot(d, "24-objeciones", { fullPage: true });
   await d.goto(`${APP}/panel/exportar`);
   await d.getByRole("heading", { name: "Exportar para inspección o juicio" }).waitFor();
   await d.locator("select[name=trabajador]").selectOption({ label: "María López" });

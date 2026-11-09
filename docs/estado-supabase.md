@@ -8,6 +8,8 @@ Bitácora de lo aplicado en los proyectos en la nube. No contiene secretos.
 | Región / Postgres | us-east-1 / 17.11 | us-east-1 / 17.11 |
 | Plan de la organización | Gratuito (subir a **Pro** antes del primer cliente) | ídem |
 | Migraciones (10) | ✅ aplicadas por API | ✅ aplicadas por API |
+| Migración 11: recordatorios de conformidad (`20261112000001`) | ⏳ pendiente | ⏳ pendiente (después de pruebas) |
+| Secretos de Vault para recordatorios (guía, sección 1.8) | ⏳ pendiente: llave `checador-recordatorios-pruebas` | ⏳ pendiente: llave `checador-recordatorios-produccion` |
 | `verificar-seguridad.sql` | ✅ 0 hallazgos | ✅ 0 hallazgos |
 | Asesor de Supabase | ✅ 16 avisos esperados (sección 1.7 de la guía) | ✅ 16 avisos esperados |
 | Verificación externa (`verificar-despliegue.sh`, `SOLO_SUPABASE=1`) | ✅ sin fallas | ✅ sin fallas |
@@ -39,7 +41,7 @@ Bitácora de lo aplicado en los proyectos en la nube. No contiene secretos.
 - Registros creados en Cloudflare (sin proxy), sin modificar ningún registro existente de `jemba.mx`:
   `resend._domainkey.checador` (DKIM) · `send.checador` (MX y SPF) · `rsend.checador` (CNAME) · `_dmarc.checador` (`p=quarantine`).
 - `_dmarc.jemba.mx` creado con `p=none` (monitoreo; no cambia la entrega). Endurecer a `p=quarantine` cuando todo el correo legítimo pase la autenticación.
-- Plan gratuito de Resend: ~100 correos/día.
+- Plan gratuito de Resend: ~100 correos/día, compartidos entre los códigos de entrada y los recordatorios de los lunes (guía, sección 1.8).
 
 ## Tokens temporales que hay que revocar al terminar
 
