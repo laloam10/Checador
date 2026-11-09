@@ -45,7 +45,7 @@ union all
 -- 6. Las tablas de evidencia deben ser de solo inserción (trigger que bloquee UPDATE/DELETE).
 select 'CRITICO', 'Tabla de evidencia sin bloqueo de UPDATE/DELETE', t.relname::text
   from tablas t
- where t.relname in ('eventos', 'acuerdos', 'firmas_acuerdo', 'conformidades', 'exportaciones')
+ where t.relname in ('eventos', 'acuerdos', 'firmas_acuerdo', 'conformidades', 'exportaciones', 'historial_bajas')
    and not exists (
      select 1 from pg_trigger g join pg_proc p on p.oid = g.tgfoid
       where g.tgrelid = t.oid and p.proname = 'prohibir_modificacion' and not g.tgisinternal)
@@ -67,7 +67,7 @@ select 'ALTO', 'Privilegio ' || privilege_type || ' para ' || grantee || ' en ta
   from information_schema.role_table_grants
  where table_schema = 'public' and grantee in ('anon', 'authenticated', 'PUBLIC')
    and privilege_type in ('UPDATE', 'DELETE')
-   and table_name in ('eventos', 'acuerdos', 'firmas_acuerdo', 'conformidades', 'exportaciones', 'cadena_estado')
+   and table_name in ('eventos', 'acuerdos', 'firmas_acuerdo', 'conformidades', 'exportaciones', 'cadena_estado', 'historial_bajas')
 union all
 -- 10. Solo las funciones diseñadas como API (o auxiliares de RLS) pueden ejecutarse con sesión.
 --     Una función SECURITY DEFINER nueva y ejecutable que no esté en esta lista es un hallazgo.
@@ -76,7 +76,7 @@ select 'ALTO', 'Función privilegiada ejecutable por authenticated sin estar en 
  where prosecdef and has_function_privilege('authenticated', oid, 'EXECUTE')
    and proname not in (
      'crear_empresa', 'vincular_mi_cuenta', 'verificar_cadena', 'asignar_pin', 'establecer_mi_pin',
-     'kiosco_identificar', 'kiosco_checar', 'kiosco_firmar_acuerdo', 'kiosco_semana', 'kiosco_conformidad', 'miembros_de_empresa',
+     'kiosco_identificar', 'kiosco_checar', 'kiosco_firmar_acuerdo', 'kiosco_semana', 'kiosco_conformidad', 'revertir_baja', 'miembros_de_empresa',
      'trabajadores_con_pin', 'mi_rol', 'es_gestor', 'puede_consultar', 'soy_trabajador', 'trabajo_en')
 union all
 -- 11. Solo vincular_mi_cuenta() liga una ficha de trabajador a una cuenta (si no, el empleador

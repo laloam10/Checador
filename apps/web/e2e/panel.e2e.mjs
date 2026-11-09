@@ -174,6 +174,19 @@ try {
   await dueno.getByText("Aún no hay trabajadores.").waitFor();
   paso("baja registrada; los registros se conservan");
 
+  // 11. Deshacer la baja (fue un error)
+  await dueno.goto(`${APP}/panel/trabajadores?bajas=1`);
+  await dueno.getByRole("link", { name: "Carla Ruiz" }).click();
+  await dueno.getByRole("heading", { name: "¿La baja fue un error?" }).waitFor();
+  await dueno.getByLabel("Motivo").fill("Se registró la baja de la persona equivocada");
+  await dueno.getByRole("button", { name: "Deshacer la baja" }).click();
+  await dueno.getByText(/Baja del \d{4}-\d{2}-\d{2} deshecha/).waitFor();
+  await dueno.getByText("Motivo: Se registró la baja de la persona equivocada").waitFor();
+  if (await dueno.getByText(/Dado de baja el/).count()) throw new Error("La persona debía quedar activa");
+  await dueno.goto(`${APP}/panel/trabajadores`);
+  await dueno.getByRole("link", { name: "Carla Ruiz" }).waitFor();
+  paso("la baja se deshace con motivo; la persona vuelve a la lista y el historial conserva ambos pasos");
+
   const conteo = sql(`select count(*) filter (where e.tipo in ('correccion','anulacion')) || ',' || count(*)
                       from eventos e join empresas x on x.id = e.empresa_id where x.razon_social = '${EMPRESA}'`);
   if (conteo !== "2,4") throw new Error(`Bitácora inesperada (ajustes,total): ${conteo}`);

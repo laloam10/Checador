@@ -5,12 +5,12 @@ import { FormAccion } from "@/components/panel/FormAccion";
 import { CamposTrabajador } from "@/components/panel/CamposTrabajador";
 import { SeccionAcuerdo } from "@/components/panel/SeccionAcuerdo";
 import { esGestor, requierePanel } from "@/lib/panel";
-import { asignarPin, darDeBaja, guardarTrabajador } from "../../acciones";
+import { asignarPin, darDeBaja, guardarTrabajador, revertirBaja } from "../../acciones";
 
 export default async function FichaTrabajador({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const ctx = await requierePanel();
-  const [{ data: t }, { data: centros }, { data: conPin }] = await Promise.all([
+  const [{ data: t }, { data: centros }, { data: conPin }, { data: historial }] = await Promise.all([
     ctx.supabase
       .from("trabajadores")
       .select("id, nombre, numero_empleado, email, curp, user_id, centro_trabajo_id, fecha_ingreso, fecha_baja, dia_descanso, jornada_pactada_min")
@@ -19,6 +19,11 @@ export default async function FichaTrabajador({ params }: { params: Promise<{ id
       .maybeSingle(),
     ctx.supabase.from("centros_trabajo").select("id, nombre").eq("empresa_id", ctx.empresa.id).order("nombre"),
     ctx.supabase.rpc("trabajadores_con_pin", { p_empresa: ctx.empresa.id }),
+    ctx.supabase
+      .from("historial_bajas")
+      .select("id, accion, fecha_baja, motivo, creado_en")
+      .eq("trabajador_id", id)
+      .order("id"),
   ]);
   if (!t) notFound();
   const gestor = esGestor(ctx.rol);
@@ -42,6 +47,39 @@ export default async function FichaTrabajador({ params }: { params: Promise<{ id
         <p className="mensaje mensaje-aviso">
           Dado de baja el {t.fecha_baja}. Ya no puede checar; sus registros se conservan como exige el art. 804 de la LFT.
         </p>
+      )}
+
+      {gestor && t.fecha_baja && (
+        <section>
+          <h2>¿La baja fue un error?</h2>
+          <p className="ayuda">
+            Al deshacerla, la persona vuelve a estar activa y puede checar de nuevo. Queda registrado quién la deshizo, cuándo y
+            por qué. Si la fecha era la equivocada, deshazla y registra la baja otra vez con la fecha correcta.
+          </p>
+          <FormAccion accion={revertirBaja} boton="Deshacer la baja">
+            <input type="hidden" name="trabajador_id" value={t.id} />
+            <label>
+              Motivo
+              <textarea name="motivo" rows={2} required minLength={5} maxLength={1000}
+                placeholder="Por ejemplo: se capturó la baja de la persona equivocada." />
+            </label>
+          </FormAccion>
+        </section>
+      )}
+
+      {(historial ?? []).length > 0 && (
+        <section>
+          <h2>Historial de bajas</h2>
+          <ul className="bitacora">
+            {(historial ?? []).map((h) => (
+              <li key={h.id}>
+                <strong>{h.accion === "baja" ? `Baja con fecha ${h.fecha_baja}` : `Baja del ${h.fecha_baja} deshecha`}</strong>
+                <span className="ayuda"> · registrado el {aHoraLocal(h.creado_en, ctx.empresa.zonaHoraria).replace("T", " ")}</span>
+                {h.motivo && <span className="ajuste">Motivo: {h.motivo}</span>}
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
 
       {!t.fecha_baja && <SeccionAcuerdo ctx={ctx} trabajadorId={t.id} gestor={gestor} />}

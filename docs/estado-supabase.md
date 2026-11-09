@@ -12,6 +12,7 @@ Bitácora de lo aplicado en los proyectos en la nube. No contiene secretos.
 | Migración 12: conformidad en el kiosco (`20261113000001`, requiere la 11) | ✅ aplicada por API (2026-11-09) | ⏳ pendiente (después de pruebas) |
 | Migración 13: protección del vínculo trabajador ↔ cuenta (`20261114000001`) | ✅ aplicada por API (2026-11-09); `verificar-seguridad.sql` sin hallazgos | ⏳ pendiente (**aplicar antes del primer cliente**) |
 | Asesor de Supabase tras las migraciones 11 a 13 | ✅ 19 avisos esperados (guía, 1.7) | ⏳ esperar 19 |
+| Migración 14: historial de bajas y `revertir_baja()` (`20261115000001`) | ⏳ pendiente (el asesor pasará a 20 avisos) | ⏳ pendiente |
 | Secretos de Vault para recordatorios (guía, sección 1.8) | ⏳ pendiente: llave `checador-recordatorios-pruebas` | ⏳ pendiente: llave `checador-recordatorios-produccion` |
 | `verificar-seguridad.sql` | ✅ 0 hallazgos | ✅ 0 hallazgos |
 | Asesor de Supabase | ✅ 16 avisos esperados (sección 1.7 de la guía) | ✅ 16 avisos esperados |

@@ -222,6 +222,16 @@ export async function darDeBaja(_: Estado, fd: FormData): Promise<Estado> {
   return ok("Baja registrada. Sus registros se conservan (art. 804 LFT).");
 }
 
+export async function revertirBaja(_: Estado, fd: FormData): Promise<Estado> {
+  const ctx = await requierePanel();
+  const motivo = texto(fd, "motivo");
+  if (motivo.length < 5) return fallo("Explica por qué se deshace la baja.");
+  const { error } = await ctx.supabase.rpc("revertir_baja", { p_trabajador: texto(fd, "trabajador_id"), p_motivo: motivo });
+  if (error) return fallo(traducir(error));
+  refrescar();
+  return ok("Baja deshecha. La persona vuelve a estar activa; el cambio quedó en el historial.");
+}
+
 // --- Bitácora: checadas del panel ---------------------------------------------------
 
 const TIPOS_CAPTURA = new Set(["entrada", "salida", "inicio_pausa", "fin_pausa"]);
