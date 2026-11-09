@@ -39,16 +39,16 @@ export default async function Exportar({ searchParams }: { searchParams: Promise
       {(exportaciones ?? []).length === 0 ? (
         <p className="vacio">Aún no hay exportaciones.</p>
       ) : (
-        <table className="tabla">
+        <table className="tabla tabla-tarjetas">
           <thead><tr><th>Emitida</th><th>Trabajador</th><th>Periodo</th><th>Formato</th><th>Huella</th></tr></thead>
           <tbody>
             {(exportaciones ?? []).map((x) => (
               <tr key={x.id}>
-                <td>{aHoraLocal(x.generado_en, ctx.empresa.zonaHoraria).replace("T", " ")}</td>
-                <td>{((Array.isArray(x.trabajadores) ? x.trabajadores[0] : x.trabajadores) as { nombre: string } | null)?.nombre ?? "Todos"}</td>
-                <td>{x.desde} al {x.hasta}</td>
-                <td>{FORMATO[x.formato]}{x.cadena_integra ? "" : " ⚠"}</td>
-                <td className="comprobante">{String(x.hash_archivo).replace(/^\\x/, "").slice(0, 16)}…</td>
+                <td data-etiqueta="Emitida">{aHoraLocal(x.generado_en, ctx.empresa.zonaHoraria).replace("T", " ")}</td>
+                <td className="celda-titulo">{((Array.isArray(x.trabajadores) ? x.trabajadores[0] : x.trabajadores) as { nombre: string } | null)?.nombre ?? "Todos"}</td>
+                <td data-etiqueta="Periodo">{x.desde} al {x.hasta}</td>
+                <td data-etiqueta="Formato">{FORMATO[x.formato]}{x.cadena_integra ? "" : " ⚠"}</td>
+                <td data-etiqueta="Huella" className="comprobante">{String(x.hash_archivo).replace(/^\\x/, "").slice(0, 16)}…</td>
               </tr>
             ))}
           </tbody>

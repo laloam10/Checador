@@ -53,15 +53,15 @@ export default async function Objeciones() {
       {objeciones.length === 0 ? (
         <p className="vacio">No hay objeciones pendientes.</p>
       ) : (
-        <table className="tabla">
+        <table className="tabla tabla-tarjetas">
           <thead><tr><th>Trabajador</th><th>Semana</th><th>Comentario</th><th>Fecha</th></tr></thead>
           <tbody>
             {objeciones.map((o) => (
               <tr key={`${o.trabajadorId}-${o.semana}`}>
-                <td><Link href={`/panel/trabajadores/${o.trabajadorId}/semana?semana=${o.semana}`}>{o.nombre}</Link></td>
-                <td>{o.semana}</td>
-                <td>“{o.comentario}”</td>
-                <td>{aHoraLocal(o.respondidoEn, ctx.empresa.zonaHoraria).replace("T", " ")}</td>
+                <td className="celda-titulo"><Link href={`/panel/trabajadores/${o.trabajadorId}/semana?semana=${o.semana}`}>{o.nombre}</Link></td>
+                <td data-etiqueta="Semana">{o.semana}</td>
+                <td data-etiqueta="Comentario">“{o.comentario}”</td>
+                <td data-etiqueta="Fecha">{aHoraLocal(o.respondidoEn, ctx.empresa.zonaHoraria).replace("T", " ")}</td>
               </tr>
             ))}
           </tbody>
@@ -91,16 +91,16 @@ export default async function Objeciones() {
       {dias.length === 0 ? (
         <p className="vacio">Todavía no se ha enviado ningún recordatorio.</p>
       ) : (
-        <table className="tabla">
+        <table className="tabla tabla-tarjetas">
           <thead><tr><th>Fecha</th><th>Personas</th><th>Resultado</th></tr></thead>
           <tbody>
             {dias.map((d) => {
               const enProceso = d.total - d.enviados - d.fallidos;
               return (
                 <tr key={d.fecha}>
-                  <td>{d.fecha}</td>
-                  <td>{d.total}</td>
-                  <td>
+                  <td className="celda-titulo">{d.fecha}</td>
+                  <td data-etiqueta="Personas">{d.total}</td>
+                  <td data-etiqueta="Resultado">
                     {d.enviados > 0 && <>{d.enviados} entregado(s) al servicio de correo. </>}
                     {enProceso > 0 && <>{enProceso} en proceso. </>}
                     {d.fallidos > 0 && (

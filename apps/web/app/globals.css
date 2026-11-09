@@ -301,3 +301,61 @@ a.indicador:hover { box-shadow: var(--sombra-alta); border-color: #c7d1cc; color
 .alta-masiva { margin: 1rem 0 2rem; }
 .alta-masiva ol { padding-left: 1.2rem; }
 .alta-masiva li { margin: 0.35rem 0; }
+
+/* ---- Panel en el celular ---- */
+.barra-inferior { display: none; }
+input[type="file"] { width: 100%; min-width: 0; font-size: 0.9rem; }
+label > input, label > select, label > textarea { min-width: 0; }
+@media (max-width: 40rem) {
+  .panel { padding-bottom: calc(5.5rem + env(safe-area-inset-bottom)); }
+  .nav-panel { display: none; }
+  .panel-contenido { padding-top: 0.25rem; }
+  .barra-inferior {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+    background: rgb(255 255 255 / 0.97); border-top: 1px solid var(--borde);
+    box-shadow: 0 -2px 10px rgb(23 32 28 / 0.06);
+    padding: 0.35rem 0.25rem calc(0.35rem + env(safe-area-inset-bottom));
+    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  }
+  .barra-inferior a, .barra-mas summary {
+    display: grid; justify-items: center; gap: 0.15rem; padding: 0.3rem 0;
+    color: var(--gris); text-decoration: none; font-size: 0.72rem; font-weight: 600;
+    border-radius: var(--radio-chico); list-style: none; cursor: pointer;
+  }
+  .barra-mas summary::-webkit-details-marker { display: none; }
+  .barra-inferior a.activo, .barra-mas.activo > summary { color: var(--marca); }
+  .barra-inferior a.activo .barra-icono, .barra-mas.activo .barra-icono { background: var(--marca-claro); }
+  .barra-icono { position: relative; display: grid; place-items: center; width: 3.2rem; height: 1.9rem; border-radius: 999px; }
+  .barra-icono .insignia { position: absolute; top: -0.2rem; right: 0.35rem; margin: 0; padding: 0 0.35rem; font-size: 0.65rem; }
+  .barra-mas { position: relative; }
+  .barra-menu {
+    position: absolute; right: 0.25rem; bottom: calc(100% + 0.6rem); min-width: 11rem;
+    background: white; border: 1px solid var(--borde); border-radius: var(--radio); box-shadow: var(--sombra-alta);
+    padding: 0.35rem; display: grid;
+  }
+  .barra-menu a { display: block; text-align: left; font-size: 1rem; color: var(--tinta); padding: 0.7rem 0.85rem; }
+  .barra-menu a.activo { background: var(--marca-claro); color: var(--marca); }
+
+  /* Tablas → tarjetas */
+  .tabla-tarjetas { display: block; background: none; border: none; box-shadow: none; overflow: visible; }
+  .tabla-tarjetas thead { display: none; }
+  .tabla-tarjetas tbody { display: grid; gap: 0.6rem; }
+  .tabla-tarjetas tr {
+    display: flex; flex-direction: column; gap: 0.15rem;
+    background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--radio);
+    box-shadow: var(--sombra); padding: 0.75rem 0.9rem;
+  }
+  .tabla-tarjetas tbody tr:hover td { background: none; }
+  .tabla-tarjetas td { display: flex; justify-content: space-between; gap: 1rem; padding: 0.15rem 0; border: none; text-align: right; }
+  .tabla-tarjetas td::before { content: attr(data-etiqueta); color: var(--gris); font-size: 0.85rem; text-align: left; flex: none; }
+  .tabla-tarjetas td.celda-titulo { order: -1; font-weight: 700; font-size: 1.02rem; text-align: left; justify-content: flex-start; padding-bottom: 0.3rem; }
+  .tabla-tarjetas td.celda-titulo::before, .tabla-tarjetas td.celda-accion::before { content: none; }
+  .tabla-tarjetas td.celda-accion { justify-content: flex-start; padding-top: 0.4rem; }
+  .tabla-tarjetas td.celda-accion:empty { display: none; }
+
+  /* Navegación entre semanas: la fecha arriba, las flechas abajo */
+  .semana-nav { flex-wrap: wrap; }
+  .semana-nav strong { order: -1; flex-basis: 100%; text-align: center; }
+}
+@media print { .barra-inferior { display: none !important; } }

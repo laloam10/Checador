@@ -23,15 +23,15 @@ export default async function Accesos() {
   return (
     <>
       <h1>Accesos</h1>
-      <table className="tabla">
+      <table className="tabla tabla-tarjetas">
         <thead><tr><th>Correo</th><th>Rol</th><th>Centro</th><th></th></tr></thead>
         <tbody>
           {((miembros ?? []) as Miembro[]).map((m) => (
             <tr key={m.user_id}>
-              <td>{m.email}</td>
-              <td>{ROL[m.rol]}</td>
-              <td>{m.centro_trabajo_id ? nombreCentro.get(m.centro_trabajo_id) : m.rol === "kiosco" ? "Todos" : "—"}</td>
-              <td>
+              <td className="celda-titulo">{m.email}</td>
+              <td data-etiqueta="Rol">{ROL[m.rol]}</td>
+              <td data-etiqueta="Centro">{m.centro_trabajo_id ? nombreCentro.get(m.centro_trabajo_id) : m.rol === "kiosco" ? "Todos" : "—"}</td>
+              <td className="celda-accion">
                 {puedeQuitar(m.rol, m.user_id) && (
                   <form action={quitarAcceso}>
                     <input type="hidden" name="user_id" value={m.user_id} />
@@ -43,10 +43,10 @@ export default async function Accesos() {
           ))}
           {(invitaciones ?? []).map((i) => (
             <tr key={i.id}>
-              <td>{i.email} <span className="etiqueta">invitación pendiente</span></td>
-              <td>{ROL[i.rol]}</td>
-              <td>{i.centro_trabajo_id ? nombreCentro.get(i.centro_trabajo_id) : i.rol === "kiosco" ? "Todos" : "—"}</td>
-              <td>
+              <td className="celda-titulo">{i.email} <span className="etiqueta">invitación pendiente</span></td>
+              <td data-etiqueta="Rol">{ROL[i.rol]}</td>
+              <td data-etiqueta="Centro">{i.centro_trabajo_id ? nombreCentro.get(i.centro_trabajo_id) : i.rol === "kiosco" ? "Todos" : "—"}</td>
+              <td className="celda-accion">
                 <form action={cancelarInvitacion}>
                   <input type="hidden" name="id" value={i.id} />
                   <button className="boton-chico">Cancelar</button>

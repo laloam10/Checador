@@ -100,22 +100,22 @@ export default async function Trabajadores({
       ) : visibles.length === 0 ? (
         <p className="vacio">Nadie coincide con la búsqueda.</p>
       ) : (
-        <table className="tabla">
+        <table className="tabla tabla-tarjetas">
           <thead><tr><th>N.º</th><th>Nombre</th><th>Centro</th><th>App</th><th>PIN</th><th>Acuerdo</th><th></th></tr></thead>
           <tbody>
             {visibles.map((t) => (
               <tr key={t.id} className={t.fecha_baja ? "tachado" : ""}>
-                <td>{t.numero_empleado ?? "—"}</td>
-                <td><Link href={`/panel/trabajadores/${t.id}`}>{t.nombre}</Link>{t.fecha_baja && ` (baja ${t.fecha_baja})`}</td>
-                <td>{(Array.isArray(t.centros_trabajo) ? t.centros_trabajo[0] : t.centros_trabajo)?.nombre}</td>
-                <td>{t.user_id ? "Vinculada" : t.email ? "Pendiente" : "—"}</td>
-                <td>{pines.has(t.id) ? "Sí" : "—"}</td>
-                <td>
+                <td data-etiqueta="N.º">{t.numero_empleado ?? "—"}</td>
+                <td className="celda-titulo"><Link href={`/panel/trabajadores/${t.id}`}>{t.nombre}</Link>{t.fecha_baja && ` (baja ${t.fecha_baja})`}</td>
+                <td data-etiqueta="Centro">{(Array.isArray(t.centros_trabajo) ? t.centros_trabajo[0] : t.centros_trabajo)?.nombre}</td>
+                <td data-etiqueta="App">{t.user_id ? "Vinculada" : t.email ? "Pendiente" : "—"}</td>
+                <td data-etiqueta="PIN">{pines.has(t.id) ? "Sí" : "—"}</td>
+                <td data-etiqueta="Acuerdo">
                   {acuerdoDe.get(t.id) ? (
                     <span className={`insignia-estado ${ACUERDO[acuerdoDe.get(t.id)!].clase}`}>{ACUERDO[acuerdoDe.get(t.id)!].texto}</span>
                   ) : "—"}
                 </td>
-                <td><Link href={`/panel/trabajadores/${t.id}/semana`}>Registros</Link></td>
+                <td className="celda-accion"><Link href={`/panel/trabajadores/${t.id}/semana`}>Registros</Link></td>
               </tr>
             ))}
           </tbody>
