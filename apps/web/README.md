@@ -108,6 +108,7 @@ npm run build -w @checador/web && npm run start -w @checador/web   # con .env.lo
 LUNES_PASADO=2026-10-26 node apps/web/e2e/pwa.e2e.mjs
 psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -f apps/web/e2e/semilla-kiosco.sql
 node apps/web/e2e/kiosco.e2e.mjs
+node apps/web/e2e/kiosco-conformidad.e2e.mjs
 node apps/web/e2e/panel.e2e.mjs
 node apps/web/e2e/acuerdo.e2e.mjs
 node apps/web/e2e/exportar.e2e.mjs   # requiere pdftotext (poppler-utils)

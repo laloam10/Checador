@@ -76,6 +76,6 @@ select 'ALTO', 'Función privilegiada ejecutable por authenticated sin estar en 
  where prosecdef and has_function_privilege('authenticated', oid, 'EXECUTE')
    and proname not in (
      'crear_empresa', 'vincular_mi_cuenta', 'verificar_cadena', 'asignar_pin', 'establecer_mi_pin',
-     'kiosco_identificar', 'kiosco_checar', 'kiosco_firmar_acuerdo', 'miembros_de_empresa',
+     'kiosco_identificar', 'kiosco_checar', 'kiosco_firmar_acuerdo', 'kiosco_semana', 'kiosco_conformidad', 'miembros_de_empresa',
      'trabajadores_con_pin', 'mi_rol', 'es_gestor', 'puede_consultar', 'soy_trabajador', 'trabajo_en')
 order by 1, 2, 3;

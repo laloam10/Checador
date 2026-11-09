@@ -283,3 +283,9 @@ a.indicador:hover { box-shadow: var(--sombra-alta); border-color: #c7d1cc; color
   .atencion li { flex-wrap: wrap; }
   .tabla { display: block; overflow-x: auto; }
 }
+
+/* ---- Kiosco: revisión de semana ---- */
+.kiosco-semana { text-align: left; }
+.kiosco-semana h1, .kiosco-semana > .ayuda { text-align: center; }
+.kiosco-semana .tabla { font-size: 0.95rem; }
+.kiosco-semana textarea { font-size: 1.05rem; }

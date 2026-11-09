@@ -1,5 +1,6 @@
 import "server-only";
 
+import { calcularSemanaDesdeFilas, configDe, type FilaEvento } from "./datos";
 import type { crearClienteServidor } from "./supabase/server";
 
 type Cliente = Awaited<ReturnType<typeof crearClienteServidor>>;
@@ -29,10 +30,27 @@ export async function miKiosco(supabase: Cliente, userId: string): Promise<Kiosc
   };
 }
 
+/** Semana terminada que la persona aún no revisa, o que objetó y el empleador ya corrigió. */
+export interface SemanaPorRevisar {
+  lunes: string;
+  clase: "sin_respuesta" | "corregida";
+}
+
 /** Respuesta de las funciones kiosco_* de la base. */
 export interface RespuestaKiosco {
   ok: boolean;
-  codigo?: "NO_ES_KIOSCO" | "KIOSCO_BLOQUEADO" | "TRABAJADOR_BLOQUEADO" | "CREDENCIALES" | "TIPO" | "RECHAZADO" | "SIN_ACUERDO";
+  codigo?:
+    | "NO_ES_KIOSCO"
+    | "KIOSCO_BLOQUEADO"
+    | "TRABAJADOR_BLOQUEADO"
+    | "CREDENCIALES"
+    | "TIPO"
+    | "RECHAZADO"
+    | "SIN_ACUERDO"
+    | "SEMANA"
+    | "COMENTARIO"
+    | "RESUMEN";
+  semanas_por_revisar?: SemanaPorRevisar[];
   acuerdo_pendiente?: { id: string; version: number; contenido: string; folio: string } | null;
   error?: string;
   nombre?: string;
@@ -61,6 +79,33 @@ export function estadoHttp(r: RespuestaKiosco): number {
       return 422;
   }
 }
+
+/** Respuesta de kiosco_semana(): checadas de la semana y datos para calcularla. */
+export interface RespuestaSemanaKiosco extends RespuestaKiosco {
+  dia_descanso?: number;
+  jornada_pactada_min?: unknown;
+  zona_horaria?: string;
+}
+
+/**
+ * Calcula en el servidor una semana pendiente del trabajador que se identificó en el kiosco,
+ * con el mismo motor que la app del celular.
+ */
+export async function semanaEnKiosco(supabase: Cliente, numero: string, pin: string, lunes: string) {
+  const { data, error } = await supabase.rpc("kiosco_semana", { p_numero: numero, p_pin: pin, p_lunes: lunes });
+  if (error) throw error;
+  const r = data as RespuestaSemanaKiosco & { eventos?: FilaEvento[] };
+  if (!r.ok) return { r, calculo: null };
+  const calculo = calcularSemanaDesdeFilas(
+    r.eventos ?? [],
+    { zonaHoraria: r.zona_horaria ?? "America/Mexico_City", config: configDe(r.dia_descanso ?? 0, r.jornada_pactada_min) },
+    lunes,
+  );
+  return { r, calculo };
+}
+
+export const esLunes = (v: unknown): v is string =>
+  typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v) && new Date(`${v}T12:00:00Z`).getUTCDay() === 1;
 
 export function validarCredenciales(numero: unknown, pin: unknown): string | null {
   if (typeof numero !== "string" || !/^[0-9A-Za-z-]{1,20}$/.test(numero)) return "Número de empleado inválido.";

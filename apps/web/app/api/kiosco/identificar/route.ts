@@ -46,6 +46,7 @@ export async function POST(request: NextRequest) {
     estado,
     desde: enCurso?.inicio.slice(11) ?? null,
     acuerdoPendiente: r.acuerdo_pendiente ?? null,
+    semanasPorRevisar: r.semanas_por_revisar ?? [],
     horaServidor: new Date().toISOString(),
   });
 }

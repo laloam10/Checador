@@ -1,10 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { aHoraLocal } from "@checador/jornada";
 import { crearClienteServidor, usuarioActual } from "@/lib/supabase/server";
-import { lunesDe, misTrabajadores, semanaDeTrabajador, sumarDias } from "@/lib/datos";
+import { lunesDe, misTrabajadores, resumenConformidad, semanaDeTrabajador, sumarDias } from "@/lib/datos";
 import { evidenciaDe } from "@/lib/evidencia";
-
-const VERSION_RESUMEN = 1;
 
 /**
  * Conformidad del trabajador con una semana cerrada (prueba plena, art. 132 XXXIV).
@@ -37,16 +35,7 @@ export async function POST(request: NextRequest) {
   const domingo = sumarDias(semana, 6);
   if (domingo >= hoyLocal) return error(422, "Solo puedes dar tu conformidad de semanas ya terminadas.");
 
-  const { semana: calculo, reconstruccion, eventoIds } = await semanaDeTrabajador(supabase, trabajador, semana);
-  const resumen = {
-    version: VERSION_RESUMEN,
-    semana,
-    totales: calculo.totales,
-    dias: calculo.dias,
-    alertas: calculo.alertas.map((a) => a.codigo),
-    incidencias: reconstruccion.incidencias,
-    eventoIds,
-  };
+  const resumen = resumenConformidad(semana, await semanaDeTrabajador(supabase, trabajador, semana));
 
   const { data, error: err } = await supabase
     .from("conformidades")

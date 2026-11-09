@@ -12,13 +12,31 @@ import {
   sincronizarColaKiosco,
   type PendienteKiosco,
 } from "@/lib/colaKiosco";
+import type { Reconstruccion, ResultadoSemana } from "@checador/jornada";
+import { sumarDias } from "@/lib/fechas";
+import { TablaSemana } from "./TablaSemana";
 import { Teclado } from "./Teclado";
 
 type Paso =
   | { tipo: "numero" }
   | { tipo: "pin" }
   | { tipo: "verificando" }
-  | { tipo: "acciones"; nombre: string; estado: "fuera" | "trabajando" | "en_pausa"; desde: string | null; acuerdo: AcuerdoPendiente | null }
+  | {
+      tipo: "acciones";
+      nombre: string;
+      estado: "fuera" | "trabajando" | "en_pausa";
+      desde: string | null;
+      acuerdo: AcuerdoPendiente | null;
+      semanas: SemanaPorRevisar[];
+    }
+  | {
+      tipo: "semana";
+      nombre: string;
+      semanas: SemanaPorRevisar[];
+      datos: { semana: ResultadoSemana; reconstruccion: Reconstruccion } | null;
+      objetando: boolean;
+      aviso?: string;
+    }
   | { tipo: "acuerdo"; nombre: string; acuerdo: AcuerdoPendiente }
   | { tipo: "acciones-sin-red" }
   | { tipo: "listo"; titulo: string; detalle: string; aviso?: boolean };
@@ -30,6 +48,15 @@ const ETIQUETA: Record<TipoCaptura, string> = {
   fin_pausa: "Fin de pausa",
 };
 
+interface SemanaPorRevisar {
+  lunes: string;
+  clase: "sin_respuesta" | "corregida";
+}
+
+const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+const fechaCorta = (f: string) => `${Number(f.slice(8, 10))} ${MESES[Number(f.slice(5, 7)) - 1]}`;
+const nombreSemana = (lunes: string) => `del ${fechaCorta(lunes)} al ${fechaCorta(sumarDias(lunes, 6))}`;
+
 interface AcuerdoPendiente {
   id: string;
   version: number;
@@ -38,7 +65,7 @@ interface AcuerdoPendiente {
 }
 
 const INACTIVIDAD_MS = 20_000;
-const LECTURA_ACUERDO_MS = 4 * 60_000;
+const LECTURA_MS = 4 * 60_000; // acuerdo o semana: tiempo para leer con calma
 const CONFIRMACION_MS = 4_000;
 
 export function Kiosco({ empresa, centro, zonaHoraria }: { empresa: string; centro: string | null; zonaHoraria: string }) {
@@ -50,12 +77,14 @@ export function Kiosco({ empresa, centro, zonaHoraria }: { empresa: string; cent
   const [enLinea, setEnLinea] = useState(true);
   const [pendientes, setPendientes] = useState<PendienteKiosco[]>([]);
   const [enviando, setEnviando] = useState(false);
+  const [comentario, setComentario] = useState("");
   const temporizador = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const reiniciar = useCallback(() => {
     setPaso({ tipo: "numero" });
     setNumero("");
     setPin("");
+    setComentario("");
     setEnviando(false);
   }, []);
 
@@ -103,12 +132,12 @@ export function Kiosco({ empresa, centro, zonaHoraria }: { empresa: string; cent
   useEffect(() => {
     if (temporizador.current) clearTimeout(temporizador.current);
     if (paso.tipo === "numero" && !numero) return;
-    const espera = paso.tipo === "listo" ? CONFIRMACION_MS : paso.tipo === "acuerdo" ? LECTURA_ACUERDO_MS : INACTIVIDAD_MS;
+    const espera = paso.tipo === "listo" ? CONFIRMACION_MS : paso.tipo === "acuerdo" || paso.tipo === "semana" ? LECTURA_MS : INACTIVIDAD_MS;
     temporizador.current = setTimeout(reiniciar, espera);
     return () => {
       if (temporizador.current) clearTimeout(temporizador.current);
     };
-  }, [paso, numero, pin, reiniciar]);
+  }, [paso, numero, pin, comentario, reiniciar]);
 
   async function identificar() {
     setError(null);
@@ -131,6 +160,7 @@ export function Kiosco({ empresa, centro, zonaHoraria }: { empresa: string; cent
       estado?: "fuera" | "trabajando" | "en_pausa";
       desde?: string | null;
       acuerdoPendiente?: AcuerdoPendiente | null;
+      semanasPorRevisar?: SemanaPorRevisar[];
       error?: string;
       horaServidor?: string;
     };
@@ -152,7 +182,75 @@ export function Kiosco({ empresa, centro, zonaHoraria }: { empresa: string; cent
       estado: c.estado ?? "fuera",
       desde: c.desde ?? null,
       acuerdo: c.acuerdoPendiente ?? null,
+      semanas: c.semanasPorRevisar ?? [],
     });
+  }
+
+  /** Muestra la primera semana pendiente de la lista, calculada en el servidor. */
+  async function abrirSemana(nombre: string, semanas: SemanaPorRevisar[], aviso?: string) {
+    setError(null);
+    setComentario("");
+    setPaso({ tipo: "semana", nombre, semanas, datos: null, objetando: false, aviso });
+    try {
+      const r = await fetch("/api/kiosco/semana", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ numero, pin, lunes: semanas[0]!.lunes }),
+      });
+      const c = (await r.json().catch(() => ({}))) as {
+        error?: string;
+        semana?: ResultadoSemana;
+        reconstruccion?: Reconstruccion;
+      };
+      if (!r.ok || !c.semana || !c.reconstruccion) {
+        setError(c.error ?? "No se pudo cargar la semana.");
+        reiniciar();
+        return;
+      }
+      setPaso({ tipo: "semana", nombre, semanas, datos: { semana: c.semana, reconstruccion: c.reconstruccion }, objetando: false, aviso });
+    } catch {
+      setError("Sin conexión: tus semanas solo se pueden revisar con internet.");
+      reiniciar();
+    }
+  }
+
+  async function responderSemana(nombre: string, semanas: SemanaPorRevisar[], respuesta: "conforme" | "objeta") {
+    if (enviando) return;
+    setEnviando(true);
+    const lunes = semanas[0]!.lunes;
+    try {
+      const r = await fetch("/api/kiosco/conformidad", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ numero, pin, lunes, respuesta, comentario }),
+      });
+      const c = (await r.json().catch(() => ({}))) as { error?: string; comprobante?: { cadena_secuencia?: number } };
+      if (!r.ok) {
+        setError(c.error ?? "No se pudo registrar tu respuesta.");
+        reiniciar();
+        return;
+      }
+      const hecho = `${respuesta === "conforme" ? "Confirmaste" : "Objetaste"} la semana ${nombreSemana(lunes)} (registro n.º ${c.comprobante?.cadena_secuencia ?? "—"}).`;
+      const restantes = semanas.slice(1);
+      setEnviando(false);
+      if (restantes.length) {
+        await abrirSemana(nombre, restantes, hecho);
+        return;
+      }
+      setPaso({
+        tipo: "listo",
+        titulo: respuesta === "conforme" ? "Semana confirmada" : "Objeción enviada",
+        detalle: `${nombre} · ${nombreSemana(lunes)} · registro n.º ${c.comprobante?.cadena_secuencia ?? "—"}`,
+      });
+      setNumero("");
+      setPin("");
+      setComentario("");
+    } catch {
+      setError("Sin conexión: tu respuesta no se envió. Intenta de nuevo con internet.");
+      reiniciar();
+    } finally {
+      setEnviando(false);
+    }
   }
 
   async function checar(tipo: TipoCaptura) {
@@ -273,6 +371,11 @@ export function Kiosco({ empresa, centro, zonaHoraria }: { empresa: string; cent
                 Tienes un acuerdo por firmar
               </button>
             )}
+            {paso.semanas.length > 0 && (
+              <button className="secundario" onClick={() => abrirSemana(paso.nombre, paso.semanas)}>
+                Revisar mis horas ({paso.semanas.length} {paso.semanas.length === 1 ? "semana" : "semanas"})
+              </button>
+            )}
             <button className="enlace" onClick={reiniciar}>Cancelar</button>
           </div>
         </section>
@@ -289,6 +392,58 @@ export function Kiosco({ empresa, centro, zonaHoraria }: { empresa: string; cent
             </button>
             <button className="enlace" onClick={reiniciar}>Ahora no</button>
           </div>
+        </section>
+      )}
+
+      {paso.tipo === "semana" && (
+        <section className="kiosco-paso kiosco-semana">
+          {paso.aviso && <p className="mensaje mensaje-ok">{paso.aviso}</p>}
+          <h1>Semana {nombreSemana(paso.semanas[0]!.lunes)}</h1>
+          <p className="ayuda">
+            {paso.nombre}
+            {paso.semanas.length > 1 && ` · te quedan ${paso.semanas.length} semanas por revisar`}
+          </p>
+          {paso.semanas[0]!.clase === "corregida" && (
+            <p className="aviso">Tu empleador hizo cambios después de tu objeción. Revisa si ahora es correcta.</p>
+          )}
+          {!paso.datos ? (
+            <p className="vacio">Cargando…</p>
+          ) : (
+            <>
+              <TablaSemana lunes={paso.semanas[0]!.lunes} semana={paso.datos.semana} reconstruccion={paso.datos.reconstruccion} />
+              {paso.objetando ? (
+                <div className="acciones">
+                  <label>
+                    ¿Qué no es correcto?
+                    <textarea
+                      rows={3}
+                      maxLength={2000}
+                      value={comentario}
+                      onChange={(e) => setComentario(e.target.value)}
+                      placeholder="Por ejemplo: el jueves salí a las 18:00, no a las 17:00."
+                    />
+                  </label>
+                  <button className="principal" disabled={enviando || !comentario.trim()}
+                    onClick={() => responderSemana(paso.nombre, paso.semanas, "objeta")}>
+                    Enviar objeción
+                  </button>
+                  <button className="enlace" onClick={() => setPaso({ ...paso, objetando: false })}>Volver</button>
+                </div>
+              ) : (
+                <div className="acciones">
+                  <button className="principal" disabled={enviando}
+                    onClick={() => responderSemana(paso.nombre, paso.semanas, "conforme")}>
+                    Mis horas son correctas
+                  </button>
+                  <button className="secundario" disabled={enviando} onClick={() => setPaso({ ...paso, objetando: true })}>
+                    Algo no es correcto
+                  </button>
+                  <p className="ayuda">Tu respuesta queda firmada con tu PIN. Es voluntaria: si no respondes, no se considera que estés de acuerdo.</p>
+                  <button className="enlace" onClick={reiniciar}>Ahora no</button>
+                </div>
+              )}
+            </>
+          )}
         </section>
       )}
 

@@ -72,7 +72,7 @@ export default async function Objeciones() {
       <p className="ayuda">
         Cada lunes a las 10:00 (hora del centro de México) Checador envía un correo a quien tenga semanas terminadas sin
         revisar, o semanas que objetó y que ya corregiste. Revisa las últimas 8 semanas y envía como máximo un correo por
-        persona a la semana. Solo lo recibe quien tiene correo registrado: quien checa únicamente en el kiosco no lo recibe.
+        persona a la semana. Solo lo recibe quien tiene correo registrado; quien checa únicamente en el kiosco ve sus semanas pendientes ahí, al identificarse con su PIN.
         Responder sigue siendo voluntario; el correo lo dice así.
       </p>
       {esGestor(ctx.rol) ? (

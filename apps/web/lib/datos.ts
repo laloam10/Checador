@@ -53,16 +53,22 @@ interface FilaTrabajador {
   centros_trabajo: unknown;
 }
 
-function filaATrabajador(t: FilaTrabajador): Trabajador {
-  const centro = uno(t.centros_trabajo) as { nombre: string; zona_horaria: string } | null;
-  const empresa = uno(t.empresas) as { razon_social: string } | null;
-  const pactada = t.jornada_pactada_min as Record<string, number> | null;
-  const config: ConfigTrabajador = { diaDescanso: t.dia_descanso as DiaSemana };
+/** Configuración para el motor a partir de las columnas del trabajador (art. 58: distribución pactada). */
+export function configDe(diaDescanso: number, jornadaPactadaMin: unknown): ConfigTrabajador {
+  const pactada = jornadaPactadaMin as Record<string, number> | null;
+  const config: ConfigTrabajador = { diaDescanso: diaDescanso as DiaSemana };
   if (pactada && Object.keys(pactada).length) {
     config.jornadaPactadaMin = Object.fromEntries(
       Object.entries(pactada).map(([d, m]) => [Number(d), m]),
     ) as ConfigTrabajador["jornadaPactadaMin"] & object;
   }
+  return config;
+}
+
+function filaATrabajador(t: FilaTrabajador): Trabajador {
+  const centro = uno(t.centros_trabajo) as { nombre: string; zona_horaria: string } | null;
+  const empresa = uno(t.empresas) as { razon_social: string } | null;
+  const config = configDe(t.dia_descanso, t.jornada_pactada_min);
   return {
     id: t.id,
     empresaId: t.empresa_id,
@@ -175,6 +181,18 @@ export async function semanaDeTrabajador(
   hasta.setUTCDate(hasta.getUTCDate() + 9);
 
   const filas = await cargarFilasEventos(supabase, trabajador.id, desde, hasta);
+  return calcularSemanaDesdeFilas(filas, trabajador, lunes);
+}
+
+/**
+ * Cálculo de la semana a partir de las filas ya cargadas (la app del celular las lee con
+ * su sesión; el kiosco, con kiosco_semana()). Ambos muestran exactamente los mismos números.
+ */
+export function calcularSemanaDesdeFilas(
+  filas: FilaEvento[],
+  trabajador: Pick<Trabajador, "zonaHoraria" | "config">,
+  lunes: string,
+): SemanaTrabajador {
   const reconstruccion = reconstruirTurnos(filas.map(filaAEvento), trabajador.zonaHoraria);
   const domingoSiguiente = sumarDias(lunes, 7);
   const turnos = reconstruccion.turnos.filter((t) => {
@@ -187,6 +205,21 @@ export async function semanaDeTrabajador(
     semana,
     reconstruccion: { ...reconstruccion, turnos },
     eventoIds: turnos.flatMap((t) => t.eventoIds),
+  };
+}
+
+export const VERSION_RESUMEN = 1;
+
+/** Lo que vio el trabajador al responder; se guarda con su conformidad (art. 132 XXXIV). */
+export function resumenConformidad(lunes: string, { semana, reconstruccion, eventoIds }: SemanaTrabajador) {
+  return {
+    version: VERSION_RESUMEN,
+    semana: lunes,
+    totales: semana.totales,
+    dias: semana.dias,
+    alertas: semana.alertas.map((a) => a.codigo),
+    incidencias: reconstruccion.incidencias,
+    eventoIds,
   };
 }
 

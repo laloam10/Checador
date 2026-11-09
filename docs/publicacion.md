@@ -139,9 +139,9 @@ Todo lo demás en **None**, en especial: Backups (permite restaurar y sobrescrib
 
 ### 1.7 Asesor de seguridad de Supabase
 
-*Advisors → Security Advisor* reporta **16 avisos esperados**, que se aceptan a propósito:
+*Advisors → Security Advisor* reporta **18 avisos esperados**, que se aceptan a propósito:
 - 1 informativo: `pines_trabajador` tiene RLS sin políticas, para que nadie pueda leer los PINs por la API.
-- 15 de "función SECURITY DEFINER ejecutable por `authenticated`": son la API de la app (`crear_empresa`, `vincular_mi_cuenta`, `verificar_cadena`, `asignar_pin`, `establecer_mi_pin`, `kiosco_identificar`, `kiosco_checar`, `kiosco_firmar_acuerdo`, `miembros_de_empresa`, `trabajadores_con_pin`), que validan por dentro quién las llama, y los auxiliares de RLS (`mi_rol`, `es_gestor`, `puede_consultar`, `soy_trabajador`, `trabajo_en`).
+- 17 de "función SECURITY DEFINER ejecutable por `authenticated`": son la API de la app (`crear_empresa`, `vincular_mi_cuenta`, `verificar_cadena`, `asignar_pin`, `establecer_mi_pin`, `kiosco_identificar`, `kiosco_checar`, `kiosco_firmar_acuerdo`, `kiosco_semana`, `kiosco_conformidad`, `miembros_de_empresa`, `trabajadores_con_pin`), que validan por dentro quién las llama, y los auxiliares de RLS (`mi_rol`, `es_gestor`, `puede_consultar`, `soy_trabajador`, `trabajo_en`).
 
 **Cualquier otro aviso es nuevo y debe revisarse.** `verificar-seguridad.sql` contiene esa misma lista y marca como hallazgo cualquier función privilegiada ejecutable que no esté en ella.
 
