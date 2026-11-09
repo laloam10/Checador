@@ -12,12 +12,28 @@ const ACUERDO: Record<ClaveEstado, { texto: string; clase: string }> = {
   sin_acuerdo: { texto: "Sin acuerdo", clase: "insignia-error" },
 };
 
-export default async function Trabajadores({ searchParams }: { searchParams: Promise<{ bajas?: string }> }) {
+const FILTROS = {
+  "": "Todos",
+  acuerdo: "Sin acuerdo vigente",
+  sin_metodo: "Sin forma de checar",
+  app_pendiente: "Con correo, sin entrar aún a la app",
+} as const;
+type Filtro = keyof typeof FILTROS;
+
+/** Minúsculas y sin acentos, para buscar "jose" y encontrar "José". */
+const normalizar = (t: string) => t.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
+
+export default async function Trabajadores({
+  searchParams,
+}: {
+  searchParams: Promise<{ bajas?: string; q?: string; centro?: string; filtro?: string }>;
+}) {
   const ctx = await requierePanel();
-  const { bajas } = await searchParams;
+  const { bajas, q = "", centro = "", filtro: filtroParam = "" } = await searchParams;
+  const filtro: Filtro = filtroParam in FILTROS ? (filtroParam as Filtro) : "";
   let consulta = ctx.supabase
     .from("trabajadores")
-    .select("id, nombre, numero_empleado, email, user_id, fecha_baja, centros_trabajo(nombre)")
+    .select("id, nombre, numero_empleado, email, user_id, fecha_baja, centro_trabajo_id, centros_trabajo(nombre)")
     .eq("empresa_id", ctx.empresa.id)
     .order("nombre");
   if (!bajas) consulta = consulta.is("fecha_baja", null);
@@ -33,19 +49,61 @@ export default async function Trabajadores({ searchParams }: { searchParams: Pro
   // Muestra del texto que se firmará (el de la primera persona pendiente), para revisarlo antes de firmar en lote.
   const muestra = esGestor(ctx.rol) && porFirmar[0] ? await estadoAcuerdo(ctx.supabase, porFirmar[0].trabajadorId) : null;
 
+  const todos = trabajadores ?? [];
+  const busqueda = normalizar(q.trim());
+  const visibles = todos.filter((t) => {
+    if (busqueda && !normalizar(`${t.nombre} ${t.numero_empleado ?? ""} ${t.email ?? ""}`).includes(busqueda)) return false;
+    if (centro && t.centro_trabajo_id !== centro) return false;
+    if (filtro === "acuerdo" && (t.fecha_baja || acuerdoDe.get(t.id) === "vigente")) return false;
+    if (filtro === "sin_metodo" && (t.fecha_baja || t.email || (t.numero_empleado && pines.has(t.id)))) return false;
+    if (filtro === "app_pendiente" && (t.fecha_baja || !t.email || t.user_id)) return false;
+    return true;
+  });
+  const filtrando = Boolean(busqueda || centro || filtro);
+
   return (
     <>
       <h1>Trabajadores</h1>
-      <p>
-        {bajas ? <Link href="/panel/trabajadores">Ocultar bajas</Link> : <Link href="/panel/trabajadores?bajas=1">Mostrar bajas</Link>}
-      </p>
-      {(trabajadores ?? []).length === 0 ? (
+      {todos.length > 0 && (
+        <form className="filtros" role="search" method="get">
+          <label className="filtro-busqueda">
+            Buscar
+            <input type="search" name="q" defaultValue={q} placeholder="Nombre, número o correo" />
+          </label>
+          {(centros ?? []).length > 1 && (
+            <label>
+              Centro
+              <select name="centro" defaultValue={centro}>
+                <option value="">Todos</option>
+                {(centros ?? []).map((c) => <option key={c.id} value={c.id}>{c.nombre}</option>)}
+              </select>
+            </label>
+          )}
+          <label>
+            Mostrar
+            <select name="filtro" defaultValue={filtro}>
+              {(Object.keys(FILTROS) as Filtro[]).map((f) => <option key={f} value={f}>{FILTROS[f]}</option>)}
+            </select>
+          </label>
+          <label className="casilla-linea">
+            <input type="checkbox" name="bajas" value="1" defaultChecked={Boolean(bajas)} /> Incluir bajas
+          </label>
+          <button className="boton">Filtrar</button>
+          {(filtrando || bajas) && <Link href="/panel/trabajadores">Limpiar</Link>}
+        </form>
+      )}
+      {todos.length > 0 && filtrando && (
+        <p className="ayuda" role="status">{visibles.length} de {todos.length} {todos.length === 1 ? "persona" : "personas"}</p>
+      )}
+      {todos.length === 0 ? (
         <p className="vacio">Aún no hay trabajadores.</p>
+      ) : visibles.length === 0 ? (
+        <p className="vacio">Nadie coincide con la búsqueda.</p>
       ) : (
         <table className="tabla">
           <thead><tr><th>N.º</th><th>Nombre</th><th>Centro</th><th>App</th><th>PIN</th><th>Acuerdo</th><th></th></tr></thead>
           <tbody>
-            {(trabajadores ?? []).map((t) => (
+            {visibles.map((t) => (
               <tr key={t.id} className={t.fecha_baja ? "tachado" : ""}>
                 <td>{t.numero_empleado ?? "—"}</td>
                 <td><Link href={`/panel/trabajadores/${t.id}`}>{t.nombre}</Link>{t.fecha_baja && ` (baja ${t.fecha_baja})`}</td>

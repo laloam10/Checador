@@ -115,7 +115,7 @@ try {
 
   // 4. Acuerdos en lote
   await p.goto(`${APP}/panel/trabajadores`);
-  await p.getByText("Sin acuerdo").first().waitFor();
+  await p.locator("table.tabla").getByText("Sin acuerdo", { exact: true }).first().waitFor();
   await p.getByText(/Ver el texto \(ejemplo:/).click();
   await p.locator("#acuerdos pre.texto-acuerdo").filter({ hasText: "ACUERDO PARA EL REGISTRO" }).waitFor();
   const lote = p.getByRole("button", { name: "Generar y firmar 2 acuerdo(s) como empresa" });

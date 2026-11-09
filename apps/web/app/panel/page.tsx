@@ -119,7 +119,7 @@ export default async function Tablero() {
             {enPausa ? `y ${enPausa} en pausa` : presentes.length ? "nadie en pausa" : "nadie ha checado entrada"}
           </span>
         </div>
-        <Link href="/panel/trabajadores#acuerdos" className="indicador">
+        <Link href={vigentes < activos ? "/panel/trabajadores?filtro=acuerdo" : "/panel/trabajadores"} className="indicador">
           <span className="indicador-titulo">Acuerdos vigentes</span>
           <span className="indicador-valor">
             {vigentes} <small>de {activos}</small>

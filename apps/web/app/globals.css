@@ -289,3 +289,11 @@ a.indicador:hover { box-shadow: var(--sombra-alta); border-color: #c7d1cc; color
 .kiosco-semana h1, .kiosco-semana > .ayuda { text-align: center; }
 .kiosco-semana .tabla { font-size: 0.95rem; }
 .kiosco-semana textarea { font-size: 1.05rem; }
+
+/* ---- Filtros de listas ---- */
+.filtros { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: end; margin: 0.5rem 0 0.25rem; }
+.filtros label { font-size: 0.85rem; }
+.filtros .filtro-busqueda { flex: 1 1 16rem; }
+.filtros .casilla-linea { align-self: center; padding-top: 1.2rem; }
+.filtros .boton { padding: 0.65rem 1rem; }
+.filtros > a { align-self: center; padding-top: 1.2rem; font-weight: 600; }

@@ -106,6 +106,12 @@ try {
   await kiosco.getByText("Entrada registrada").waitFor();
   paso("el kiosco aceptó la invitación al entrar y la trabajadora checó con su PIN");
 
+  // 5b. Búsqueda en la lista de trabajadores
+  await dueno.goto(`${APP}/panel/trabajadores?q=CARLA`);
+  await dueno.getByText(/^1 de \d+ personas?$/).waitFor();
+  await dueno.locator("table.tabla tbody tr", { hasText: "Carla Ruiz" }).waitFor();
+  paso("la búsqueda de trabajadores no distingue mayúsculas");
+
   // 6. Tablero
   await dueno.getByRole("link", { name: "Tablero" }).click();
   await dueno.getByRole("heading", { name: "En turno ahora" }).waitFor();
