@@ -3,7 +3,7 @@ import { FormAccion } from "@/components/panel/FormAccion";
 import { CamposTrabajador } from "@/components/panel/CamposTrabajador";
 import { estadoAcuerdo, estadosAcuerdosEmpresa, type ClaveEstado } from "@/lib/acuerdosDatos";
 import { esGestor, requierePanel } from "@/lib/panel";
-import { generarAcuerdosPendientes, guardarTrabajador } from "../acciones";
+import { generarAcuerdosPendientes, guardarTrabajador, importarTrabajadores } from "../acciones";
 
 const ACUERDO: Record<ClaveEstado, { texto: string; clase: string }> = {
   vigente: { texto: "Vigente", clase: "insignia-ok" },
@@ -162,9 +162,37 @@ export default async function Trabajadores({
           {(centros ?? []).length === 0 ? (
             <p className="mensaje mensaje-aviso">Primero crea un <Link href="/panel/centros">centro de trabajo</Link>.</p>
           ) : (
-            <FormAccion accion={guardarTrabajador} boton="Dar de alta">
-              <CamposTrabajador centros={centros ?? []} />
-            </FormAccion>
+            <>
+              <FormAccion accion={guardarTrabajador} boton="Dar de alta">
+                <CamposTrabajador centros={centros ?? []} />
+              </FormAccion>
+              <details className="alta-masiva" id="alta-masiva">
+                <summary>Dar de alta a varias personas desde Excel</summary>
+                <ol className="ayuda">
+                  <li>
+                    Descarga la <a href="/panel/trabajadores/plantilla" download>plantilla</a> y ábrela en Excel. Una persona por
+                    renglón; borra los dos ejemplos.
+                  </li>
+                  <li>
+                    Columnas: <strong>nombre</strong> y <strong>fecha_ingreso</strong> (15/03/2026) son obligatorias;
+                    cada persona necesita <strong>numero_empleado</strong> (para el kiosco) o <strong>correo</strong> (para la
+                    app). <strong>centro</strong> con el nombre tal como aparece en Centros (si solo tienes uno, puedes dejarlo
+                    vacío). <strong>dia_descanso</strong>: domingo a sábado (si lo dejas vacío, domingo).
+                  </li>
+                  <li>Guárdala como <strong>CSV</strong> (Archivo → Guardar como → CSV) y súbela aquí.</li>
+                </ol>
+                <FormAccion accion={importarTrabajadores} boton="Revisar y dar de alta" limpiar>
+                  <label>
+                    Archivo CSV
+                    <input type="file" name="archivo" accept=".csv,text/csv" required />
+                  </label>
+                  <p className="ayuda">
+                    Se revisa todo el archivo antes de guardar: si un renglón tiene un error, no se da de alta a nadie y te
+                    decimos qué corregir. Máximo 500 personas por archivo.
+                  </p>
+                </FormAccion>
+              </details>
+            </>
           )}
         </>
       )}

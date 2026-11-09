@@ -7,7 +7,8 @@ import { aHoraLocal, localAInstante } from "@checador/jornada";
 import { generarTextoAcuerdo } from "@/lib/acuerdo";
 import { datosActuales, estadosAcuerdosEmpresa } from "@/lib/acuerdosDatos";
 import { trabajadorPorId } from "@/lib/datos";
-import { requierePanel } from "@/lib/panel";
+import { decodificar, MAX_BYTES, validarImportacion } from "@/lib/importacion";
+import { esGestor, requierePanel } from "@/lib/panel";
 import { crearClienteServidor, usuarioActual } from "@/lib/supabase/server";
 
 /**
@@ -151,6 +152,50 @@ export async function guardarTrabajador(_: Estado, fd: FormData): Promise<Estado
   if (error) return fallo(traducir(error));
   refrescar();
   redirect(`/panel/trabajadores/${data.id}`);
+}
+
+export async function importarTrabajadores(_: Estado, fd: FormData): Promise<Estado> {
+  const ctx = await requierePanel();
+  if (!esGestor(ctx.rol)) return fallo("Solo el propietario o un administrador pueden dar de alta personal.");
+  const archivo = fd.get("archivo");
+  if (!(archivo instanceof File) || archivo.size === 0) return fallo("Elige el archivo CSV.");
+  if (archivo.size > MAX_BYTES) return fallo("El archivo es demasiado grande (máximo 500 personas por archivo).");
+
+  const texto = decodificar(new Uint8Array(await archivo.arrayBuffer()));
+  const [{ data: centros, error: e1 }, { data: existentes, error: e2 }] = await Promise.all([
+    ctx.supabase.from("centros_trabajo").select("id, nombre").eq("empresa_id", ctx.empresa.id),
+    // Incluye bajas: el número y el correo siguen siendo únicos dentro de la empresa.
+    ctx.supabase.from("trabajadores").select("numero_empleado, email").eq("empresa_id", ctx.empresa.id),
+  ]);
+  if (e1 || e2) return fallo(traducir((e1 ?? e2)!));
+  if (!centros?.length) return fallo("Primero crea un centro de trabajo.");
+
+  const hoy = aHoraLocal(new Date(), ctx.empresa.zonaHoraria).slice(0, 10);
+  const { trabajadores, errores } = validarImportacion(
+    texto,
+    centros,
+    {
+      numeros: (existentes ?? []).map((t) => t.numero_empleado).filter((n): n is string => Boolean(n)),
+      correos: (existentes ?? []).map((t) => t.email).filter((c): c is string => Boolean(c)),
+    },
+    hoy,
+  );
+  if (errores.length) {
+    const lista = errores.slice(0, 15).map((e) => `Renglón ${e.fila}: ${e.mensaje}`);
+    if (errores.length > 15) lista.push(`… y ${errores.length - 15} renglón(es) más.`);
+    return fallo(`No se dio de alta a nadie. Corrige el archivo y vuelve a subirlo:\n${lista.join("\n")}`);
+  }
+
+  // Una sola inserción: o entran todas las personas o ninguna.
+  const { error } = await ctx.supabase
+    .from("trabajadores")
+    .insert(trabajadores.map((t) => ({ ...t, empresa_id: ctx.empresa.id })));
+  if (error) return fallo(`No se dio de alta a nadie: ${traducir(error)}`);
+  refrescar();
+  return ok(
+    `Se dio de alta a ${trabajadores.length} ${trabajadores.length === 1 ? "persona" : "personas"}. ` +
+      "Siguiente paso: asigna los PIN de quienes checarán en el kiosco y firma sus acuerdos.",
+  );
 }
 
 export async function asignarPin(_: Estado, fd: FormData): Promise<Estado> {
