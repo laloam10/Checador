@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   title: "Checador",
   description: "Registro electrónico de jornada laboral",
   appleWebApp: { capable: true, title: "Checador", statusBarStyle: "default" },
-  icons: { apple: "/icon-180.png" },
+  icons: { icon: [{ url: "/icon.svg", type: "image/svg+xml" }], apple: "/icon-180.png" },
 };
 
 export const viewport: Viewport = {

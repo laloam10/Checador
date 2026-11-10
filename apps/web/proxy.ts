@@ -77,6 +77,6 @@ function politicaSeguridad(nonce: string, https: boolean): string {
 export const config = {
   matcher: [
     // Todo excepto estáticos, íconos, manifiesto y service worker.
-    "/((?!_next/static|_next/image|favicon.ico|icon-.*\\.png|manifest.webmanifest|sw.js).*)",
+    "/((?!_next/static|_next/image|favicon.ico|icon\\.svg|icon-.*\\.png|manifest.webmanifest|sw.js).*)",
   ],
 };
