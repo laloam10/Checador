@@ -29,11 +29,20 @@ export default async function Exportar({ searchParams }: { searchParams: Promise
         Cada archivo queda registrado con su huella digital (SHA-256), quién lo emitió y el estado de la bitácora en ese
         momento. Así puedes demostrar después que un archivo entregado no fue modificado.
       </p>
-      <FormExportar trabajadores={lista} inicial={inicial} desde={sumarDias(lunesDe(hoy), -28)} hasta={sumarDias(lunesDe(hoy), -1)} />
-
-      <h2>Verificar un archivo</h2>
-      <p className="ayuda">El archivo no se sube: la huella se calcula en tu navegador.</p>
-      <VerificarArchivo />
+      <div className="dos-columnas">
+        <section>
+          <h2>Generar archivo</h2>
+          <FormExportar trabajadores={lista} inicial={inicial} desde={sumarDias(lunesDe(hoy), -28)} hasta={sumarDias(lunesDe(hoy), -1)} />
+        </section>
+        <section>
+          <h2>Verificar un archivo</h2>
+          <p className="ayuda">
+            ¿Te entregaron o reenviaron un archivo emitido por Checador? Compruébalo aquí: si alguien cambió un solo
+            dato, la huella no coincidirá. El archivo no se sube; la huella se calcula en tu navegador.
+          </p>
+          <VerificarArchivo />
+        </section>
+      </div>
 
       <h2>Exportaciones recientes</h2>
       {(exportaciones ?? []).length === 0 ? (

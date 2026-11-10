@@ -143,7 +143,7 @@ try {
   await salida.getByLabel("Motivo de la anulación").fill("Capturada por error");
   await salida.getByRole("button", { name: "Anular checada" }).click();
   // Al anularse desaparece el formulario (ya no se puede corregir); la confirmación es el tachado.
-  await dueno.locator(".bitacora li", { hasText: "Anulada" }).locator(".tachado").waitFor();
+  await dueno.locator(".bitacora li", { hasText: "Anulada" }).locator(".tachado").first().waitFor();
   paso("checada anulada: aparece tachada y con su motivo");
 
   // 8. Integridad

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { aHoraLocal } from "@checador/jornada";
 import { FormAccion } from "@/components/panel/FormAccion";
-import { TablaSemana } from "@/components/TablaSemana";
+import { hm, TablaSemana } from "@/components/TablaSemana";
 import { lunesDe, semanaDeTrabajador, sumarDias, trabajadorPorId, type FilaEvento } from "@/lib/datos";
 import { requierePanel } from "@/lib/panel";
 import { agregarChecada, anularChecada, corregirChecada } from "../../../acciones";
@@ -14,6 +14,17 @@ const ETIQUETA: Record<string, string> = {
   fin_pausa: "Fin de pausa",
 };
 const ORIGEN: Record<string, string> = { pwa: "celular", kiosco: "kiosco", panel: "panel" };
+const MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+const DIAS = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+const partes = (f: string) => ({ d: Number(f.slice(8, 10)), m: MESES[Number(f.slice(5, 7)) - 1]!, a: f.slice(0, 4) });
+/** "Lunes 26 de octubre". */
+const nombreDia = (f: string) => `${DIAS[new Date(`${f}T12:00:00Z`).getUTCDay()]} ${partes(f).d} de ${partes(f).m}`;
+/** "del 26 de octubre al 1 de noviembre de 2026". */
+function nombreSemana(lunes: string) {
+  const a = partes(lunes);
+  const b = partes(sumarDias(lunes, 6));
+  return a.m === b.m ? `del ${a.d} al ${b.d} de ${b.m} de ${b.a}` : `del ${a.d} de ${a.m} al ${b.d} de ${b.m} de ${b.a}`;
+}
 
 interface Captura extends FilaEvento {
   vigente: string; // hora efectiva tras correcciones
@@ -76,14 +87,41 @@ export default async function SemanaPanel({
   });
   const ultima = conformidades?.[0];
   const local = (iso: string) => aHoraLocal(iso, zona).replace("T", " ");
+  const hoy = ahoraLocal.slice(0, 10);
+  const cerrada = domingo < hoy;
+  const estado = ultima
+    ? ultima.respuesta === "conforme"
+      ? { clase: "insignia-ok", texto: "Conforme" }
+      : { clase: "insignia-error", texto: "Objetada" }
+    : cerrada
+      ? { clase: "insignia-aviso", texto: "Sin respuesta" }
+      : { clase: "insignia-neutra", texto: "Semana en curso" };
+  const t = semana.totales;
+  const extra = t.extraDobleMin + t.extraTripleMin;
+
+  // Bitácora agrupada por día (hora local del centro).
+  const porDia = new Map<string, Captura[]>();
+  for (const c of capturas) {
+    const f = aHoraLocal(c.vigente, zona).slice(0, 10);
+    porDia.set(f, [...(porDia.get(f) ?? []), c]);
+  }
 
   return (
     <>
-      <p><Link href={`/panel/trabajadores/${trabajador.id}`}>← {trabajador.nombre}</Link></p>
-      <div className="semana-nav">
-        <Link href={`?semana=${sumarDias(lunes, -7)}`}>← Anterior</Link>
-        <strong>{lunes} al {domingo}</strong>
-        <Link href={`?semana=${sumarDias(lunes, 7)}`}>Siguiente →</Link>
+      <p className="migas"><Link href={`/panel/trabajadores/${trabajador.id}`}>← Ficha de {trabajador.nombre}</Link></p>
+      <div className="semana-cabecera">
+        <div>
+          <h1>{trabajador.nombre}</h1>
+          <p className="ayuda">
+            Semana {nombreSemana(lunes)} · {trabajador.centro}{" "}
+            <span className={`insignia-estado ${estado.clase}`}>{estado.texto}</span>
+          </p>
+        </div>
+        <nav className="semana-botones" aria-label="Cambiar de semana">
+          <Link className="boton-chico" href={`?semana=${sumarDias(lunes, -7)}`}>← Anterior</Link>
+          {lunes !== lunesDe(hoy) && <Link className="boton-chico" href="?">Esta semana</Link>}
+          {lunes < lunesDe(hoy) && <Link className="boton-chico" href={`?semana=${sumarDias(lunes, 7)}`}>Siguiente →</Link>}
+        </nav>
       </div>
 
       {ultima && (
@@ -94,7 +132,28 @@ export default async function SemanaPanel({
         </div>
       )}
 
-      <TablaSemana lunes={lunes} semana={semana} reconstruccion={reconstruccion} />
+      <div className="indicadores indicadores-3">
+        <div className="indicador">
+          <span className="indicador-titulo">Trabajado</span>
+          <span className="indicador-valor">{hm(t.trabajadoMin)}</span>
+          <span className="indicador-detalle">horas en la semana</span>
+        </div>
+        <div className="indicador">
+          <span className="indicador-titulo">Jornada ordinaria</span>
+          <span className="indicador-valor">{hm(t.ordinariaMin)} <small>de {hm(semana.jornadaSemanalMaxMin)}</small></span>
+          <div className={`progreso ${t.ordinariaMin >= semana.jornadaSemanalMaxMin ? "progreso-aviso" : ""}`}>
+            <span style={{ width: `${Math.min(100, (t.ordinariaMin / semana.jornadaSemanalMaxMin) * 100)}%` }} />
+          </div>
+          <span className="indicador-detalle">máximo legal de la semana</span>
+        </div>
+        <div className={`indicador ${extra ? "indicador-aviso" : ""}`}>
+          <span className="indicador-titulo">Tiempo extra</span>
+          <span className="indicador-valor">{hm(extra)}</span>
+          <span className="indicador-detalle">{hm(t.extraDobleMin)} al doble · {hm(t.extraTripleMin)} al triple</span>
+        </div>
+      </div>
+
+      <TablaSemana lunes={lunes} semana={semana} reconstruccion={reconstruccion} vista="empleador" />
 
       <h2>Bitácora de la semana</h2>
       <p className="ayuda">
@@ -103,42 +162,50 @@ export default async function SemanaPanel({
       {capturas.length === 0 ? (
         <p className="vacio">Sin checadas esta semana.</p>
       ) : (
-        <ul className="bitacora">
-          {capturas.map((c) => (
-            <li key={c.id}>
-              <span className={c.anulada ? "tachado" : ""}>
-                <strong>{local(c.vigente)}</strong> · {ETIQUETA[c.tipo]}
-              </span>{" "}
-              <span className="etiqueta">{ORIGEN[c.origen]}</span>
-              {c.diferido && <span className="etiqueta">sin conexión</span>}
-              {c.origen === "panel" && c.motivo && <span className="ajuste">Capturada por el empleador: {c.motivo}</span>}
-              {c.correcciones.map((k) => (
-                <span key={k.id} className="ajuste">
-                  Corregida a {local(k.hora_efectiva)} el {local(k.hora_servidor)}: {k.motivo}
-                  {k === c.correcciones[0] && ` (original: ${local(c.hora_efectiva)})`}
-                </span>
-              ))}
-              {c.anulada && <span className="ajuste">Anulada el {local(c.anulada.hora_servidor)}: {c.anulada.motivo}</span>}
-              {!c.anulada && (
-                <details>
-                  <summary>Corregir o anular</summary>
-                  <FormAccion accion={corregirChecada} boton="Corregir hora" className="form-panel form-linea">
-                    <input type="hidden" name="trabajador_id" value={trabajador.id} />
-                    <input type="hidden" name="evento_id" value={c.id} />
-                    <label>Hora correcta<input type="datetime-local" name="hora" required
-                      defaultValue={aHoraLocal(c.vigente, zona)} max={ahoraLocal} /></label>
-                    <label>Motivo<input name="motivo" required placeholder="Ej.: el trabajador olvidó checar a tiempo" /></label>
-                  </FormAccion>
-                  <FormAccion accion={anularChecada} boton="Anular checada" peligro className="form-panel form-linea">
-                    <input type="hidden" name="trabajador_id" value={trabajador.id} />
-                    <input type="hidden" name="evento_id" value={c.id} />
-                    <label>Motivo de la anulación<input name="motivo" required placeholder="Ej.: checada duplicada" /></label>
-                  </FormAccion>
-                </details>
-              )}
-            </li>
+        <div className="bitacora-dias">
+          {[...porDia.entries()].map(([dia, lista]) => (
+            <section key={dia} className="bitacora-dia">
+              <h3>{nombreDia(dia)}</h3>
+              <ul className="bitacora">
+                {lista.map((c) => (
+                  <li key={c.id}>
+                    <div className="bitacora-fila">
+                      <span className={`bitacora-hora ${c.anulada ? "tachado" : ""}`}>{aHoraLocal(c.vigente, zona).slice(11)}</span>
+                      <span className={c.anulada ? "tachado" : ""}>{ETIQUETA[c.tipo]}</span>
+                      <span className="etiqueta etiqueta-origen">{ORIGEN[c.origen]}</span>
+                      {c.diferido && <span className="etiqueta">sin conexión</span>}
+                    </div>
+                    {c.origen === "panel" && c.motivo && <span className="ajuste">Capturada por el empleador: {c.motivo}</span>}
+                    {c.correcciones.map((k) => (
+                      <span key={k.id} className="ajuste">
+                        Corregida a {local(k.hora_efectiva)} el {local(k.hora_servidor)}: {k.motivo}
+                        {k === c.correcciones[0] && ` (original: ${local(c.hora_efectiva)})`}
+                      </span>
+                    ))}
+                    {c.anulada && <span className="ajuste">Anulada el {local(c.anulada.hora_servidor)}: {c.anulada.motivo}</span>}
+                    {!c.anulada && (
+                      <details>
+                        <summary>Corregir o anular</summary>
+                        <FormAccion accion={corregirChecada} boton="Corregir hora" className="form-panel form-linea">
+                          <input type="hidden" name="trabajador_id" value={trabajador.id} />
+                          <input type="hidden" name="evento_id" value={c.id} />
+                          <label>Hora correcta<input type="datetime-local" name="hora" required
+                            defaultValue={aHoraLocal(c.vigente, zona)} max={ahoraLocal} /></label>
+                          <label>Motivo<input name="motivo" required placeholder="Ej.: el trabajador olvidó checar a tiempo" /></label>
+                        </FormAccion>
+                        <FormAccion accion={anularChecada} boton="Anular checada" peligro className="form-panel form-linea">
+                          <input type="hidden" name="trabajador_id" value={trabajador.id} />
+                          <input type="hidden" name="evento_id" value={c.id} />
+                          <label>Motivo de la anulación<input name="motivo" required placeholder="Ej.: checada duplicada" /></label>
+                        </FormAccion>
+                      </details>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </section>
           ))}
-        </ul>
+        </div>
       )}
 
       <h2>Agregar checada faltante</h2>

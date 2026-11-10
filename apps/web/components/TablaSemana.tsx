@@ -12,10 +12,13 @@ export function TablaSemana({
   lunes,
   semana,
   reconstruccion,
+  vista = "trabajador",
 }: {
   lunes: string;
   semana: ResultadoSemana;
   reconstruccion: Reconstruccion;
+  /** En el panel los totales se muestran como indicadores arriba de la tabla. */
+  vista?: "trabajador" | "empleador";
 }) {
   const turnosPorDia = new Map<string, typeof reconstruccion.turnos>();
   for (const t of reconstruccion.turnos) {
@@ -75,7 +78,7 @@ export function TablaSemana({
           </tfoot>
         </table>
 
-        <dl className="resumen">
+        {vista === "trabajador" && <dl className="resumen">
           <dt>Jornada ordinaria</dt>
           <dd>
             {hm(semana.totales.ordinariaMin)} de {hm(semana.jornadaSemanalMaxMin)} máximo legal
@@ -84,11 +87,15 @@ export function TablaSemana({
           <dd>{hm(semana.totales.extraDobleMin)}</dd>
           <dt>Extra pagada al triple</dt>
           <dd>{hm(semana.totales.extraTripleMin)}</dd>
-        </dl>
+        </dl>}
 
         {reconstruccion.incidencias.length > 0 && (
           <div className="mensaje mensaje-aviso">
-            <p>Registros incompletos (pide a tu empleador que los corrija):</p>
+            <p>
+              {vista === "trabajador"
+                ? "Registros incompletos (pide a tu empleador que los corrija):"
+                : "Registros incompletos: corrígelos en la bitácora de abajo."}
+            </p>
             <ul>
               {reconstruccion.incidencias.map((i) => (
                 <li key={`${i.codigo}-${i.eventoId}`}>{i.mensaje}</li>

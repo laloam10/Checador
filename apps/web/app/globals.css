@@ -359,3 +359,52 @@ label > input, label > select, label > textarea { min-width: 0; }
   .semana-nav strong { order: -1; flex-basis: 100%; text-align: center; }
 }
 @media print { .barra-inferior { display: none !important; } }
+
+/* ---- Semana del trabajador (panel) ---- */
+.migas { margin: 0.75rem 0 0; font-size: 0.9rem; }
+.migas a { text-decoration: none; font-weight: 600; }
+.semana-cabecera { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 0.75rem 1.5rem; }
+.semana-cabecera h1 { margin-bottom: 0.15rem; }
+.semana-cabecera .ayuda { margin: 0; font-size: 0.95rem; }
+.semana-botones { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.semana-botones .boton-chico { text-decoration: none; font-weight: 600; }
+.insignia-neutra { background: #eef1ef; color: var(--gris); }
+.indicador-aviso { border-color: rgb(138 83 0 / 0.3); background: linear-gradient(var(--ambar-claro), white 70%); }
+.bitacora-dias { display: grid; gap: 1rem; margin-top: 0.75rem; }
+.bitacora-dia { background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--radio); box-shadow: var(--sombra); padding: 0.4rem 1rem 0.2rem; }
+.bitacora-dia h3 { margin: 0.4rem 0 0.2rem; font-size: 0.85rem; color: var(--gris); text-transform: uppercase; letter-spacing: 0.04em; }
+.bitacora-dia .bitacora { margin: 0; }
+.bitacora-dia .bitacora li:last-child { border-bottom: none; }
+.bitacora-fila { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem; }
+.bitacora-hora { font-variant-numeric: tabular-nums; font-weight: 700; font-size: 1.05rem; min-width: 3.2rem; }
+.etiqueta-origen { background: #eef1ef; color: var(--gris); }
+.bitacora details summary { font-size: 0.88rem; }
+@media (min-width: 64rem) {
+  .bitacora-dias { grid-template-columns: 1fr 1fr; align-items: start; }
+}
+
+/* ---- Centros, Accesos y Exportar ---- */
+.centros { display: grid; gap: 1rem; margin: 1rem 0; }
+.centro { background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--radio); box-shadow: var(--sombra); padding: 0.9rem 1.1rem; }
+.centro-cabecera { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+.centro h2 { margin: 0; }
+.centro-cabecera .ayuda { margin: 0.15rem 0 0; }
+.centro-datos { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.6rem 0 0.4rem; }
+.centro details > .form-panel, .nuevo-centro > .form-panel { box-shadow: none; }
+.nuevo-centro { margin: 1rem 0; }
+.roles { margin: 1rem 0 0; }
+.roles ul { padding-left: 1.2rem; }
+.roles li { margin: 0.35rem 0; }
+.dos-columnas { display: grid; gap: 0 1.5rem; }
+.dos-columnas h2 { margin-top: 1.25rem; }
+@media (min-width: 56rem) {
+  .dos-columnas { grid-template-columns: 1.2fr 1fr; align-items: start; }
+}
+@media (max-width: 40rem) {
+  .indicadores-3 { grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+  .indicadores-3 .indicador { padding: 0.65rem 0.6rem; }
+  .indicadores-3 .indicador-titulo { font-size: 0.66rem; }
+  .indicadores-3 .indicador-valor { font-size: 1.3rem; }
+  .indicadores-3 .indicador-valor small { display: block; font-size: 0.75rem; }
+  .indicadores-3 .indicador-detalle { font-size: 0.72rem; line-height: 1.3; }
+}

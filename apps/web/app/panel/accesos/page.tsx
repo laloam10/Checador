@@ -28,7 +28,7 @@ export default async function Accesos() {
         <tbody>
           {((miembros ?? []) as Miembro[]).map((m) => (
             <tr key={m.user_id}>
-              <td className="celda-titulo">{m.email}</td>
+              <td className="celda-titulo">{m.email}{m.user_id === ctx.userId && <span className="etiqueta etiqueta-origen">tú</span>}</td>
               <td data-etiqueta="Rol">{ROL[m.rol]}</td>
               <td data-etiqueta="Centro">{m.centro_trabajo_id ? nombreCentro.get(m.centro_trabajo_id) : m.rol === "kiosco" ? "Todos" : "—"}</td>
               <td className="celda-accion">
@@ -56,6 +56,16 @@ export default async function Accesos() {
           ))}
         </tbody>
       </table>
+
+      <details className="roles">
+        <summary>¿Qué puede hacer cada rol?</summary>
+        <ul className="ayuda">
+          <li><strong>Propietario:</strong> todo, incluido invitar o quitar administradores.</li>
+          <li><strong>Administrador:</strong> todo excepto administrar a otros administradores: personal, PIN, acuerdos, centros, accesos, correcciones y exportaciones.</li>
+          <li><strong>Supervisor:</strong> consulta el tablero y los registros, corrige checadas con motivo, atiende objeciones y exporta. No da de alta ni de baja, ni firma acuerdos.</li>
+          <li><strong>Kiosco:</strong> una tableta en el centro de trabajo donde el personal checa con número y PIN. No ve el panel.</li>
+        </ul>
+      </details>
 
       <h2>Invitar</h2>
       <p className="ayuda">
