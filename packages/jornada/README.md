@@ -32,7 +32,7 @@ pagoTiempoExtraCentavos(r, 5000); // salario de $50.00/h
 | Las pausas en que el trabajador no puede salir cuentan como jornada | Art. 64 |
 | Tiempo extra al doble: tope semanal de 9, 9, 10, 11 o 12 h según el año; máximo 4 h diarias y 4 días | Art. 66, transitorio 4.º |
 | Tiempo extra que excede el art. 66: al triple, hasta 4 h por semana | Art. 68, 2.º párr. |
-| Alertas: más de 12 h en un día, triple por encima del máximo, 7 días sin descanso, trabajo en día de descanso o en domingo, pacto mayor al máximo semanal | Arts. 68, 69, 71, 73 y 59 |
+| Alertas: más de 12 h en un día, triple por encima del máximo, 7 días sin descanso, trabajo en el descanso obligatorio o en uno adicional pactado, trabajo en domingo, pacto mayor al máximo semanal | Arts. 68, 69, 71, 73 y 59 |
 
 ## Interpretaciones que debe validar un abogado
 
@@ -44,6 +44,7 @@ Son decisiones del motor que la ley no resuelve de forma literal:
 4. **Semana que cruza de un año a otro:** se aplican la menor jornada y el menor tope de horas al doble de los dos años (art. 18, interpretación más favorable al trabajador).
 5. **Turnos nocturnos:** se atribuyen al día en que inician. El tipo de jornada se clasifica con el turno completo, incluidas las pausas.
 6. **Exceso sobre el límite legal:** se reporta al triple y genera alerta. La ley prohíbe ese exceso, pero las horas trabajadas deben pagarse igual.
+7. **Más de un día de descanso:** el art. 69 exige un día por cada seis de trabajo. El empleador marca cuál es el **descanso semanal obligatorio**; trabajarlo genera la alerta del art. 73 (salario doble). Los **días adicionales pactados** (p. ej., el sábado en una semana de 5 días) son un beneficio del contrato: trabajarlos genera una alerta distinta que no afirma el pago doble, y sus horas cuentan para el máximo semanal como cualquier otra.
 
 ## Fuera de alcance (por ahora)
 

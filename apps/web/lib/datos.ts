@@ -41,22 +41,24 @@ export interface FilaEvento {
 
 const COLUMNAS_EVENTO = "id, tipo, origen, hora_efectiva, hora_servidor, puede_salir, corrige_evento_id, diferido, motivo";
 const SELECT_TRABAJADOR =
-  "id, empresa_id, nombre, dia_descanso, jornada_pactada_min, empresas(razon_social), centros_trabajo(nombre, zona_horaria)";
+  "id, empresa_id, nombre, dia_descanso, dias_descanso_adicionales, jornada_pactada_min, empresas(razon_social), centros_trabajo(nombre, zona_horaria)";
 
 interface FilaTrabajador {
   id: string;
   empresa_id: string;
   nombre: string;
   dia_descanso: number;
+  dias_descanso_adicionales: number[] | null;
   jornada_pactada_min: unknown;
   empresas: unknown;
   centros_trabajo: unknown;
 }
 
 /** Configuración para el motor a partir de las columnas del trabajador (art. 58: distribución pactada). */
-export function configDe(diaDescanso: number, jornadaPactadaMin: unknown): ConfigTrabajador {
+export function configDe(diaDescanso: number, jornadaPactadaMin: unknown, adicionales: number[] = []): ConfigTrabajador {
   const pactada = jornadaPactadaMin as Record<string, number> | null;
   const config: ConfigTrabajador = { diaDescanso: diaDescanso as DiaSemana };
+  if (adicionales.length) config.diasDescansoAdicionales = adicionales as DiaSemana[];
   if (pactada && Object.keys(pactada).length) {
     config.jornadaPactadaMin = Object.fromEntries(
       Object.entries(pactada).map(([d, m]) => [Number(d), m]),
@@ -68,7 +70,7 @@ export function configDe(diaDescanso: number, jornadaPactadaMin: unknown): Confi
 function filaATrabajador(t: FilaTrabajador): Trabajador {
   const centro = uno(t.centros_trabajo) as { nombre: string; zona_horaria: string } | null;
   const empresa = uno(t.empresas) as { razon_social: string } | null;
-  const config = configDe(t.dia_descanso, t.jornada_pactada_min);
+  const config = configDe(t.dia_descanso, t.jornada_pactada_min, t.dias_descanso_adicionales ?? []);
   return {
     id: t.id,
     empresaId: t.empresa_id,

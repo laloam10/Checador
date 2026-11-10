@@ -83,6 +83,7 @@ export function estadoHttp(r: RespuestaKiosco): number {
 /** Respuesta de kiosco_semana(): checadas de la semana y datos para calcularla. */
 export interface RespuestaSemanaKiosco extends RespuestaKiosco {
   dia_descanso?: number;
+  dias_descanso_adicionales?: number[];
   jornada_pactada_min?: unknown;
   zona_horaria?: string;
 }
@@ -98,7 +99,7 @@ export async function semanaEnKiosco(supabase: Cliente, numero: string, pin: str
   if (!r.ok) return { r, calculo: null };
   const calculo = calcularSemanaDesdeFilas(
     r.eventos ?? [],
-    { zonaHoraria: r.zona_horaria ?? "America/Mexico_City", config: configDe(r.dia_descanso ?? 0, r.jornada_pactada_min) },
+    { zonaHoraria: r.zona_horaria ?? "America/Mexico_City", config: configDe(r.dia_descanso ?? 0, r.jornada_pactada_min, r.dias_descanso_adicionales ?? []) },
     lunes,
   );
   return { r, calculo };

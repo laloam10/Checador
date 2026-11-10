@@ -149,7 +149,7 @@ try {
 
   // 6. Cambio posterior de jornada: el acuerdo queda desactualizado y la lista vuelve
   await p.goto(fichaMario);
-  await p.getByLabel("Día de descanso").selectOption("6");
+  await p.getByLabel("Descanso semanal obligatorio").selectOption("6");
   await p.getByRole("button", { name: "Guardar cambios" }).click();
   await estado(p, "Datos actualizados");
   await p.goto(`${APP}/panel/trabajadores`);
@@ -158,6 +158,22 @@ try {
   await pasoPendiente("Firma los acuerdos de registro como empresa").getByText(/Faltan 1: Mario Díaz/).waitFor();
   await acuerdosVigentes("1 de 2");
   paso("al cambiar el día de descanso de Mario, su acuerdo queda desactualizado y el tablero lo vuelve a pedir");
+
+  // 7. Descanso adicional (semana de 5 días): solo cambia el acuerdo de quien lo tiene
+  await p.goto(`${APP}/panel/trabajadores`);
+  await p.getByRole("link", { name: "Lucía Gómez" }).click();
+  await p.getByRole("heading", { name: "Lucía Gómez" }).waitFor();
+  await p.getByRole("checkbox", { name: "Sábado" }).check();
+  await p.getByRole("button", { name: "Guardar cambios" }).click();
+  await estado(p, "Datos actualizados");
+  await p.reload();
+  if (!(await p.getByRole("checkbox", { name: "Sábado" }).isChecked())) throw new Error("El sábado adicional no se guardó");
+  if ((await p.getByLabel("Descanso semanal obligatorio").inputValue()) !== "0") throw new Error("El descanso obligatorio debía seguir en domingo");
+  await p.getByText(/descansará el sábado, como descanso adicional pactado/).first().waitFor({ state: "attached" });
+  await p.goto(`${APP}/panel/trabajadores`);
+  await p.getByRole("row", { name: /Lucía Gómez/ }).getByText("Desactualizado").waitFor();
+  await p.getByRole("row", { name: /Mario Díaz/ }).getByText("Desactualizado").waitFor();
+  paso("un sábado adicional se guarda aparte del descanso obligatorio y desactualiza solo el acuerdo de esa persona");
 
   console.log("\nPrueba del alta guiada: OK");
 } catch (e) {

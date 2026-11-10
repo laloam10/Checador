@@ -28,8 +28,18 @@ export interface DatosAcuerdo {
     curp: string | null;
     email: string | null;
     diaDescanso: number;
+    /** Descansos adicionales pactados; si no hay, el texto es idéntico al de antes (no desactualiza acuerdos). */
+    diasDescansoAdicionales?: number[];
     jornadaPactadaMin: Record<string, number> | null;
   };
+}
+
+/** "; además, la persona trabajadora descansará el sábado" (días adicionales pactados, en orden lunes→domingo). */
+function adicionales(dias: number[] | undefined) {
+  if (!dias?.length) return "";
+  const orden = [...dias].sort((a, b) => ((a + 6) % 7) - ((b + 6) % 7)).map((d) => `el ${DIAS[d]}`);
+  const lista = orden.length === 1 ? orden[0] : `${orden.slice(0, -1).join(", ")} y ${orden.at(-1)}`;
+  return `; además, la persona trabajadora descansará ${lista}, como descanso adicional pactado`;
 }
 
 function horas(min: number) {
@@ -86,7 +96,7 @@ Se registran el inicio y el fin de la jornada y de las pausas. La hora de cada r
 
 TERCERA. Jornada. ${pactada
     ? `Las partes acuerdan la siguiente distribución de la jornada ordinaria (artículo 58 de la Ley Federal del Trabajo): ${pactada}.`
-    : "La jornada ordinaria diaria será la prevista en el artículo 61 de la Ley Federal del Trabajo según su tipo (diurna, nocturna o mixta)."} En ningún caso la jornada ordinaria excederá el máximo semanal vigente conforme a la ley y a sus disposiciones transitorias. El día de descanso semanal será el ${DIAS[t.diaDescanso]}.
+    : "La jornada ordinaria diaria será la prevista en el artículo 61 de la Ley Federal del Trabajo según su tipo (diurna, nocturna o mixta)."} En ningún caso la jornada ordinaria excederá el máximo semanal vigente conforme a la ley y a sus disposiciones transitorias. El día de descanso semanal será el ${DIAS[t.diaDescanso]}${adicionales(t.diasDescansoAdicionales)}.
 
 CUARTA. Pausas. ${d.centro.pausaPuedeSalir
     ? "Durante la pausa para reposo o comida la persona trabajadora puede salir del centro de trabajo; ese tiempo no se computa como jornada."

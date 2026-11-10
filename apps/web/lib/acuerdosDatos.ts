@@ -32,7 +32,7 @@ export const MODALIDAD: Record<Firma["modalidad"], string> = {
 };
 
 const SELECT_DATOS =
-  "id, empresa_id, nombre, numero_empleado, curp, email, dia_descanso, jornada_pactada_min, empresas(razon_social, rfc), centros_trabajo(nombre, direccion, pausa_puede_salir, zona_horaria)";
+  "id, empresa_id, nombre, numero_empleado, curp, email, dia_descanso, dias_descanso_adicionales, jornada_pactada_min, empresas(razon_social, rfc), centros_trabajo(nombre, direccion, pausa_puede_salir, zona_horaria)";
 
 type FilaDatos = {
   id: string;
@@ -42,6 +42,7 @@ type FilaDatos = {
   curp: string | null;
   email: string | null;
   dia_descanso: number;
+  dias_descanso_adicionales: number[] | null;
   jornada_pactada_min: unknown;
   empresas: unknown;
   centros_trabajo: unknown;
@@ -64,6 +65,7 @@ function construirDatos(data: FilaDatos) {
     empresaId: data.empresa_id,
     zonaHoraria: c.zona_horaria,
     diaDescanso: data.dia_descanso,
+    diasDescansoAdicionales: data.dias_descanso_adicionales ?? [],
     jornadaPactadaMin: data.jornada_pactada_min as Record<string, number> | null,
     base: (version: number, fecha: string): DatosAcuerdo => ({
       version,
@@ -76,6 +78,7 @@ function construirDatos(data: FilaDatos) {
         curp: data.curp,
         email: data.email,
         diaDescanso: data.dia_descanso,
+        diasDescansoAdicionales: data.dias_descanso_adicionales ?? [],
         jornadaPactadaMin: data.jornada_pactada_min as Record<string, number> | null,
       },
     }),

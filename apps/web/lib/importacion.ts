@@ -32,6 +32,7 @@ export interface TrabajadorImportado {
   centro_trabajo_id: string;
   fecha_ingreso: string;
   dia_descanso: number;
+  dias_descanso_adicionales: number[];
 }
 
 export interface ErrorFila {
@@ -209,12 +210,20 @@ export function validarImportacion(
     else if (!fecha) problemas.push(`fecha de ingreso inválida "${fechaTexto}" (usa 15/03/2026)`);
     else if (fecha > hoy) problemas.push("la fecha de ingreso es futura");
 
-    const descansoTexto = normalizar(valor("dia_descanso"));
+    // Uno o varios días: "domingo", "sábado y domingo", "sab, dom". El descanso semanal obligatorio
+    // (art. 69) es el domingo si aparece (el art. 69 lo prefiere); si no, el primero. Los demás son adicionales.
+    const palabras = normalizar(valor("dia_descanso")).split(" ").filter((w) => w && w !== "y" && w !== "e");
     let descanso = 0;
-    if (descansoTexto) {
-      const d = /^[0-6]$/.test(descansoTexto) ? Number(descansoTexto) : DIAS[descansoTexto];
-      if (d === undefined) problemas.push(`día de descanso inválido "${valor("dia_descanso")}"`);
-      else descanso = d;
+    let adicionales: number[] = [];
+    if (palabras.length) {
+      const dias = palabras.map((w) => (/^[0-6]$/.test(w) ? Number(w) : DIAS[w]));
+      if (dias.some((d) => d === undefined)) problemas.push(`día de descanso inválido "${valor("dia_descanso")}"`);
+      else {
+        const unicos = [...new Set(dias as number[])];
+        descanso = unicos.includes(0) ? 0 : unicos[0]!;
+        adicionales = unicos.filter((d) => d !== descanso).sort();
+        if (adicionales.length > 3) problemas.push("máximo 4 días de descanso (1 obligatorio y 3 adicionales)");
+      }
     }
 
     if (!numero && !email) problemas.push("necesita número de empleado (kiosco) o correo (app) para poder checar");
@@ -233,6 +242,7 @@ export function validarImportacion(
       centro_trabajo_id: centroId!,
       fecha_ingreso: fecha!,
       dia_descanso: descanso,
+      dias_descanso_adicionales: adicionales,
     });
   });
 

@@ -190,6 +190,16 @@ function generarAlertas(
         fecha: d.fecha,
         minutos: d.trabajadoMin,
       });
+    } else if (config.diasDescansoAdicionales?.includes(d.diaSemana)) {
+      alertas.push({
+        codigo: "TRABAJO_EN_DESCANSO_ADICIONAL",
+        fundamento: "LFT arts. 58 y 69 (descanso adicional pactado)",
+        mensaje:
+          "Se trabajó en un día de descanso adicional pactado: las horas cuentan para el máximo semanal; " +
+          "revisa el pago conforme a lo pactado con la persona trabajadora.",
+        fecha: d.fecha,
+        minutos: d.trabajadoMin,
+      });
     }
     if (d.diaSemana === 0) {
       alertas.push({

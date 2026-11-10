@@ -149,9 +149,15 @@ export async function guardarTrabajador(_: Estado, fd: FormData): Promise<Estado
     centro_trabajo_id: texto(fd, "centro_trabajo_id"),
     fecha_ingreso: texto(fd, "fecha_ingreso"),
     dia_descanso: Number(texto(fd, "dia_descanso") || 0),
+    dias_descanso_adicionales: [...new Set(fd.getAll("descanso_adicional").map(Number))]
+      .filter((d) => Number.isInteger(d) && d >= 0 && d <= 6)
+      .sort(),
     jornada_pactada_min: Object.keys(pactada).length ? pactada : null,
   };
   if (!datos.nombre) return fallo("Escribe el nombre del trabajador.");
+  // El descanso obligatorio no se repite como adicional (art. 69: uno por cada seis días de trabajo).
+  datos.dias_descanso_adicionales = datos.dias_descanso_adicionales.filter((d) => d !== datos.dia_descanso);
+  if (datos.dias_descanso_adicionales.length > 3) return fallo("Máximo 3 días de descanso adicionales.");
   if (!datos.centro_trabajo_id) return fallo("Elige el centro de trabajo.");
   if (!/^\d{4}-\d{2}-\d{2}$/.test(datos.fecha_ingreso)) return fallo("Indica la fecha de ingreso.");
   if (datos.numero_empleado && !/^[0-9A-Za-z-]{1,20}$/.test(datos.numero_empleado)) {
@@ -400,6 +406,7 @@ async function generarYFirmarPara(
       version,
       contenido: generarTextoAcuerdo(datos.base(version, hoy)),
       dia_descanso: datos.diaDescanso,
+      dias_descanso_adicionales: datos.diasDescansoAdicionales,
       jornada_pactada_min: datos.jornadaPactadaMin,
     })
     .select("id")

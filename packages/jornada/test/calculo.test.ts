@@ -176,6 +176,27 @@ describe("calcularSemana", () => {
     expect(codigos).toContain("SIN_DESCANSO_SEMANAL");
   });
 
+  it("descanso adicional pactado: alerta propia, sin la del art. 73", () => {
+    // Semana del lunes 4 de enero de 2027; descanso obligatorio domingo y adicional sábado.
+    const r = calcularSemana("2027-01-04", turnosDiurnos("2027-01-04", [8, 8, 8, 8, 8, 6]), {
+      diaDescanso: 0,
+      diasDescansoAdicionales: [6],
+    });
+    const sabado = r.alertas.filter((a) => a.fecha === "2027-01-09").map((a) => a.codigo);
+    expect(sabado).toEqual(["TRABAJO_EN_DESCANSO_ADICIONAL"]);
+    expect(r.alertas.map((a) => a.codigo)).not.toContain("TRABAJO_EN_DIA_DESCANSO");
+    // Las horas del sábado cuentan para la semana como cualquier otra.
+    expect(r.totales.trabajadoMin).toBe(46 * H);
+  });
+
+  it("si el día es el descanso obligatorio, solo aplica la alerta del art. 73", () => {
+    const r = calcularSemana("2027-01-04", [{ inicio: "2027-01-09T07:00", fin: "2027-01-09T13:00" }], {
+      diaDescanso: 6,
+      diasDescansoAdicionales: [6, 0],
+    });
+    expect(r.alertas.map((a) => a.codigo)).toEqual(["TRABAJO_EN_DIA_DESCANSO"]);
+  });
+
   it("rechaza turnos fuera de la semana", () => {
     expect(() =>
       calcularSemana("2027-01-04", [{ inicio: "2027-01-11T08:00", fin: "2027-01-11T16:00" }], DOMINGO),

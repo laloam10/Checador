@@ -421,3 +421,4 @@ label > input, label > select, label > textarea { min-width: 0; }
 .interruptor-perilla { position: absolute; top: 0.2rem; left: 0.2rem; width: 1.4rem; height: 1.4rem; border-radius: 50%; background: white; box-shadow: 0 1px 3px rgb(0 0 0 / 0.25); transition: transform 0.2s; }
 .interruptor[aria-checked="true"] .interruptor-perilla { transform: translateX(1.3rem); }
 .interruptor:disabled { cursor: wait; }
+.dias-semana { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; margin: 0.25rem 0; }

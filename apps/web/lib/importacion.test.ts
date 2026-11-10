@@ -46,9 +46,9 @@ describe("validarImportacion", () => {
     expect(r.errores).toEqual([]);
     expect(r.trabajadores).toEqual([
       { nombre: "María López Hernández", numero_empleado: "101", email: "maria@ejemplo.mx", curp: null,
-        centro_trabajo_id: "c1", fecha_ingreso: "2026-03-15", dia_descanso: 0 },
+        centro_trabajo_id: "c1", fecha_ingreso: "2026-03-15", dia_descanso: 0, dias_descanso_adicionales: [] },
       { nombre: "José Pérez", numero_empleado: "102", email: null, curp: null,
-        centro_trabajo_id: "c1", fecha_ingreso: "2026-04-01", dia_descanso: 6 },
+        centro_trabajo_id: "c1", fecha_ingreso: "2026-04-01", dia_descanso: 6, dias_descanso_adicionales: [] },
     ]);
   });
 
@@ -57,6 +57,17 @@ describe("validarImportacion", () => {
     const r = validarImportacion(csv, CENTROS, SIN_EXISTENTES, HOY);
     expect(r.errores).toEqual([]);
     expect(r.trabajadores[0]).toMatchObject({ nombre: "Ana", numero_empleado: "7", centro_trabajo_id: "c2", dia_descanso: 6 });
+  });
+
+  it("acepta varios días de descanso: el domingo es el obligatorio si aparece", () => {
+    const csv = "nombre,numero_empleado,fecha_ingreso,dia_descanso\nAna,1,01/01/2026,sábado y domingo\nBeto,2,01/01/2026,\"vie, sab\"\nCarla,3,01/01/2026,lunes martes";
+    const r = validarImportacion(csv, [CENTROS[0]!], SIN_EXISTENTES, HOY);
+    expect(r.errores).toEqual([]);
+    expect(r.trabajadores.map((t) => [t.dia_descanso, t.dias_descanso_adicionales])).toEqual([
+      [0, [6]],
+      [5, [6]],
+      [1, [2]],
+    ]);
   });
 
   it("si hay un solo centro, no hace falta indicarlo", () => {

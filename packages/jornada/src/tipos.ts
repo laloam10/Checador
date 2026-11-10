@@ -32,8 +32,14 @@ export interface Turno {
 }
 
 export interface ConfigTrabajador {
-  /** Día de descanso semanal pactado (arts. 69 y 70). */
+  /** Día de descanso semanal obligatorio pactado (arts. 69 y 70); trabajarlo se paga doble (art. 73). */
   diaDescanso: DiaSemana;
+  /**
+   * Días de descanso adicionales pactados (p. ej., el sábado en una semana de 5 días).
+   * La ley exige uno por cada seis de trabajo (art. 69); estos son un beneficio del contrato,
+   * así que trabajarlos no genera la alerta del art. 73 sino una propia (ver README).
+   */
+  diasDescansoAdicionales?: DiaSemana[];
   /**
    * Distribución pactada de la jornada ordinaria por día de la semana, en minutos
    * (art. 58, 2.º párr.). Si se omite un día, se usa el límite del art. 61
@@ -47,6 +53,7 @@ export type CodigoAlerta =
   | "EXTRA_EXCEDE_LIMITE_LEGAL"
   | "SIN_DESCANSO_SEMANAL"
   | "TRABAJO_EN_DIA_DESCANSO"
+  | "TRABAJO_EN_DESCANSO_ADICIONAL"
   | "TRABAJO_EN_DOMINGO"
   | "PACTO_EXCEDE_MAXIMO_SEMANAL";
 

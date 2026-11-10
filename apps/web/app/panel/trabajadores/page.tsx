@@ -177,7 +177,7 @@ export default async function Trabajadores({
                     Columnas: <strong>nombre</strong> y <strong>fecha_ingreso</strong> (15/03/2026) son obligatorias;
                     cada persona necesita <strong>numero_empleado</strong> (para el kiosco) o <strong>correo</strong> (para la
                     app). <strong>centro</strong> con el nombre tal como aparece en Centros (si solo tienes uno, puedes dejarlo
-                    vacío). <strong>dia_descanso</strong>: domingo a sábado (si lo dejas vacío, domingo).
+                    vacío). <strong>dia_descanso</strong>: uno o varios días, por ejemplo "domingo" o "sábado y domingo" (vacío = domingo). Con varios, el domingo es el descanso obligatorio si aparece; si no, el primero, y los demás quedan como descansos adicionales.
                   </li>
                   <li>Guárdala como <strong>CSV</strong> (Archivo → Guardar como → CSV) y súbela aquí.</li>
                 </ol>

@@ -13,7 +13,7 @@ export default async function FichaTrabajador({ params }: { params: Promise<{ id
   const [{ data: t }, { data: centros }, { data: conPin }, { data: historial }] = await Promise.all([
     ctx.supabase
       .from("trabajadores")
-      .select("id, nombre, numero_empleado, email, curp, user_id, centro_trabajo_id, fecha_ingreso, fecha_baja, dia_descanso, jornada_pactada_min")
+      .select("id, nombre, numero_empleado, email, curp, user_id, centro_trabajo_id, fecha_ingreso, fecha_baja, dia_descanso, dias_descanso_adicionales, jornada_pactada_min")
       .eq("id", id)
       .eq("empresa_id", ctx.empresa.id)
       .maybeSingle(),
