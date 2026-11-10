@@ -14,6 +14,7 @@
 | `migrations/…10…02_vinculo_solo_codigo.sql` | Vincular cuentas solo si la sesión se inició con código (claim `amr`) |
 | `migrations/…09…01_exportaciones.sql` | Registro inmutable de exportaciones con huellas SHA-256 y estado de la cadena |
 | `migrations/…08…01_acuerdos_firma.sql` | Modalidades de firma (electrónica, PIN en kiosco, autógrafa), orden de firma, `acuerdo_vigente()`, `acuerdo_pendiente()`, `kiosco_firmar_acuerdo()` |
+| `migrations/…17…01_revisar_recordatorios_cada_hora.sql` | La revisión del resultado de los recordatorios corre cada hora (antes, solo los lunes) |
 | `migrations/…16…01_indicador_conformidad.sql` | `conformidad_semana()`: el indicador "Semana pasada" del tablero contado en la base (sin el límite de 1000 filas de la API) |
 | `migrations/…15…01_reversion_baja.sql` | Historial de bajas (solo inserción) y `revertir_baja()` con motivo; la fecha de baja ya no se edita directamente |
 | `migrations/…14…01_vinculo_trabajador.sql` | Solo `vincular_mi_cuenta()` liga una ficha a una cuenta; cambiar el correo desvincula la cuenta anterior |

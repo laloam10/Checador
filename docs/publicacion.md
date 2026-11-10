@@ -148,7 +148,7 @@ Todo lo demás en **None**, en especial: Backups (permite restaurar y sobrescrib
 
 ### 1.8 Recordatorios de conformidad por correo
 
-La migración `20261112000001_recordatorios_conformidad.sql` programa en **pg_cron** dos tareas cada lunes: el envío a las 16:00 UTC (10:00 en el centro de México) y, a las 16:20, la revisión de lo que respondió Resend. El correo sale desde la base con **pg_net**; la llave vive en **Supabase Vault**, nunca en la app ni en Vercel. **Sin los tres secretos de abajo no se envía nada.**
+La migración `20261112000001_recordatorios_conformidad.sql` programa en **pg_cron** el envío cada lunes a las 16:00 UTC (10:00 en el centro de México), y `20261117000001` revisa **cada hora**, al minuto 20, lo que respondió Resend (pg_net guarda las respuestas solo unas horas). El correo sale desde la base con **pg_net**; la llave vive en **Supabase Vault**, nunca en la app ni en Vercel. **Sin los tres secretos de abajo no se envía nada.**
 
 Qué se envía: un correo por persona con correo registrado que tenga semanas terminadas sin revisar (de las últimas 8) o semanas que objetó y que el empleador ya corrigió. Como máximo uno cada 6 días. Cada empresa puede apagarlos en el panel (**Objeciones → Recordatorios por correo**), donde también ve el resultado de cada envío.
 
@@ -173,7 +173,7 @@ Qué se envía: un correo por persona con correo registrado que tenga semanas te
 
    ```sql
    select public.enviar_recordatorios_conformidad();
-   -- espera un minuto
+   -- espera un minuto (o deja que la revisión de cada hora lo haga sola)
    select public.revisar_envios_recordatorios();
    select enviado_en, correo, estado, detalle from public.recordatorios_conformidad order by id desc limit 10;
    ```

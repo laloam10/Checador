@@ -14,7 +14,8 @@ Bitácora de lo aplicado en los proyectos en la nube. No contiene secretos.
 | Asesor de Supabase tras las migraciones 11 a 15 | ✅ 20 avisos esperados (guía, 1.7) | ✅ 19 (no muestra el de contraseñas filtradas) |
 | Migración 14: historial de bajas y `revertir_baja()` (`20261115000001`) | ✅ aplicada por API (2026-11-09); asesor: 20 avisos esperados | ✅ aplicada por API (2026-11-10) |
 | Migración 15: indicador de conformidad en la base (`20261116000001`) | ✅ aplicada por API (2026-11-10); sin avisos nuevos | ✅ aplicada por API (2026-11-10); `verificar-seguridad.sql` sin hallazgos |
-| Secretos de Vault para recordatorios (guía, sección 1.8) | ⏳ pendiente: llave `checador-recordatorios-pruebas` | ⏳ pendiente: llave `checador-recordatorios-produccion` |
+| Secretos de Vault para recordatorios (guía, sección 1.8) | ✅ llave `checador-recordatorios-pruebas`; envío de prueba aceptado por Resend (2026-11-10) | ✅ llave `checador-recordatorios-produccion` |
+| Migración 16: revisar recordatorios cada hora (`20261117000001`) | ✅ aplicada por API (2026-11-10) | ✅ aplicada por API (2026-11-10) |
 | `verificar-seguridad.sql` | ✅ 0 hallazgos | ✅ 0 hallazgos |
 | Asesor de Supabase | ✅ 16 avisos esperados (sección 1.7 de la guía) | ✅ 16 avisos esperados |
 | Verificación externa (`verificar-despliegue.sh`, `SOLO_SUPABASE=1`) | ✅ sin fallas | ✅ sin fallas |
