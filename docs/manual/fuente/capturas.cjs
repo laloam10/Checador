@@ -91,7 +91,7 @@ const estado = (p, t) => p.getByRole("status").filter({ hasText: t }).first().wa
     await d.getByLabel("Número de empleado").fill(t.numero);
     if (t.email) await d.getByLabel("Correo (opcional)").fill(t.email);
     await d.getByLabel("Fecha de ingreso").fill(INGRESO);
-    if (i === 0) await shotEl(d.locator("form").filter({ hasText: "Dar de alta" }).last(), "05-alta-trabajador");
+    if (i === 0) await shotEl(d.locator("form").filter({ has: d.getByRole("button", { name: "Dar de alta", exact: true }) }), "05-alta-trabajador");
     await d.getByRole("button", { name: "Dar de alta" }).click();
     await d.getByRole("heading", { name: t.nombre }).waitFor();
     if (t.nombre === "José Hernández") {
@@ -142,7 +142,7 @@ const estado = (p, t) => p.getByRole("status").filter({ hasText: t }).first().wa
   await shot(d, "09-accesos", { fullPage: true });
   await d.goto(`${APP}/panel/centros`);
   await d.getByRole("heading", { name: "Centros de trabajo" }).waitFor();
-  await shotEl(d.locator("form.form-panel").first(), "10-centro");
+  await shotEl(d.locator(".centro").first(), "10-centro");
   log("acuerdos, accesos y centros");
 
   // ---------- Trabajadora (celular) ----------
@@ -196,6 +196,14 @@ const estado = (p, t) => p.getByRole("status").filter({ hasText: t }).first().wa
   await k.getByRole("button", { name: "Registrar entrada" }).click();
   await k.getByText("Entrada registrada").waitFor();
   await shot(k, "20-kiosco-listo");
+  // Revisión de semanas en el kiosco (José no tiene correo: aquí da su conformidad)
+  await k.getByRole("heading", { name: "Número de empleado" }).waitFor({ timeout: 10000 });
+  await teclear("102"); await k.getByRole("button", { name: "Continuar" }).click();
+  await teclear("3917"); await k.getByRole("button", { name: "Continuar" }).click();
+  await k.getByRole("button", { name: /Revisar mis horas/ }).click();
+  await k.locator(".kiosco-semana .tabla").waitFor();
+  await shot(k, "27-kiosco-semana", { fullPage: true });
+  await k.getByRole("button", { name: "Ahora no" }).click();
   log("kiosco");
 
   // ---------- Dueño: tablero, registros, corrección, objeciones, exportación ----------
@@ -204,7 +212,7 @@ const estado = (p, t) => p.getByRole("status").filter({ hasText: t }).first().wa
   await shot(d, "21-tablero", { fullPage: true });
   await d.goto(`${APP}/panel/trabajadores/${jose}/semana?semana=${LUNES}`);
   await d.getByRole("heading", { name: "Bitácora de la semana" }).waitFor();
-  const alto = await d.evaluate(() => document.querySelector("dl.resumen").getBoundingClientRect().bottom + window.scrollY + 16);
+  const alto = await d.evaluate(() => document.querySelector("main table.tabla").getBoundingClientRect().bottom + window.scrollY + 16);
   await d.setViewportSize({ width: 1180, height: Math.ceil(alto) });
   await shot(d, "22-semana-tabla");
   await d.setViewportSize({ width: 1180, height: 860 });
@@ -238,6 +246,20 @@ const estado = (p, t) => p.getByRole("status").filter({ hasText: t }).first().wa
   await d.goto(`${APP}/panel/trabajadores/${rosa}`);
   await d.getByText("Registrar firma en papel").click();
   await shotEl(d.locator(".mensaje-aviso").filter({ hasText: "pendiente de firma" }), "26-acuerdo-pendiente-papel");
+  // Configuración, alta masiva y panel en el celular
+  await d.goto(`${APP}/panel/configuracion`);
+  await d.getByRole("switch", { name: "Recordatorios de conformidad por correo" }).waitFor();
+  await shot(d, "28-configuracion", { fullPage: true });
+  await d.goto(`${APP}/panel/trabajadores`);
+  await d.getByText("Dar de alta a varias personas desde Excel").click();
+  await shotEl(d.locator("#alta-masiva"), "29-alta-masiva");
+  await shotEl(d.locator("form.filtros"), "29b-filtros");
+  const cel = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, locale: "es-MX", storageState: await escritorio.storageState() });
+  const pc = await cel.newPage();
+  await pc.goto(`${APP}/panel/trabajadores`);
+  await pc.getByRole("navigation", { name: "Secciones del panel" }).waitFor();
+  await pc.locator(".barra-mas summary").click();
+  await shot(pc, "30-panel-celular");
   log("panel");
 
   await b.close();

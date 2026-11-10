@@ -64,7 +64,7 @@
     Registro electrónico de la jornada de trabajo<br>
     conforme al artículo 132, fracción XXXIV, de la Ley Federal del Trabajo<br><br>
     <b>Aplicación:</b> https://checador.jemba.mx<br>
-    Versión 1.0 · noviembre de 2026
+    Versión 1.1 · noviembre de 2026
   </div>
 </section>
 
@@ -80,7 +80,7 @@
       <li>3.4 PIN para el kiosco · 3.5 Acuerdos de registro · 3.6 Instalar el kiosco</li>
       <li>3.7 Centros de trabajo · 3.8 Tablero · 3.9 Registros semanales</li>
       <li>3.10 Corregir checadas · 3.11 Objeciones · 3.12 Exportar para inspección o juicio</li>
-      <li>3.13 Accesos y roles · 3.14 Dar de baja a un trabajador</li>
+      <li>3.13 Accesos y roles · 3.14 Dar de baja (y deshacerla) · 3.15 Configuración · 3.16 El panel en el celular</li>
     </ol>
   </li>
   <li><a href="#trabajador">4. Guía del trabajador (app en el celular)</a></li>
@@ -107,7 +107,7 @@
   <li><b>La hora la pone el servidor</b>, no el celular. Cambiar la hora del teléfono no altera la checada.</li>
   <li><b>El acuerdo da valor de prueba plena.</b> La ley indica que el registro hace prueba plena si se acredita que fue <b>acordado</b> entre empleador y trabajador. Por eso cada trabajador firma un acuerdo de registro.</li>
   <li><b>El acuerdo no es retroactivo.</b> Solo cubre los registros a partir de que ambas partes lo firman. Fírmalo el primer día.</li>
-  <li><b>Cada semana, el trabajador revisa sus horarios</b> y da su conformidad o los objeta. Si no responde, no significa que esté de acuerdo.</li>
+  <li><b>Cada semana, el trabajador revisa sus horarios</b> (en su app o en el kiosco) y da su conformidad o los objeta. Si no responde, no significa que esté de acuerdo.</li>
 </ol>
 
 <!-- ======================= 2. ENTRAR ======================= -->
@@ -161,10 +161,26 @@
   <tr><td>Número de empleado</td><td>Lo usa para checar en el <b>kiosco</b>. Usa <b>solo dígitos</b>: el teclado del kiosco es numérico.</td></tr>
   <tr><td>Correo (opcional)</td><td>Si lo pones, la persona podrá usar la <b>app en su celular</b>. Al entrar por primera vez con ese correo, su cuenta se vincula sola.</td></tr>
   <tr><td>CURP (opcional)</td><td>Identificación adicional en el acuerdo y en los reportes.</td></tr>
-  <tr><td>Centro, fecha de ingreso, día de descanso</td><td>Necesarios para el cálculo de jornada y para el acuerdo.</td></tr>
+  <tr><td>Centro y fecha de ingreso</td><td>Necesarios para el cálculo de jornada y para el acuerdo.</td></tr>
+  <tr><td>Descanso semanal obligatorio</td><td>El día de descanso que exige la ley: uno por cada seis de trabajo (art. 69). Si la persona lo trabaja, Checador avisa que se paga doble (art. 73).</td></tr>
+  <tr><td>Días de descanso adicionales (opcional)</td><td>Para quien descansa más de un día, por ejemplo el sábado en una semana de 5 días. Es un beneficio pactado: si se trabaja, Checador lo señala y esas horas cuentan para el máximo semanal, pero no aplica el pago doble del art. 73.</td></tr>
   <tr><td>Jornada pactada por día (opcional)</td><td>Si acordaron repartir las horas de otra forma (artículo 58 de la LFT), por ejemplo 9.6 horas de lunes a viernes. Si lo dejas vacío, se usa la jornada legal (8 h diurna, 7 h nocturna, 7.5 h mixta).</td></tr>
 </table>
 <div class="consejo"><b>¿App o kiosco?</b>Cada persona necesita al menos una forma de checar: <b>correo</b> (app en el celular) o <b>número de empleado con PIN</b> (kiosco). Puede tener las dos.</div>
+
+<h3>Dar de alta a varias personas desde Excel</h3>
+<p>Debajo del formulario, abre <b>Dar de alta a varias personas desde Excel</b>:</p>
+<figure><img src="img/29-alta-masiva.png"><figcaption>Alta masiva: plantilla, instrucciones y carga del archivo.</figcaption></figure>
+<ol>
+  <li>Descarga la <b>plantilla</b> y ábrela en Excel. Una persona por renglón; borra los dos ejemplos.</li>
+  <li>Obligatorias: <b>nombre</b> y <b>fecha_ingreso</b> (por ejemplo 15/03/2026). Cada persona necesita <b>numero_empleado</b> (kiosco) o <b>correo</b> (app). En <b>dia_descanso</b> puedes poner un día o varios ("sábado y domingo"): si aparece el domingo, ese es el obligatorio y los demás quedan como adicionales.</li>
+  <li>Guárdala como <b>CSV</b> (Archivo → Guardar como → CSV) y súbela con <span class="boton">Revisar y dar de alta</span>.</li>
+</ol>
+<p>Checador revisa todo el archivo antes de guardar. Si un renglón tiene un error, <b>no se da de alta a nadie</b> y te dice qué corregir en cada renglón. Subir el mismo archivo dos veces no duplica a nadie. Máximo 500 personas por archivo.</p>
+
+<h3>Buscar y filtrar</h3>
+<figure><img src="img/29b-filtros.png"><figcaption>Búsqueda y filtros de la lista de trabajadores.</figcaption></figure>
+<p>Arriba de la lista puedes buscar por nombre, número o correo (sin importar acentos ni mayúsculas) y mostrar solo a quienes <b>no tienen acuerdo vigente</b>, <b>no tienen forma de checar</b> o <b>tienen correo pero aún no entran a la app</b>. Marca <b>Incluir bajas</b> para ver también a quienes ya no trabajan contigo.</p>
 
 <h2>3.4 PIN para el kiosco</h2>
 <p>En la ficha de cada trabajador está la sección <b>PIN para el kiosco</b>. Escribe un PIN de 4 a 6 dígitos y presiona <span class="boton">Asignar PIN</span>. Entrégalo a la persona <b>en privado</b>.</p>
@@ -213,31 +229,37 @@
 <div class="consejo"><b>Recomendaciones para la tableta</b>Déjala conectada a la corriente y a internet, y usa el modo de app fija: <i>Fijar pantalla</i> en Android o <i>Acceso guiado</i> en iPad. Así nadie puede salir de Checador ni cerrar la sesión.</div>
 
 <h2>3.7 Centros de trabajo</h2>
-<p>En <span class="menu">Centros</span> defines cada sucursal: nombre, dirección, zona horaria y si el personal <b>puede salir durante la pausa de comida</b>. Esta regla se aplica automáticamente a todas las checadas del celular y del kiosco.</p>
+<p>En <span class="menu">Centros</span> cada sucursal aparece como una tarjeta con cuántas personas activas tiene, su zona horaria y si el personal <b>puede salir durante la pausa de comida</b>. Esta regla se aplica automáticamente a todas las checadas del celular y del kiosco. Usa <b>Editar</b> para cambiarla y <b>Agregar otro centro de trabajo</b> para crear uno nuevo.</p>
 <figure class="media"><img src="img/10-centro.png"><figcaption>Configuración de un centro de trabajo.</figcaption></figure>
 
 <h2>3.8 Tablero</h2>
-<figure><img src="img/21-tablero.png"><figcaption>Tablero: quién está en turno, acuerdos vigentes y objeciones.</figcaption></figure>
+<figure><img src="img/21-tablero.png"><figcaption>Tablero: indicadores, lo que requiere tu atención, primeros pasos y quién está en turno.</figcaption></figure>
+<p>Arriba hay cuatro indicadores:</p>
 <ul>
-  <li><b>En turno ahora</b>: quién está trabajando o en pausa y desde qué hora.</li>
-  <li><b>X de Y con acuerdo de registro vigente</b>: si no están todos, se marca en amarillo.</li>
-  <li><b>Objeciones por atender</b>: semanas que algún trabajador marcó como incorrectas.</li>
+  <li><b>En turno ahora</b>: cuántas personas están trabajando y cuántas en pausa.</li>
+  <li><b>Acuerdos vigentes</b>: cuántas personas tienen su acuerdo firmado por ambas partes. Al tocarlo ves la lista de quienes faltan.</li>
+  <li><b>Semana pasada</b>: de quienes trabajaron, cuántos ya confirmaron sus horas, cuántos objetaron y cuántos no han respondido.</li>
+  <li><b>Objeciones</b>: se pinta de rojo si hay alguna por atender.</li>
+</ul>
+<p>Debajo, <b>lo que requiere tu atención</b> (objeciones y personas que no revisaron la semana pasada), cada cosa con un botón para resolverla. Si no hay nada pendiente aparece <b>"Todo en orden"</b>. Más abajo:</p>
+<ul>
+  <li><b>En turno ahora</b>: quién está trabajando (punto verde) o en pausa (punto ámbar), desde qué hora y cuánto tiempo lleva.</li>
   <li><b>Integridad de la bitácora</b> → <span class="boton">Verificar ahora</span>: comprueba que ningún registro haya sido alterado. Hazlo de vez en cuando y antes de entregar información a una autoridad.</li>
 </ul>
 
 <h2>3.9 Registros semanales</h2>
-<p>En <span class="menu">Trabajadores</span> → <b>Registros</b> (o desde el nombre en el tablero) ves la semana de cada persona: turnos, pausas, horas trabajadas y tiempo extra. Usa <b>Anterior</b> y <b>Siguiente</b> para cambiar de semana.</p>
+<p>En <span class="menu">Trabajadores</span> → <b>Registros</b> (o desde el nombre en el tablero) ves la semana de cada persona. Arriba aparece si ya respondió esa semana: <b>Conforme</b>, <b>Objetada</b>, <b>Sin respuesta</b> o <b>Semana en curso</b>. Debajo, tres indicadores (horas trabajadas, jornada ordinaria frente al máximo legal y tiempo extra) y la tabla por día. Usa <b>Anterior</b>, <b>Esta semana</b> y <b>Siguiente</b> para cambiar de semana.</p>
 <figure><img src="img/22-semana-tabla.png"><figcaption>Semana de un trabajador: el jueves trabajó 11 horas, 3 de ellas extra.</figcaption></figure>
 <p>Checador calcula automáticamente:</p>
 <ul>
   <li><b>Jornada ordinaria</b> frente al <b>máximo legal semanal</b> del año: 48 h en 2026, 46 h en 2027, hasta 40 h en 2030.</li>
   <li><b>Extra al doble</b>: hasta el tope semanal del año, máximo 4 horas al día y 4 días por semana.</li>
   <li><b>Extra al triple</b>: lo que exceda lo anterior.</li>
-  <li><b>Alertas</b>: más de 12 horas en un día, trabajo en el día de descanso o en domingo (prima dominical), semana sin descanso.</li>
+  <li><b>Alertas</b>: más de 12 horas en un día, trabajo en el descanso obligatorio (pago doble) o en un descanso adicional pactado, trabajo en domingo (prima dominical) y semana sin descanso.</li>
 </ul>
 
 <h2>3.10 Corregir checadas</h2>
-<p>En la parte de abajo de la semana está la <b>Bitácora</b> con cada checada y su origen (celular, kiosco o panel). En cada registro, <b>Corregir o anular</b> permite:</p>
+<p>En la parte de abajo de la semana está la <b>Bitácora</b>, agrupada por día, con cada checada y su origen (celular, kiosco o panel). En cada registro, <b>Corregir o anular</b> permite:</p>
 <ul>
   <li><b>Corregir la hora</b>: escribe la hora correcta y el motivo.</li>
   <li><b>Anular la checada</b>: por ejemplo, si se registró dos veces. Requiere motivo.</li>
@@ -248,15 +270,15 @@
 
 <h2>3.11 Objeciones</h2>
 <p>Cuando un trabajador marca una semana como incorrecta, aparece en <span class="menu">Objeciones</span> con su comentario.</p>
-<figure><img src="img/24-objeciones.png"><figcaption>Objeción pendiente de una trabajadora y, abajo, los recordatorios por correo.</figcaption></figure>
+<figure><img src="img/24-objeciones.png"><figcaption>Objeción pendiente de una trabajadora y, abajo, el historial de recordatorios por correo.</figcaption></figure>
 <ol>
   <li>Abre la semana desde el nombre del trabajador.</li>
   <li>Revisa su comentario y, si tiene razón, corrige las checadas con el motivo correspondiente.</li>
-  <li>Pídele que revise de nuevo y dé su conformidad desde su app. La objeción sale de la lista cuando lo hace.</li>
+  <li>Pídele que revise de nuevo y dé su conformidad desde su app o en el kiosco. La objeción sale de la lista cuando lo hace.</li>
 </ol>
 <h3>Recordatorios por correo</h3>
-<p>Cada lunes a las 10:00 (hora del centro de México), Checador envía un correo a quien tenga semanas terminadas sin revisar, o semanas que objetó y que ya corregiste, con un enlace a cada semana. Revisa las últimas 8 semanas y envía como máximo un correo por persona a la semana. Solo lo recibe quien tiene correo registrado.</p>
-<p>Al final de la página <span class="menu">Objeciones</span>, el propietario o un administrador pueden <b>apagarlos o encenderlos</b> para toda la empresa. Ahí mismo se ve cuántas personas los recibieron cada lunes y si alguno no se pudo enviar.</p>
+<p>Cada lunes a las 10:00 (hora del centro de México), Checador envía un correo a quien tenga semanas terminadas sin revisar, o semanas que objetó y que ya corregiste, con un enlace a cada semana. Revisa las últimas 8 semanas y envía como máximo un correo por persona a la semana. Solo lo recibe quien tiene correo registrado; quien checa únicamente en el kiosco ve sus semanas pendientes ahí (sección 5).</p>
+<p>Al final de <span class="menu">Objeciones</span> se ve cuántas personas los recibieron cada lunes y si alguno no se pudo enviar. Para <b>apagarlos o encenderlos</b>, ve a <span class="menu">Configuración</span> (sección 3.15).</p>
 <div class="nota"><b>Responder sigue siendo voluntario</b>El correo lo dice así. Recordar no obliga a nadie a confirmar, y una semana sin respuesta no significa que el trabajador esté de acuerdo. Lo que sí hace es que más semanas queden confirmadas, que es lo que da fuerza al registro.</div>
 
 <h2>3.12 Exportar para inspección o juicio</h2>
@@ -283,12 +305,35 @@
   <tr><td>Exportar</td><td class="si">✓</td><td class="si">✓</td><td class="si">✓</td><td class="no">—</td></tr>
   <tr><td>Dar de alta y de baja, asignar PIN, firmar acuerdos</td><td class="si">✓</td><td class="si">✓</td><td class="no">—</td><td class="no">—</td></tr>
   <tr><td>Configurar centros, invitar supervisores y kioscos</td><td class="si">✓</td><td class="si">✓</td><td class="no">—</td><td class="no">—</td></tr>
+  <tr><td>Configuración: recordatorios y datos de la empresa</td><td class="si">✓</td><td class="si">✓</td><td class="no">—</td><td class="no">—</td></tr>
+  <tr><td>Deshacer una baja registrada por error</td><td class="si">✓</td><td class="si">✓</td><td class="no">—</td><td class="no">—</td></tr>
   <tr><td>Invitar o quitar administradores</td><td class="si">✓</td><td class="no">—</td><td class="no">—</td><td class="no">—</td></tr>
-  <tr><td>Registrar checadas con número y PIN</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="si">✓</td></tr>
+  <tr><td>Registrar checadas, revisar semanas y firmar con número y PIN</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="si">✓</td></tr>
 </table>
+<p>En la lista de accesos tu propia cuenta aparece marcada con <b>"tú"</b>, y la sección <b>¿Qué puede hacer cada rol?</b> resume esta tabla.</p>
 
-<h2>3.14 Dar de baja a un trabajador</h2>
+<h2>3.14 Dar de baja a un trabajador (y deshacerla)</h2>
 <p>En la ficha del trabajador, sección <b>Baja</b>: indica la fecha, escribe <code>BAJA</code> para confirmar y presiona <span class="boton">Registrar baja</span>. La persona ya no podrá checar, pero <b>sus registros se conservan</b>, como exige el artículo 804 de la LFT (durante la relación laboral y un año después), y se pueden seguir exportando.</p>
+<h3>Si la baja fue un error</h3>
+<p>En la ficha de la persona dada de baja aparece <b>¿La baja fue un error?</b>. Escribe el motivo y presiona <span class="boton">Deshacer la baja</span>: la persona vuelve a estar activa y puede checar otra vez. La ficha muestra el <b>Historial de bajas</b> con cada baja y cada reversión, cuándo se registró y por qué; ese historial no se puede modificar. Si lo que estaba mal era la fecha, deshaz la baja y regístrala de nuevo con la fecha correcta.</p>
+
+<h2>3.15 Configuración</h2>
+<p>En <span class="menu">Configuración</span> (en el celular, dentro de <b>Más</b>) el propietario o un administrador controlan:</p>
+<figure><img src="img/28-configuracion.png"><figcaption>Configuración: interruptor de recordatorios y datos de la empresa.</figcaption></figure>
+<ul>
+  <li><b>Recordatorios por correo</b>: un interruptor que se guarda al tocarlo. Apagado, el envío de los lunes no incluye a tu empresa.</li>
+  <li><b>Datos de la empresa</b>: razón social, RFC y zona horaria.</li>
+</ul>
+<div class="importante"><b>Antes de cambiar la razón social o el RFC</b>Aparecen en el acuerdo de registro de cada persona. Al cambiarlos, los acuerdos de todo tu personal quedan <b>desactualizados</b> y hay que firmar una versión nueva (la anterior sigue vigente mientras tanto). Hazlo solo si el dato estaba mal o cambió de verdad.</div>
+
+<h2>3.16 El panel en el celular</h2>
+<div class="fila">
+  <figure class="celular"><img src="img/30-panel-celular.png"><figcaption>Lista de trabajadores en el celular, con el menú Más abierto.</figcaption></figure>
+  <div style="flex:1.3; font-size:10pt">
+    <p>Desde el teléfono, el panel muestra una <b>barra fija abajo</b> con <b>Tablero</b>, <b>Trabajadores</b>, <b>Objeciones</b> (con su contador) y <b>Más</b>, que lleva a Exportar, Centros, Accesos y Configuración.</p>
+    <p>Las listas se ven como <b>tarjetas</b>, con cada dato y su etiqueta, para que nada quede cortado. Para dar de alta a mucha gente conviene más la computadora (alta desde Excel).</p>
+  </div>
+</div>
 
 <!-- ======================= 4. TRABAJADOR ======================= -->
 <h1 id="trabajador">4. Guía del trabajador (app en el celular)</h1>
@@ -350,11 +395,23 @@
   <figure class="tableta"><img src="img/20-kiosco-listo.png"><figcaption>4. Confirmación. La pantalla vuelve sola al inicio.</figcaption></figure>
 </div>
 <ul>
-  <li>El kiosco solo muestra tu nombre y la acción que te corresponde, sin historial: es un dispositivo compartido.</li>
+  <li>El kiosco solo muestra tu nombre y la acción que te corresponde: es un dispositivo compartido. Tus horas solo aparecen si las pides con <b>Revisar mis horas</b>, después de tu PIN.</li>
   <li>Si nadie toca la pantalla, vuelve sola al inicio en unos segundos.</li>
   <li>Si tienes un acuerdo pendiente, aparece el botón <b>"Tienes un acuerdo por firmar"</b>. Al tocarlo puedes leerlo (tienes 4 minutos) y firmarlo con <span class="boton">Leí el acuerdo y lo firmo con mi PIN</span>.</li>
 </ul>
 <figure class="tableta"><img src="img/19-kiosco-acuerdo.png"><figcaption>Firma del acuerdo en el kiosco.</figcaption></figure>
+<h2>Revisar tus horas en el kiosco</h2>
+<div class="fila">
+  <figure class="tableta"><img src="img/27-kiosco-semana.png"><figcaption>Revisión de una semana en el kiosco.</figcaption></figure>
+  <div style="flex:1.1; font-size:10pt">
+    <p>Si tienes semanas terminadas sin revisar, después de tu PIN aparece <b>Revisar mis horas (N semanas)</b>. Verás la misma tabla que ve tu empleador.</p>
+    <ul>
+      <li>Si es correcta: <span class="boton">Mis horas son correctas</span>.</li>
+      <li>Si algo no coincide: <b>Algo no es correcto</b>, explica qué y <span class="boton">Enviar objeción</span>.</li>
+    </ul>
+    <p>Tu respuesta queda firmada con tu PIN y recibes un número de registro. Si tienes varias semanas, pasa sola a la siguiente. Tienes 4 minutos por semana; con <b>Ahora no</b> lo dejas para otro día. Responder es voluntario.</p>
+  </div>
+</div>
 <div class="nota"><b>PIN incorrecto o bloqueado</b>Después de <b>5 intentos fallidos</b> el PIN se bloquea <b>15 minutos</b>. Si lo olvidaste, pide a tu empleador que te asigne uno nuevo.</div>
 <div class="nota"><b>Sin internet</b>El kiosco guarda la checada y verifica tu PIN cuando vuelve la conexión. Si el PIN era incorrecto, la checada se rechaza y aparece abajo en la pantalla para que el supervisor la capture con su motivo.</div>
 
@@ -367,12 +424,15 @@
   <tr><td>"Tu cuenta aún no está vinculada"</td><td>Tu empleador debe darte de alta con el mismo correo con el que entraste. Después sal y vuelve a entrar.</td></tr>
   <tr><td>Olvidé checar mi salida</td><td>Avisa a tu empleador: la agrega desde el panel con <b>Agregar checada faltante</b> y un motivo.</td></tr>
   <tr><td>Checé dos veces por error</td><td>El empleador anula la checada duplicada con motivo. Si entrada y salida quedaron en el mismo minuto, ese turno no se cuenta y aparece como incidencia.</td></tr>
-  <tr><td>Me llegan correos de "semanas por revisar"</td><td>Son los recordatorios de los lunes. Dejan de llegar cuando respondes esas semanas. El empleador puede apagarlos para toda la empresa en <b>Objeciones</b>.</td></tr>
+  <tr><td>Me llegan correos de "semanas por revisar"</td><td>Son los recordatorios de los lunes. Dejan de llegar cuando respondes esas semanas. El empleador puede apagarlos para toda la empresa en <b>Configuración</b>.</td></tr>
+  <tr><td>Alguien sin correo, ¿cómo confirma su semana?</td><td>En el kiosco: después de su número y PIN aparece <b>Revisar mis horas</b>.</td></tr>
+  <tr><td>Mi personal trabaja 5 días y descansa sábado y domingo</td><td>En la ficha, pon el <b>domingo</b> como descanso semanal obligatorio y marca el <b>sábado</b> como día de descanso adicional. Desde Excel, escribe "sábado y domingo".</td></tr>
+  <tr><td>Di de baja a alguien por error</td><td>En su ficha, <b>¿La baja fue un error?</b> → escribe el motivo → <span class="boton">Deshacer la baja</span>. Queda en el historial.</td></tr>
   <tr><td>Mis horas de la semana no son correctas</td><td>En <b>Mis registros</b>, al terminar la semana, presiona <b>Algo no es correcto</b> y explica qué está mal.</td></tr>
   <tr><td>¿Se puede borrar un registro?</td><td>No. Para que el registro sea válido como prueba, nada se borra: se corrige o se anula con motivo y el original queda visible.</td></tr>
   <tr><td>Cambié de celular</td><td>Abre Checador en el nuevo y entra con tu correo. Tus registros están en el servidor, no en el teléfono.</td></tr>
   <tr><td>Un trabajador no quiere firmar el acuerdo</td><td>No se le puede obligar. Sus registros siguen siendo prueba, aunque no prueba plena. Conviene aclarar sus dudas sobre el texto.</td></tr>
-  <tr><td>Cambié la jornada o el día de descanso de alguien</td><td>Su acuerdo queda <b>desactualizado</b>: firma la nueva versión y pídele que la firme. La anterior sigue vigente mientras tanto.</td></tr>
+  <tr><td>Cambié la jornada o los días de descanso de alguien</td><td>Su acuerdo queda <b>desactualizado</b>: firma la nueva versión y pídele que la firme. La anterior sigue vigente mientras tanto.</td></tr>
   <tr><td>El kiosco dice "Este dispositivo no está configurado"</td><td>La cuenta con la que se entró en la tableta no tiene el rol de kiosco. Invítala desde <b>Accesos</b> y vuelve a cargar la página.</td></tr>
   <tr><td>"Verificar ahora" muestra una alerta de alteración</td><td>No corrijas nada. Exporta los registros y contacta a soporte de inmediato.</td></tr>
 </table>
@@ -388,6 +448,7 @@
   <tr><td>Objeción</td><td>Aviso del trabajador de que algo en su semana no es correcto, con su explicación.</td></tr>
   <tr><td>Corrección / anulación</td><td>Ajuste a una checada hecho por el empleador con un motivo. El registro original se conserva.</td></tr>
   <tr><td>Sin conexión (diferida)</td><td>Checada hecha sin internet y enviada después. Se guardan la hora del dispositivo y la hora en que llegó.</td></tr>
+  <tr><td>Descanso semanal obligatorio / adicional</td><td>El obligatorio es el día que exige la ley por cada seis de trabajo (art. 69); trabajarlo se paga doble (art. 73). Los adicionales son días extra que pactas, como el sábado en una semana de 5 días.</td></tr>
   <tr><td>Kiosco</td><td>Tableta compartida donde se checa con número de empleado y PIN.</td></tr>
   <tr><td>Jornada ordinaria / tiempo extra</td><td>Horas normales de trabajo y horas adicionales. El extra se paga al doble y, por encima de los límites, al triple (arts. 66 y 68 LFT).</td></tr>
   <tr><td>Huella digital (SHA-256)</td><td>Código que identifica de forma única el contenido de un registro o archivo. Cualquier cambio produce una huella distinta.</td></tr>
