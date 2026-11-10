@@ -12,6 +12,7 @@ const ENLACES = [
   { href: "/panel/exportar", etiqueta: "Exportar" },
   { href: "/panel/centros", etiqueta: "Centros" },
   { href: "/panel/accesos", etiqueta: "Accesos" },
+  { href: "/panel/configuracion", etiqueta: "Configuración" },
 ];
 
 async function salir() {

@@ -8,7 +8,7 @@ import { generarTextoAcuerdo } from "@/lib/acuerdo";
 import { datosActuales, estadosAcuerdosEmpresa } from "@/lib/acuerdosDatos";
 import { trabajadorPorId } from "@/lib/datos";
 import { decodificar, MAX_BYTES, validarImportacion } from "@/lib/importacion";
-import { esGestor, requierePanel } from "@/lib/panel";
+import { esGestor, requierePanel, ZONAS_MX } from "@/lib/panel";
 import { crearClienteServidor, usuarioActual } from "@/lib/supabase/server";
 
 /**
@@ -93,9 +93,9 @@ export async function guardarCentro(_: Estado, fd: FormData): Promise<Estado> {
 
 // --- Recordatorios de conformidad -------------------------------------------------
 
-export async function guardarRecordatorios(_: Estado, fd: FormData): Promise<Estado> {
+/** Interruptor de recordatorios (Configuración): se guarda al tocarlo. */
+export async function cambiarRecordatorios(activar: boolean): Promise<Estado> {
   const ctx = await requierePanel();
-  const activar = fd.get("activar") === "on";
   // RLS: solo el propietario o un administrador pueden modificar la empresa.
   const { data, error } = await ctx.supabase
     .from("empresas")
@@ -106,6 +106,26 @@ export async function guardarRecordatorios(_: Estado, fd: FormData): Promise<Est
   if (!data?.length) return fallo("No tienes permiso para hacer esto.");
   refrescar();
   return ok(activar ? "Recordatorios activados." : "Recordatorios desactivados.");
+}
+
+// --- Datos de la empresa -------------------------------------------------------
+
+export async function guardarEmpresa(_: Estado, fd: FormData): Promise<Estado> {
+  const ctx = await requierePanel();
+  const razon = texto(fd, "razon_social");
+  const rfc = texto(fd, "rfc").toUpperCase() || null;
+  const zona = texto(fd, "zona_horaria");
+  if (!razon) return fallo("Escribe la razón social o nombre del negocio.");
+  if (!ZONAS_MX.some((z) => z.zona === zona)) return fallo("Elige la zona horaria.");
+  const { data, error } = await ctx.supabase
+    .from("empresas")
+    .update({ razon_social: razon, rfc, zona_horaria: zona })
+    .eq("id", ctx.empresa.id)
+    .select("id");
+  if (error) return fallo(traducir(error));
+  if (!data?.length) return fallo("No tienes permiso para hacer esto.");
+  refrescar();
+  return ok("Datos de la empresa actualizados.");
 }
 
 // --- Trabajadores -------------------------------------------------------------------

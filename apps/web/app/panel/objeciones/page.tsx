@@ -1,7 +1,5 @@
 import Link from "next/link";
 import { aHoraLocal } from "@checador/jornada";
-import { guardarRecordatorios } from "@/app/panel/acciones";
-import { FormAccion } from "@/components/panel/FormAccion";
 import { esGestor, objecionesPendientes, requierePanel } from "@/lib/panel";
 
 interface EnvioDia {
@@ -75,19 +73,10 @@ export default async function Objeciones() {
         persona a la semana. Solo lo recibe quien tiene correo registrado; quien checa únicamente en el kiosco ve sus semanas pendientes ahí, al identificarse con su PIN.
         Responder sigue siendo voluntario; el correo lo dice así.
       </p>
-      {esGestor(ctx.rol) ? (
-        <FormAccion accion={guardarRecordatorios} boton="Guardar">
-          <label className="casilla-linea">
-            <input type="checkbox" name="activar" defaultChecked={activos} />
-            Enviar recordatorios de conformidad a mi personal
-          </label>
-        </FormAccion>
-      ) : (
-        <p>
-          Los recordatorios están <strong>{activos ? "activados" : "desactivados"}</strong>. Solo el propietario o un
-          administrador pueden cambiarlo.
-        </p>
-      )}
+      <p>
+        Los recordatorios están <strong>{activos ? "activados" : "desactivados"}</strong>.{" "}
+        {esGestor(ctx.rol) && <Link href="/panel/configuracion">Cambiar en Configuración</Link>}
+      </p>
       {dias.length === 0 ? (
         <p className="vacio">Todavía no se ha enviado ningún recordatorio.</p>
       ) : (

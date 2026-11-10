@@ -187,6 +187,22 @@ try {
   await dueno.getByRole("link", { name: "Carla Ruiz" }).waitFor();
   paso("la baja se deshace con motivo; la persona vuelve a la lista y el historial conserva ambos pasos");
 
+  // 12. Configuración: interruptor de recordatorios y datos de la empresa
+  await dueno.goto(`${APP}/panel/configuracion`);
+  const interruptor = dueno.getByRole("switch", { name: "Recordatorios de conformidad por correo" });
+  if ((await interruptor.getAttribute("aria-checked")) !== "true") throw new Error("Los recordatorios debían venir activados");
+  await interruptor.click();
+  await dueno.getByRole("status").filter({ hasText: "Recordatorios desactivados." }).waitFor();
+  if (sql(`select recordatorios_conformidad from empresas where razon_social = '${EMPRESA}'`) !== "f") throw new Error("No se guardó el interruptor");
+  await dueno.reload();
+  if ((await interruptor.getAttribute("aria-checked")) !== "false") throw new Error("El interruptor no conservó su estado");
+  await interruptor.click();
+  await dueno.getByRole("status").filter({ hasText: "Recordatorios activados." }).waitFor();
+  await dueno.getByLabel("RFC (opcional)").fill("NOESRFC");
+  await dueno.getByRole("button", { name: "Guardar datos" }).click();
+  await mensaje(dueno, "El RFC no tiene un formato válido.");
+  paso("Configuración: el interruptor de recordatorios se guarda al tocarlo y el RFC se valida");
+
   const conteo = sql(`select count(*) filter (where e.tipo in ('correccion','anulacion')) || ',' || count(*)
                       from eventos e join empresas x on x.id = e.empresa_id where x.razon_social = '${EMPRESA}'`);
   if (conteo !== "2,4") throw new Error(`Bitácora inesperada (ajustes,total): ${conteo}`);

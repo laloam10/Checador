@@ -408,3 +408,16 @@ label > input, label > select, label > textarea { min-width: 0; }
   .indicadores-3 .indicador-valor small { display: block; font-size: 0.75rem; }
   .indicadores-3 .indicador-detalle { font-size: 0.72rem; line-height: 1.3; }
 }
+
+/* ---- Configuración: interruptor ---- */
+.ajuste-seccion { background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--radio); box-shadow: var(--sombra); padding: 0.4rem 1.1rem 1rem; margin: 1rem 0; }
+.ajuste-seccion h2 { margin: 0.6rem 0 0.75rem; }
+.ajuste-seccion .form-panel { border: none; box-shadow: none; padding: 0; margin: 0; }
+.interruptor-fila { display: flex; align-items: flex-start; gap: 0.85rem; }
+.interruptor-fila strong { margin-right: 0.5rem; }
+.interruptor-fila .ayuda, .interruptor-fila .texto-error { margin: 0.35rem 0 0; }
+.interruptor { flex: none; position: relative; width: 3.1rem; height: 1.8rem; border-radius: 999px; background: #c5cec9; padding: 0; transition: background-color 0.2s; }
+.interruptor[aria-checked="true"] { background: var(--marca); }
+.interruptor-perilla { position: absolute; top: 0.2rem; left: 0.2rem; width: 1.4rem; height: 1.4rem; border-radius: 50%; background: white; box-shadow: 0 1px 3px rgb(0 0 0 / 0.25); transition: transform 0.2s; }
+.interruptor[aria-checked="true"] .interruptor-perilla { transform: translateX(1.3rem); }
+.interruptor:disabled { cursor: wait; }
