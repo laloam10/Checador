@@ -13,3 +13,4 @@ dist/
 e2e-fallo.png
 next-env.d.ts
 node_modules/
+.claude/settings.local.json

@@ -8,12 +8,12 @@ Bitácora de lo aplicado en los proyectos en la nube. No contiene secretos.
 | Región / Postgres | us-east-1 / 17.11 | us-east-1 / 17.11 |
 | Plan de la organización | Gratuito (subir a **Pro** antes del primer cliente) | ídem |
 | Migraciones (10) | ✅ aplicadas por API | ✅ aplicadas por API |
-| Migración 11: recordatorios de conformidad (`20261112000001`) | ✅ aplicada por API (2026-11-09); tareas de pg_cron creadas | ⏳ pendiente (después de pruebas) |
-| Migración 12: conformidad en el kiosco (`20261113000001`, requiere la 11) | ✅ aplicada por API (2026-11-09) | ⏳ pendiente (después de pruebas) |
-| Migración 13: protección del vínculo trabajador ↔ cuenta (`20261114000001`) | ✅ aplicada por API (2026-11-09); `verificar-seguridad.sql` sin hallazgos | ⏳ pendiente (**aplicar antes del primer cliente**) |
-| Asesor de Supabase tras las migraciones 11 a 13 | ✅ 19 avisos esperados (guía, 1.7) | ⏳ esperar 19 |
-| Migración 14: historial de bajas y `revertir_baja()` (`20261115000001`) | ✅ aplicada por API (2026-11-09); asesor: 20 avisos esperados | ⏳ pendiente |
-| Migración 15: indicador de conformidad en la base (`20261116000001`) | ✅ aplicada por API (2026-11-10); sin avisos nuevos | ⏳ pendiente |
+| Migración 11: recordatorios de conformidad (`20261112000001`) | ✅ aplicada por API (2026-11-09); tareas de pg_cron creadas | ✅ aplicada por API (2026-11-10); tareas de pg_cron creadas |
+| Migración 12: conformidad en el kiosco (`20261113000001`, requiere la 11) | ✅ aplicada por API (2026-11-09) | ✅ aplicada por API (2026-11-10) |
+| Migración 13: protección del vínculo trabajador ↔ cuenta (`20261114000001`) | ✅ aplicada por API (2026-11-09); `verificar-seguridad.sql` sin hallazgos | ✅ aplicada por API (2026-11-10) |
+| Asesor de Supabase tras las migraciones 11 a 15 | ✅ 20 avisos esperados (guía, 1.7) | ✅ 19 (no muestra el de contraseñas filtradas) |
+| Migración 14: historial de bajas y `revertir_baja()` (`20261115000001`) | ✅ aplicada por API (2026-11-09); asesor: 20 avisos esperados | ✅ aplicada por API (2026-11-10) |
+| Migración 15: indicador de conformidad en la base (`20261116000001`) | ✅ aplicada por API (2026-11-10); sin avisos nuevos | ✅ aplicada por API (2026-11-10); `verificar-seguridad.sql` sin hallazgos |
 | Secretos de Vault para recordatorios (guía, sección 1.8) | ⏳ pendiente: llave `checador-recordatorios-pruebas` | ⏳ pendiente: llave `checador-recordatorios-produccion` |
 | `verificar-seguridad.sql` | ✅ 0 hallazgos | ✅ 0 hallazgos |
 | Asesor de Supabase | ✅ 16 avisos esperados (sección 1.7 de la guía) | ✅ 16 avisos esperados |
