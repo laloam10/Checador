@@ -60,11 +60,11 @@ fi
 echo "== Supabase: $SUPABASE_URL"
 AJUSTES=$(curl -s -H "apikey: $K" "$SUPABASE_URL/auth/v1/settings")
 revisa "Auth exige confirmar el correo (mailer_autoconfirm = false)" '[[ $(python3 -c "import sys,json; print(json.load(sys.stdin).get(\"mailer_autoconfirm\"))" <<<"$AJUSTES") == False ]]'
-for tabla in trabajadores eventos pines_trabajador acuerdos conformidades empresas exportaciones; do
+for tabla in trabajadores eventos pines_trabajador acuerdos conformidades empresas exportaciones historial_bajas recordatorios_conformidad; do
   revisa "anónimo no puede leer $tabla" '[[ $(curl -s -o /dev/null -w "%{http_code}" -H "apikey: $K" "$SUPABASE_URL/rest/v1/$tabla?select=*&limit=1") =~ ^(401|403)$ ]]'
 done
 revisa "anónimo no puede insertar eventos" '[[ $(curl -s -o /dev/null -w "%{http_code}" -X POST -H "apikey: $K" -H "Content-Type: application/json" -d "{}" "$SUPABASE_URL/rest/v1/eventos") =~ ^(401|403)$ ]]'
-for fn in kiosco_identificar vincular_mi_cuenta verificar_cadena mi_rol; do
+for fn in kiosco_identificar kiosco_semana kiosco_conformidad vincular_mi_cuenta verificar_cadena revertir_baja conformidad_semana enviar_recordatorios_conformidad mi_rol; do
   revisa "anónimo no puede ejecutar $fn()" '[[ $(curl -s -o /dev/null -w "%{http_code}" -X POST -H "apikey: $K" -H "Content-Type: application/json" -d "{}" "$SUPABASE_URL/rest/v1/rpc/$fn") =~ ^(401|403|404)$ ]]'
 done
 

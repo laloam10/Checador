@@ -246,7 +246,7 @@ SUPABASE_PUBLISHABLE_KEY=sb_publishable_... \
 ./scripts/verificar-despliegue.sh
 ```
 
-✅ Debe terminar en **"Despliegue verificado: sin fallas."** Revisa 33 puntos desde fuera, como lo haría un atacante:
+✅ Debe terminar en **"Despliegue verificado: sin fallas."** Revisa 40 puntos desde fuera, como lo haría un atacante:
 - HTTPS y HSTS;
 - la CSP y que el *nonce* cambie en cada petición;
 - las demás cabeceras de seguridad;
