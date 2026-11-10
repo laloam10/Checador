@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { aHoraLocal, localAInstante } from "@checador/jornada";
+import { aHoraLocal } from "@checador/jornada";
 import { FormAccion } from "@/components/panel/FormAccion";
 import { calcularAlta, PrimerosPasos } from "@/components/panel/PrimerosPasos";
 import { estadosAcuerdosEmpresa } from "@/lib/acuerdosDatos";
@@ -14,37 +14,13 @@ interface SemanaPasada {
   objetadas: number;
 }
 
-/** Quiénes checaron la semana pasada y cuántos ya respondieron (última respuesta por persona). */
+/** Quiénes checaron la semana pasada y cuántos respondieron (última respuesta por persona), contado en la base. */
 async function semanaPasada(ctx: ContextoPanel, lunes: string): Promise<SemanaPasada> {
-  const zona = ctx.empresa.zonaHoraria;
-  const desde = localAInstante(`${lunes}T00:00`, zona).toISOString();
-  const hasta = localAInstante(`${sumarDias(lunes, 7)}T00:00`, zona).toISOString();
-  const [{ data: entradas }, { data: respuestas }] = await Promise.all([
-    ctx.supabase
-      .from("eventos")
-      .select("trabajador_id")
-      .eq("empresa_id", ctx.empresa.id)
-      .eq("tipo", "entrada")
-      .gte("hora_efectiva", desde)
-      .lt("hora_efectiva", hasta)
-      .limit(5000),
-    ctx.supabase
-      .from("conformidades")
-      .select("trabajador_id, respuesta, respondido_en")
-      .eq("empresa_id", ctx.empresa.id)
-      .eq("periodo_inicio", lunes)
-      .order("respondido_en"),
-  ]);
-  const trabajaron = new Set((entradas ?? []).map((e) => e.trabajador_id as string));
-  const ultima = new Map<string, string>();
-  for (const r of respuestas ?? []) if (trabajaron.has(r.trabajador_id)) ultima.set(r.trabajador_id, r.respuesta);
-  const valores = [...ultima.values()];
-  return {
-    lunes,
-    trabajaron: trabajaron.size,
-    conformes: valores.filter((v) => v === "conforme").length,
-    objetadas: valores.filter((v) => v === "objeta").length,
-  };
+  const { data, error } = await ctx.supabase
+    .rpc("conformidad_semana", { p_empresa: ctx.empresa.id, p_lunes: lunes })
+    .single<{ trabajaron: number; conformes: number; objetadas: number }>();
+  if (error) throw error;
+  return { lunes, trabajaron: data.trabajaron, conformes: data.conformes, objetadas: data.objetadas };
 }
 
 const fechaLarga = (zona: string) =>

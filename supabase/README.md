@@ -14,6 +14,7 @@
 | `migrations/…10…02_vinculo_solo_codigo.sql` | Vincular cuentas solo si la sesión se inició con código (claim `amr`) |
 | `migrations/…09…01_exportaciones.sql` | Registro inmutable de exportaciones con huellas SHA-256 y estado de la cadena |
 | `migrations/…08…01_acuerdos_firma.sql` | Modalidades de firma (electrónica, PIN en kiosco, autógrafa), orden de firma, `acuerdo_vigente()`, `acuerdo_pendiente()`, `kiosco_firmar_acuerdo()` |
+| `migrations/…16…01_indicador_conformidad.sql` | `conformidad_semana()`: el indicador "Semana pasada" del tablero contado en la base (sin el límite de 1000 filas de la API) |
 | `migrations/…15…01_reversion_baja.sql` | Historial de bajas (solo inserción) y `revertir_baja()` con motivo; la fecha de baja ya no se edita directamente |
 | `migrations/…14…01_vinculo_trabajador.sql` | Solo `vincular_mi_cuenta()` liga una ficha a una cuenta; cambiar el correo desvincula la cuenta anterior |
 | `migrations/…13…01_kiosco_conformidad.sql` | Conformidad semanal en el kiosco con PIN: `_semanas_por_confirmar()` (definición única de semana pendiente), `kiosco_semana()`, `kiosco_conformidad()`; `kiosco_identificar()` devuelve las semanas pendientes |
@@ -39,6 +40,7 @@ empresas ─┬─ miembros (propietario | admin | supervisor | kiosco)
 - **Kiosco:** solo registra con número de empleado y PIN, verificados en la base. Hay bloqueo por intentos y los PINs no son legibles por la API.
 - **Pausa (art. 64):** si se puede salir o no lo impone el centro de trabajo, no quien checa.
 - **Prueba plena (art. 132 XXXIV):** cada firma guarda el hash del texto firmado, y cada conformidad queda anclada al estado de la cadena al momento de responder.
+- **Indicador del tablero (`tests/95_indicadores.sql`):** cuenta bien con más de 1000 entradas en la semana y respeta RLS.
 - **Bajas (`tests/90_bajas.sql`):** cada baja y reversión queda en el historial; deshacer exige motivo y rol de propietario o administrador; la fecha no se edita por la API.
 - **Vínculo ficha ↔ cuenta (`tests/80_vinculo.sql`):** el empleador no puede ligar la ficha de un trabajador a ninguna cuenta (ni a la suya); cambiar el correo desvincula la anterior.
 - **Conformidad en el kiosco (`tests/70_kiosco_conformidad.sql`):** solo con número y PIN, solo semanas pendientes, una respuesta por semana, el resumen debe ser de esa semana y de checadas de esa persona; queda como firmada con PIN en el kiosco.
