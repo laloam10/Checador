@@ -217,6 +217,9 @@ recordatorios de conformidad siguen saliendo por correo (1.8); quien solo usa Wh
 (prospectos, curiosos) se reenvían a un bot de Forja publicado en tu Cloudflare; ese bot responde por su cuenta. Los
 mensajes de trabajadores registrados **nunca** se reenvían: pueden ser una checada o una objeción.
 
+La configuración del asistente (datos, reglas y base de conocimiento) y los pasos detallados están en
+`forja/README.md`. En resumen:
+
 1. Publica el bot con `npx forjabot` y configúrale el **mismo** número: `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_ACCESS_TOKEN` y
    `WHATSAPP_APP_SECRET` iguales a los de Checador (Checador vuelve a firmar cada mensaje con ese secreto).
 2. **No registres el webhook de Forja en Meta.** Meta solo entrega a una URL por app y debe seguir siendo la de
