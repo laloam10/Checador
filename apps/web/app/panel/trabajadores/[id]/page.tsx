@@ -5,7 +5,7 @@ import { FormAccion } from "@/components/panel/FormAccion";
 import { CamposTrabajador } from "@/components/panel/CamposTrabajador";
 import { SeccionAcuerdo } from "@/components/panel/SeccionAcuerdo";
 import { esGestor, requierePanel } from "@/lib/panel";
-import { asignarPin, darDeBaja, guardarTrabajador, revertirBaja } from "../../acciones";
+import { asignarPin, darDeBaja, generarCodigoWhatsApp, guardarTrabajador, revertirBaja } from "../../acciones";
 
 export default async function FichaTrabajador({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -40,8 +40,8 @@ export default async function FichaTrabajador({ params }: { params: Promise<{ id
       </p>
       <p className="ayuda">
         App del celular: {t.user_id ? "vinculada" : t.email ? `pendiente (entrará con ${t.email})` : "sin correo"} ·
-        PIN: {tienePin ? "asignado" : "sin asignar"} ·
-        WhatsApp: {!t.telefono ? "sin celular" : t.telefono_verificado_en ? "activado" : tienePin ? "pendiente (debe escribir su PIN al número de Checador)" : "pendiente (falta asignar PIN)"}
+        PIN de kiosco: {tienePin ? "asignado" : "sin asignar"} ·
+        WhatsApp: {!t.telefono ? "sin celular" : t.telefono_verificado_en ? "activado" : "pendiente de activar"}
       </p>
 
       {t.fecha_baja && (
@@ -92,7 +92,7 @@ export default async function FichaTrabajador({ params }: { params: Promise<{ id
             <CamposTrabajador centros={centros ?? []} t={{ ...t, jornada_pactada_min: t.jornada_pactada_min as Record<string, number> | null }} />
           </FormAccion>
 
-          <h2>PIN para el kiosco y WhatsApp</h2>
+          <h2>PIN para el kiosco</h2>
           <FormAccion accion={asignarPin} boton={tienePin ? "Reemplazar PIN" : "Asignar PIN"} className="form-panel form-linea" limpiar>
             <input type="hidden" name="trabajador_id" value={t.id} />
             <label>
@@ -105,6 +105,22 @@ export default async function FichaTrabajador({ params }: { params: Promise<{ id
             <p className="mensaje mensaje-aviso">
               El kiosco solo tiene teclado numérico: con el número “{t.numero_empleado}” no podrá checar ahí. Usa solo dígitos.
             </p>
+          )}
+
+          {t.telefono && (
+            <>
+              <h2>WhatsApp</h2>
+              <p className="ayuda">
+                {t.telefono_verificado_en
+                  ? "Ya está activado: puede checar escribiendo al número de WhatsApp de Checador. Genera un código solo si necesita activarlo de nuevo."
+                  : "Genera un código y entrégalo en persona. La persona lo escribe al número de WhatsApp de Checador desde su celular y queda activado."}{" "}
+                El código sirve una sola vez, vence en 24 horas y se anula al quinto intento fallido. Para cortar el acceso, borra o
+                cambia el celular en los datos.
+              </p>
+              <FormAccion accion={generarCodigoWhatsApp} boton={t.telefono_verificado_en ? "Generar código nuevo" : "Generar código de activación"} className="form-panel form-linea">
+                <input type="hidden" name="trabajador_id" value={t.id} />
+              </FormAccion>
+            </>
           )}
 
           <h2>Baja</h2>

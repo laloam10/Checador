@@ -99,7 +99,7 @@ const PALABRAS: [RegExp, TipoChecada][] = [
 export type Intencion =
   | { clase: "checar"; tipo: TipoChecada }
   | { clase: "boton_vencido"; tipo: TipoChecada }
-  | { clase: "pin"; pin: string }
+  | { clase: "codigo"; codigo: string }
   | { clase: "otro" };
 
 /** Qué quiere hacer la persona. Solo frases completas: "no he salido" no es una salida. */
@@ -111,7 +111,9 @@ export function intencionDe(m: MensajeEntrante, ahoraS: number): Intencion {
     return Number(r[2]) >= ahoraS ? { clase: "checar", tipo } : { clase: "boton_vencido", tipo };
   }
   const crudo = (m.texto ?? "").trim();
-  if (/^[0-9]{4,6}$/.test(crudo)) return { clase: "pin", pin: crudo };
+  // Código de activación de un solo uso: seis dígitos, solos o después de "activar".
+  const codigo = /^(?:activar\s+)?([0-9]{3})[\s-]?([0-9]{3})$/i.exec(crudo);
+  if (codigo) return { clase: "codigo", codigo: `${codigo[1]}${codigo[2]}` };
   const t = sinAcentos(crudo);
   for (const [re, tipo] of PALABRAS) if (re.test(t)) return { clase: "checar", tipo };
   return { clase: "otro" };
@@ -158,12 +160,14 @@ export function confirmacion(tipo: TipoChecada, horaLocal: string, secuencia: nu
 export const TEXTOS = {
   noRegistrado:
     "Este número no está registrado en Checador. Si trabajas en una empresa que lo usa, pide que capturen tu celular en tu ficha.",
-  sinPin: "Tu empresa ya registró este número, pero aún no tienes PIN. Pídelo a tu empresa y vuelve a escribir.",
-  pedirPin:
-    "Hola. Para activar tu checada por WhatsApp escribe tu PIN de Checador (el mismo del kiosco). Solo se pide una vez. Después de enviarlo, borra ese mensaje del chat.",
-  pinIncorrecto: "PIN incorrecto. Revísalo e intenta de nuevo. Al quinto intento fallido se bloquea 15 minutos.",
-  bloqueado: (min: number) => `Demasiados intentos. Intenta de nuevo en ${min} min o pide a tu empresa un PIN nuevo.`,
-  vinculado: (nombre: string) => `Listo, ${nombre.split(" ")[0]}: tu WhatsApp quedó activado. Borra de este chat el mensaje con tu PIN.`,
+  sinCodigo:
+    "Tu empresa ya registró este número. Para activarlo, pide a tu empresa tu código de activación de WhatsApp (6 dígitos) y escríbelo aquí.",
+  pedirCodigo:
+    "Hola. Para activar tu checada por WhatsApp escribe el código de activación de 6 dígitos que te dio tu empresa. Solo se pide una vez.",
+  codigoIncorrecto: (restantes: number) =>
+    `Código incorrecto. Revísalo e intenta de nuevo (${restantes === 1 ? "queda 1 intento" : `quedan ${restantes} intentos`}).`,
+  codigoAnulado: "Demasiados intentos: el código se anuló. Pide a tu empresa que genere uno nuevo.",
+  vinculado: (nombre: string) => `Listo, ${nombre.split(" ")[0]}: tu WhatsApp quedó activado. El código ya no sirve; no necesitas guardarlo.`,
   tarde: "Tu mensaje llegó con retraso y no se registró. Envíalo de nuevo para registrar con la hora actual.",
   error: "No se pudo registrar. Intenta de nuevo en un momento; si sigue fallando, avisa a tu empresa.",
 } as const;

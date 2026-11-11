@@ -85,7 +85,7 @@ select 'ALTO', 'Función privilegiada ejecutable por authenticated sin estar en 
    and proname not in (
      'crear_empresa', 'vincular_mi_cuenta', 'verificar_cadena', 'asignar_pin', 'establecer_mi_pin',
      'kiosco_identificar', 'kiosco_checar', 'kiosco_firmar_acuerdo', 'kiosco_semana', 'kiosco_conformidad', 'revertir_baja', 'miembros_de_empresa',
-     'whatsapp_estado', 'whatsapp_vincular', 'whatsapp_checar',
+     'whatsapp_estado', 'whatsapp_vincular', 'whatsapp_checar', 'generar_codigo_whatsapp',
      'trabajadores_con_pin', 'mi_rol', 'es_gestor', 'puede_consultar', 'soy_trabajador', 'trabajo_en')
 union all
 -- 11. Solo vincular_mi_cuenta() liga una ficha de trabajador a una cuenta (si no, el empleador

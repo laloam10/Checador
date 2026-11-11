@@ -73,8 +73,10 @@ describe("intencionDe", () => {
       expect(intencionDe(msj({ texto: t }), AHORA)).toEqual({ clase: "otro" });
     }
   });
-  it("distingue el PIN", () => {
-    expect(intencionDe(msj({ texto: "7391" }), AHORA)).toEqual({ clase: "pin", pin: "7391" });
+  it("distingue el código de activación (6 dígitos)", () => {
+    expect(intencionDe(msj({ texto: "739104" }), AHORA)).toEqual({ clase: "codigo", codigo: "739104" });
+    expect(intencionDe(msj({ texto: "Activar 739 104" }), AHORA)).toEqual({ clase: "codigo", codigo: "739104" });
+    expect(intencionDe(msj({ texto: "7391" }), AHORA)).toEqual({ clase: "otro" });
     expect(intencionDe(msj({ texto: "1234567" }), AHORA)).toEqual({ clase: "otro" });
   });
   it("los botones vencen", () => {

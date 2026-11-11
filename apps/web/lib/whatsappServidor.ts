@@ -51,7 +51,7 @@ interface Estado {
   codigo?: string;
   registrado?: boolean;
   vinculado?: boolean;
-  tiene_pin?: boolean;
+  tiene_codigo?: boolean;
   nombre?: string;
   empresa?: string;
   zona_horaria?: string;
@@ -84,17 +84,17 @@ export async function atender(m: MensajeEntrante, cfg: ConfigWhatsApp, ahora = n
   const intencion = intencionDe(m, ahoraS);
 
   if (!estado.vinculado) {
-    if (!estado.tiene_pin) return { texto: TEXTOS.sinPin };
-    if (intencion.clase !== "pin") return { texto: TEXTOS.pedirPin };
-    const v = await rpc<{ nombre?: string; minutos?: number }>("whatsapp_vincular", { p_pin: intencion.pin });
+    if (!estado.tiene_codigo) return { texto: TEXTOS.sinCodigo };
+    if (intencion.clase !== "codigo") return { texto: TEXTOS.pedirCodigo };
+    const v = await rpc<{ nombre?: string; restantes?: number }>("whatsapp_vincular", { p_codigo: intencion.codigo });
     if (v.ok) {
       const e = await rpc<Estado>("whatsapp_estado", {});
       const { estado: est, enCurso } = reconstruir(e);
       return menu(v.nombre ?? "", est, enCurso, `${TEXTOS.vinculado(v.nombre ?? "")}\n\n`);
     }
-    if (v.codigo === "BLOQUEADO") return { texto: TEXTOS.bloqueado(v.minutos ?? 15) };
-    if (v.codigo === "SIN_PIN") return { texto: TEXTOS.sinPin };
-    return { texto: TEXTOS.pinIncorrecto };
+    if (v.codigo === "ANULADO") return { texto: TEXTOS.codigoAnulado };
+    if (v.codigo === "INCORRECTO") return { texto: TEXTOS.codigoIncorrecto(v.restantes ?? 1) };
+    return { texto: TEXTOS.sinCodigo };
   }
 
   const { estado: est, enCurso } = reconstruir(estado, ahora);

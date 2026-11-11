@@ -237,6 +237,17 @@ export async function asignarPin(_: Estado, fd: FormData): Promise<Estado> {
   return ok("PIN asignado. Entrégalo al trabajador en persona.");
 }
 
+export async function generarCodigoWhatsApp(_: Estado, fd: FormData): Promise<Estado> {
+  const ctx = await requierePanel();
+  const { data, error } = await ctx.supabase.rpc("generar_codigo_whatsapp", { p_trabajador: texto(fd, "trabajador_id") });
+  if (error) return fallo(traducir(error));
+  refrescar();
+  const codigo = String(data);
+  return ok(
+    `Código de activación: ${codigo.slice(0, 3)} ${codigo.slice(3)}. Entrégalo en persona: sirve una sola vez, vence en 24 horas y no se vuelve a mostrar.`,
+  );
+}
+
 export async function darDeBaja(_: Estado, fd: FormData): Promise<Estado> {
   const ctx = await requierePanel();
   const fecha = texto(fd, "fecha_baja");

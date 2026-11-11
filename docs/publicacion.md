@@ -199,8 +199,12 @@ verifica la firma y registra con reglas fijas (sin IA). Si falta cualquier varia
    `WHATSAPP_PHONE_ID`. Ninguna lleva prefijo `NEXT_PUBLIC_`. Vuelve a desplegar.
 4. **Webhook en Meta** (WhatsApp → Configuración): URL `https://<dominio>/api/whatsapp/webhook`, el mismo token de
    verificación, y suscribe el campo **messages**.
-5. **Prueba**: captura tu celular en la ficha de un trabajador de prueba con PIN, escribe al número y sigue el flujo
-   (PIN → Entrada). Hazlo en el proyecto de pruebas, nunca con datos de prueba en producción (la bitácora es inmutable).
+5. **Prueba**: captura tu celular en la ficha de un trabajador de prueba, pulsa **Generar código de activación**, escribe
+   ese código al número y sigue el flujo (código → Entrada). Hazlo en el proyecto de pruebas, nunca con datos de prueba
+   en producción (la bitácora es inmutable).
+
+La activación no usa el PIN del kiosco: un PIN es reutilizable y quedaría escrito en el chat. El código sirve una vez,
+vence en 24 horas, se anula al quinto intento fallido y está atado al celular capturado.
 
 Por qué un secreto de servicio: el webhook no tiene sesión de usuario y la app nunca usa la llave `service_role`. Las
 funciones `whatsapp_*()` son las únicas ejecutables sin sesión y no hacen ni revelan nada sin ese secreto;

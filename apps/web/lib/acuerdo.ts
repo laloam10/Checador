@@ -76,7 +76,7 @@ export function generarTextoAcuerdo(d: DatosAcuerdo): string {
   }
   if (t.telefono) {
     metodos.push(
-      `${"abc"[metodos.length]}) Mensajes de WhatsApp enviados desde su teléfono celular con número ${t.telefono} al número de WhatsApp del sistema, previa activación con su PIN personal, confidencial e intransferible.`,
+      `${"abc"[metodos.length]}) Mensajes de WhatsApp enviados desde su teléfono celular con número ${t.telefono} al número de WhatsApp del sistema, previa activación con un código de un solo uso que le entrega la persona empleadora.`,
     );
   }
   if (!metodos.length) metodos.push("a) Captura en el sistema por parte de la persona empleadora, con el motivo de cada registro.");

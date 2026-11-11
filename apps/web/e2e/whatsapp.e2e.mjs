@@ -66,7 +66,7 @@ async function enviar(de, contenido, { id = `wamid.${randomUUID()}`, ts = ahoraS
 }
 
 try {
-  // --- Datos: una empresa con una trabajadora con celular y PIN ---
+  // --- Datos: una empresa con una trabajadora con celular ---
   const s = Date.now().toString(36);
   const cel = "55" + String(Date.now()).slice(-8);
   const deWhatsApp = `521${cel}`; // así lo entrega WhatsApp en México
@@ -80,7 +80,8 @@ try {
          t as (insert into public.trabajadores (empresa_id, centro_trabajo_id, nombre, numero_empleado, fecha_ingreso, telefono)
                select empresa_id, id, 'Wendy Prueba', '77', '2026-01-01', '${cel}' from c returning id)
     select id from t;`).split("\n").pop();
-  sql(`select set_config('request.jwt.claim.sub', '${dueno}', false); set role authenticated; select public.asignar_pin('${trabajador}', '7391');`);
+  const generarCodigo = () =>
+    sql(`select set_config('request.jwt.claim.sub', '${dueno}', false); set role authenticated; select public.generar_codigo_whatsapp('${trabajador}');`).split("\n").pop();
   const eventos = () => sql(`select coalesce(string_agg(tipo || ':' || origen, ',' order by id), '') from public.eventos where trabajador_id = '${trabajador}'`);
 
   // --- Verificación del webhook y firma ---
@@ -97,14 +98,19 @@ try {
   r = await enviar("5215500000001", { texto: "hola" });
   afirmar(r.texto.includes("no está registrado") && r.para === "5215500000001", "a un número desconocido se le explica que no está registrado");
 
-  // --- Vinculación con PIN ---
+  // --- Activación con código de un solo uso ---
   r = await enviar(deWhatsApp, { texto: "entrada" });
-  afirmar(r.texto.includes("escribe tu PIN") && eventos() === "", "sin activar no se checa: se pide el PIN");
+  afirmar(r.texto.includes("pide a tu empresa tu código") && eventos() === "", "sin activar no se checa: falta que la empresa genere el código");
   afirmar(enviados.at(-1).autorizacion === "Bearer token-e2e" && enviados.at(-1).ruta === `/${ID_NUMERO}/messages`, "la respuesta va a la API de WhatsApp con el token");
-  r = await enviar(deWhatsApp, { texto: "1111" });
-  afirmar(r.texto.startsWith("PIN incorrecto"), "un PIN incorrecto no activa");
-  r = await enviar(deWhatsApp, { texto: "7391" });
-  afirmar(r.texto.includes("Listo, Wendy") && r.botones.length === 1 && r.botones[0].title === "Entrada", "el PIN correcto activa y ofrece la entrada");
+  const codigo = generarCodigo();
+  afirmar(/^\d{6}$/.test(codigo), "el empleador genera un código de 6 dígitos");
+  r = await enviar(deWhatsApp, { texto: "entrada" });
+  afirmar(r.texto.includes("escribe el código de activación") && eventos() === "", "con código pendiente, se pide escribirlo");
+  r = await enviar(deWhatsApp, { texto: codigo === "000000" ? "000001" : "000000" });
+  afirmar(r.texto.startsWith("Código incorrecto") && r.texto.includes("quedan 4 intentos"), "un código incorrecto no activa y avisa los intentos");
+  r = await enviar(deWhatsApp, { texto: `${codigo.slice(0, 3)} ${codigo.slice(3)}` });
+  afirmar(r.texto.includes("Listo, Wendy") && r.botones.length === 1 && r.botones[0].title === "Entrada", "el código correcto activa y ofrece la entrada");
+  afirmar(sql(`select count(*) from public.codigos_whatsapp where trabajador_id = '${trabajador}'`) === "0", "el código se consume: no queda guardado");
 
   // --- Checada con botón, reintento de Meta y texto ---
   const idMensaje = `wamid.${randomUUID()}`;

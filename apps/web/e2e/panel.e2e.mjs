@@ -73,8 +73,13 @@ try {
   await dueno.getByLabel("Nombre completo").fill("Carla Ruiz");
   await dueno.getByLabel("Número de empleado").fill(NUMERO);
   await dueno.getByLabel("Fecha de ingreso").fill("2026-01-10");
+  await dueno.getByLabel("Celular para WhatsApp (opcional)").fill(`55 ${String(Date.now()).slice(-8)}`);
   await dueno.getByRole("button", { name: "Dar de alta" }).click();
   await dueno.getByRole("heading", { name: "Carla Ruiz" }).waitFor();
+  await dueno.getByText("WhatsApp: pendiente de activar").waitFor();
+  await dueno.getByRole("button", { name: "Generar código de activación" }).click();
+  await mensaje(dueno, /Código de activación: \d{3} \d{3}\. Entrégalo en persona/);
+  paso("celular capturado; el código de activación de WhatsApp se muestra una sola vez");
   await dueno.getByLabel("Nuevo PIN (4 a 6 dígitos)").fill("0000");
   await dueno.getByRole("button", { name: "Asignar PIN" }).click();
   await mensaje(dueno, "no ser obvio");

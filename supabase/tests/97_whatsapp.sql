@@ -37,7 +37,10 @@ select tests.debe_fallar(format(
   $$insert into public.trabajadores (empresa_id, centro_trabajo_id, nombre, numero_empleado, fecha_ingreso, telefono)
     values (%L, %L, 'Repetido', '0971', '2026-01-01', '5512345678')$$, :'empresa_a', :'centro_a'),
   'dos personas activas con el mismo teléfono');
-select public.asignar_pin(:'w', '7391');
+select tests.debe_fallar($$select count(*) from public.codigos_whatsapp$$, 'leer los códigos de activación por la API');
+select set_config('request.jwt.claim.sub', :'u_otro', false) \gset
+select tests.debe_fallar(format($$select public.generar_codigo_whatsapp(%L)$$, :'w'), 'otra empresa genera el código');
+select set_config('request.jwt.claim.sub', :'u_prop', false) \gset
 
 \echo '--- Sin el secreto no hay nada'
 set role anon;
@@ -52,14 +55,21 @@ select tests.afirmar(public.whatsapp_estado(null, '5215512345678') ->> 'codigo' 
 select tests.afirmar(public.whatsapp_estado(:'secreto', '5219999999999') = '{"ok": true, "registrado": false}'::jsonb,
   'número desconocido');
 select tests.afirmar(
-  public.whatsapp_estado(:'secreto', '5215512345678') = '{"ok": true, "registrado": true, "vinculado": false, "tiene_pin": true}'::jsonb,
+  public.whatsapp_estado(:'secreto', '5215512345678') = '{"ok": true, "registrado": true, "vinculado": false, "tiene_codigo": false}'::jsonb,
   'sin vincular no se revela nombre ni empresa');
+select tests.afirmar(public.whatsapp_vincular(:'secreto', '5215512345678', '123456') ->> 'codigo' = 'SIN_CODIGO', 'sin código generado no se activa');
+set role authenticated;
+select public.generar_codigo_whatsapp(:'w') as codigo \gset
+select tests.afirmar(:'codigo' ~ '^[0-9]{6}$', 'el código es de 6 dígitos');
+set role anon;
+select tests.afirmar((public.whatsapp_estado(:'secreto', '5215512345678') ->> 'tiene_codigo')::boolean, 'el estado indica que hay un código vigente');
 select tests.afirmar(
   public.whatsapp_checar(:'secreto', '5215512345678', 'entrada', '00000000-0000-4000-8000-000000000970') ->> 'codigo' = 'NO_VINCULADO',
   'no se checa sin vincular');
-select tests.afirmar(public.whatsapp_vincular(:'secreto', '5215512345678', '0000') ->> 'codigo' = 'PIN', 'PIN incorrecto');
-select tests.afirmar(public.whatsapp_vincular(:'secreto', '5219999999999', '7391') ->> 'codigo' = 'NO_REGISTRADO', 'vincular un número desconocido');
-select tests.afirmar((public.whatsapp_vincular(:'secreto', '5215512345678', '7391') ->> 'ok')::boolean, 'PIN correcto vincula');
+select tests.afirmar(public.whatsapp_vincular(:'secreto', '5215512345678', 'xxxxxx') ->> 'codigo' = 'INCORRECTO', 'código incorrecto');
+select tests.afirmar(public.whatsapp_vincular(:'secreto', '5219999999999', :'codigo') ->> 'codigo' = 'NO_REGISTRADO', 'vincular un número desconocido');
+select tests.afirmar((public.whatsapp_vincular(:'secreto', '5215512345678', :'codigo') ->> 'ok')::boolean, 'el código correcto activa');
+select tests.afirmar(public.whatsapp_vincular(:'secreto', '5215512345678', :'codigo') ->> 'codigo' = 'SIN_CODIGO', 'el código sirve una sola vez');
 select tests.afirmar(
   (select e ->> 'nombre' = 'Wendy WhatsApp' and e ->> 'empresa' = 'Empresa A SA de CV' and (e ->> 'vinculado')::boolean
           and e -> 'eventos' = '[]'::jsonb
@@ -96,26 +106,39 @@ select tests.afirmar(
     where e.trabajador_id = :'w' and e.tipo = 'inicio_pausa'),
   'la pausa toma la regla del centro (art. 64)');
 
-\echo '--- Bloqueo por intentos y cambio de teléfono'
+\echo '--- Cambio de teléfono, intentos y vencimiento'
 set role authenticated;
 select set_config('request.jwt.claim.sub', :'u_prop', false) \gset
+select public.generar_codigo_whatsapp(:'w') as viejo \gset
 update public.trabajadores set telefono = '5587654321' where id = :'w';
 select tests.afirmar((select telefono_verificado_en is null from public.trabajadores where id = :'w'),
   'cambiar el teléfono quita la verificación');
 set role anon;
 select tests.afirmar(public.whatsapp_estado(:'secreto', '5215512345678') = '{"ok": true, "registrado": false}'::jsonb,
   'el teléfono anterior deja de estar registrado');
-select public.whatsapp_vincular(:'secreto', '525587654321', '1111') from generate_series(1, 5) \g /dev/null
-select tests.afirmar(public.whatsapp_vincular(:'secreto', '525587654321', '7391') ->> 'codigo' = 'BLOQUEADO',
-  'cinco PIN incorrectos bloquean, aunque el sexto sea correcto');
+select tests.afirmar(public.whatsapp_vincular(:'secreto', '525587654321', :'viejo') ->> 'codigo' = 'SIN_CODIGO',
+  'un código generado para el celular anterior no activa el nuevo');
+set role authenticated;
+select public.generar_codigo_whatsapp(:'w') as codigo \gset
+set role anon;
+select public.whatsapp_vincular(:'secreto', '525587654321', 'xxxxxx') from generate_series(1, 5) \g /dev/null
+select tests.afirmar(public.whatsapp_vincular(:'secreto', '525587654321', :'codigo') ->> 'codigo' = 'SIN_CODIGO',
+  'cinco intentos fallidos anulan el código, aunque el sexto sea correcto');
+set role authenticated;
+select public.generar_codigo_whatsapp(:'w') as codigo \gset
+reset role;
+update public.codigos_whatsapp set expira_en = now() - interval '1 minute' where trabajador_id = :'w';
+set role anon;
+select tests.afirmar(public.whatsapp_vincular(:'secreto', '525587654321', :'codigo') ->> 'codigo' = 'SIN_CODIGO', 'un código vencido no activa');
 
 \echo '--- La baja corta el acceso'
-reset role;
-update public.pines_trabajador set intentos_fallidos = 0, bloqueado_hasta = null where trabajador_id = :'w';
+set role authenticated;
+select public.generar_codigo_whatsapp(:'w') as codigo \gset
 set role anon;
-select tests.afirmar((public.whatsapp_vincular(:'secreto', '525587654321', '7391') ->> 'ok')::boolean, 'se vincula de nuevo');
+select tests.afirmar((public.whatsapp_vincular(:'secreto', '525587654321', :'codigo') ->> 'ok')::boolean, 'se activa de nuevo');
 set role authenticated;
 update public.trabajadores set fecha_baja = current_date where id = :'w';
+select tests.debe_fallar(format($$select public.generar_codigo_whatsapp(%L)$$, :'w'), 'generar código para una persona dada de baja');
 set role anon;
 select tests.afirmar(
   public.whatsapp_checar(:'secreto', '525587654321', 'salida', '00000000-0000-4000-8000-000000000974') ->> 'codigo' = 'NO_VINCULADO',

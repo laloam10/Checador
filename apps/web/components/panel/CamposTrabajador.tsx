@@ -38,7 +38,7 @@ export function CamposTrabajador({ t, centros }: { t?: DatosTrabajador; centros:
           <input name="telefono" type="tel" inputMode="tel" autoComplete="off" placeholder="10 dígitos"
             defaultValue={t?.telefono ? t.telefono.replace(/^52(?=\d{10}$)/, "") : ""} />
           <span className="ayuda">
-            Para checar por WhatsApp. La persona lo activa una vez con su PIN; si cambias o borras el número, deja de poder
+            Para checar por WhatsApp. La persona lo activa una vez con un código que generas en esta ficha; si cambias o borras el número, deja de poder
             checar desde el anterior.
           </span>
         </label>
