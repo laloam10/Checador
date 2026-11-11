@@ -22,6 +22,8 @@ export interface MensajeEntrante {
   enviadoEn: number; // segundos Unix
   texto: string | null;
   boton: string | null; // id del botón tocado
+  /** El mensaje tal como lo entregó Meta, para poder reenviarlo íntegro al asistente. */
+  origen: { metadatos: unknown; contactos: unknown[]; crudo: Record<string, unknown> };
 }
 
 /** Verifica X-Hub-Signature-256: HMAC-SHA256 del cuerpo crudo con el secreto de la app de Meta. */
@@ -40,7 +42,7 @@ export function mensajesDe(payload: unknown, idNumero: string): MensajeEntrante[
   for (const entrada of p.entry ?? []) {
     for (const cambio of entrada.changes ?? []) {
       const v = cambio.value as
-        | { metadata?: { phone_number_id?: string }; messages?: Record<string, unknown>[] }
+        | { metadata?: { phone_number_id?: string }; contacts?: { wa_id?: string }[]; messages?: Record<string, unknown>[] }
         | undefined;
       if (cambio.field !== "messages" || v?.metadata?.phone_number_id !== idNumero) continue;
       for (const m of v.messages ?? []) {
@@ -57,11 +59,33 @@ export function mensajesDe(payload: unknown, idNumero: string): MensajeEntrante[
           enviadoEn: ts,
           texto: typeof texto === "string" ? texto.slice(0, 500) : null,
           boton: typeof boton === "string" ? boton.slice(0, 100) : null,
+          origen: { metadatos: v.metadata, contactos: (v.contacts ?? []).filter((c) => c?.wa_id === de), crudo: m },
         });
       }
     }
   }
   return salida;
+}
+
+export const firmar = (cuerpo: string, secretoApp: string) =>
+  "sha256=" + createHmac("sha256", secretoApp).update(cuerpo, "utf8").digest("hex");
+
+/**
+ * Cuerpo que se reenvía al asistente (Forja): el mismo formato de Meta, pero SOLO con este mensaje.
+ * Un envío de Meta puede traer mensajes de varias personas; reenviarlo entero entregaría al asistente
+ * mensajes de trabajadores (checadas, objeciones). Por eso se arma de nuevo y se firma otra vez.
+ */
+export function cuerpoParaAsistente(m: MensajeEntrante): string {
+  return JSON.stringify({
+    object: "whatsapp_business_account",
+    entry: [{
+      id: "checador",
+      changes: [{
+        field: "messages",
+        value: { messaging_product: "whatsapp", metadata: m.origen.metadatos, contacts: m.origen.contactos, messages: [m.origen.crudo] },
+      }],
+    }],
+  });
 }
 
 /** Identificador estable por mensaje (forma de UUID): si Meta reintenta la entrega, no se duplica la checada. */
@@ -139,6 +163,10 @@ export interface Respuesta {
   botones?: TipoChecada[];
   /** Otros botones (revisar semana, conformidad). Entre todos, máximo 3. */
   extra?: Boton[];
+  /** El mensaje se reenvía al asistente; `texto` solo se envía si el reenvío falla. */
+  reenviar?: boolean;
+  /** No se responde nada (límite de mensajes alcanzado). */
+  silencio?: boolean;
   /** Texto largo que se envía antes, como mensaje aparte (el cuerpo con botones admite 1024 caracteres). */
   previo?: string;
 }
@@ -187,6 +215,7 @@ export const TEXTOS = {
     `Código incorrecto. Revísalo e intenta de nuevo (${restantes === 1 ? "queda 1 intento" : `quedan ${restantes} intentos`}).`,
   codigoAnulado: "Demasiados intentos: el código se anuló. Pide a tu empresa que genere uno nuevo.",
   vinculado: (nombre: string) => `Listo, ${nombre.split(" ")[0]}: tu WhatsApp quedó activado. El código ya no sirve; no necesitas guardarlo.`,
+  limite: "Recibimos muchos mensajes tuyos en poco tiempo. Podremos atenderte de nuevo en una hora.",
   tarde: "Tu mensaje llegó con retraso y no se registró. Envíalo de nuevo para registrar con la hora actual.",
   error: "No se pudo registrar. Intenta de nuevo en un momento; si sigue fallando, avisa a tu empresa.",
 } as const;

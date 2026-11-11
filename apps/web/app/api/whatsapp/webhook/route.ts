@@ -1,7 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
-import { firmaValida, mensajesDe, TEXTOS } from "@/lib/whatsapp";
-import { atender, configWhatsApp, responder } from "@/lib/whatsappServidor";
+import { firmaValida, mensajesDe, TEXTOS, type Respuesta } from "@/lib/whatsapp";
+import { atender, configWhatsApp, reenviarAlAsistente, responder } from "@/lib/whatsappServidor";
 
 /**
  * Webhook de WhatsApp (Cloud API de Meta). Un solo número atiende a todas las empresas.
@@ -43,10 +43,16 @@ export async function POST(request: NextRequest) {
   // La checada es idempotente por id de mensaje, así que un reintento no duplica.
   for (const m of mensajesDe(payload, cfg.idNumero)) {
     try {
-      const respuesta = await atender(m, cfg).catch((e) => {
+      const respuesta: Respuesta = await atender(m, cfg).catch((e) => {
         console.error("whatsapp atender", e);
         return { texto: TEXTOS.error };
       });
+      if (respuesta.silencio) continue;
+      if (respuesta.reenviar) {
+        // Si el asistente no está disponible, la persona recibe al menos la respuesta fija.
+        const entregado = await reenviarAlAsistente(m, cfg).then(() => true, (e) => (console.error("whatsapp asistente", e), false));
+        if (entregado) continue;
+      }
       await responder(m.telefono, respuesta, cfg);
     } catch (e) {
       console.error("whatsapp responder", e);

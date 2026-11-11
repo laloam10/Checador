@@ -7,6 +7,8 @@ import {
   idBoton,
   idClienteDe,
   intencionDe,
+  cuerpoParaAsistente,
+  firmar,
   conAviso,
   huellaResumen,
   rangoSemana,
@@ -21,7 +23,8 @@ import {
 
 const AHORA = 1_800_000_000;
 const msj = (p: Partial<MensajeEntrante>): MensajeEntrante => ({
-  id: "wamid.X", telefono: "5215512345678", enviadoEn: AHORA, texto: null, boton: null, ...p,
+  id: "wamid.X", telefono: "5215512345678", enviadoEn: AHORA, texto: null, boton: null,
+  origen: { metadatos: { phone_number_id: "111" }, contactos: [], crudo: {} }, ...p,
 });
 
 describe("firma de Meta", () => {
@@ -51,6 +54,7 @@ describe("mensajesDe", () => {
       ]),
       "111",
     );
+    expect(r[0]!.origen.crudo).toMatchObject({ id: "a", type: "text" });
     expect(r.map((m) => [m.id, m.texto, m.boton])).toEqual([
       ["a", "Entrada", null],
       ["b", null, "chk:salida:1800000600"],
@@ -167,5 +171,29 @@ describe("conformidad semanal", () => {
     expect(r.extra).toEqual([{ id: `sem:2026-11-02:${AHORA + VIGENCIA_REVISION_S}`, titulo: "Revisar semana" }]);
     expect(conAviso({ texto: "Hola" }, [], AHORA)).toEqual({ texto: "Hola" });
     expect(conAviso({ texto: "Hola", botones: ["entrada"], extra: [{ id: "a", titulo: "A" }, { id: "b", titulo: "B" }] }, pendientes, AHORA).extra).toHaveLength(2);
+  });
+});
+
+describe("reenvío al asistente", () => {
+  it("reenvía solo el mensaje de esa persona, con su contacto, y la firma es válida", () => {
+    const payload = {
+      object: "whatsapp_business_account",
+      entry: [{ changes: [{ field: "messages", value: {
+        metadata: { phone_number_id: "111", display_phone_number: "5215500000000" },
+        contacts: [{ wa_id: "5215500000001", profile: { name: "Prospecto" } }, { wa_id: "5215512345678", profile: { name: "Trabajadora" } }],
+        messages: [
+          { id: "a", from: "5215500000001", timestamp: "1800000000", type: "text", text: { body: "¿Qué es Checador?" } },
+          { id: "b", from: "5215512345678", timestamp: "1800000000", type: "text", text: { body: "Ese día salí a las 19:00" } },
+        ],
+      } }] }],
+    };
+    const [prospecto] = mensajesDe(payload, "111");
+    const cuerpo = cuerpoParaAsistente(prospecto!);
+    const v = JSON.parse(cuerpo).entry[0].changes[0].value;
+    expect(v.messages).toEqual([payload.entry[0]!.changes[0]!.value.messages[0]]);
+    expect(v.contacts).toEqual([{ wa_id: "5215500000001", profile: { name: "Prospecto" } }]);
+    expect(v.metadata.phone_number_id).toBe("111");
+    expect(cuerpo).not.toContain("19:00");
+    expect(firmaValida(cuerpo, firmar(cuerpo, "secreto"), "secreto")).toBe(true);
   });
 });

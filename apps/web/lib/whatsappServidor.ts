@@ -19,6 +19,8 @@ import {
   idClienteDe,
   intencionDe,
   menu,
+  cuerpoParaAsistente,
+  firmar,
   type MensajeEntrante,
   type Respuesta,
 } from "./whatsapp";
@@ -30,6 +32,8 @@ export interface ConfigWhatsApp {
   idNumero: string;
   secretoServicio: string;
   urlGraph: string;
+  /** Webhook del asistente (Forja) para mensajes de números no registrados; null = respuesta fija. */
+  urlAsistente: string | null;
 }
 
 /** Configuración del canal; null si falta algo (el canal queda apagado y el webhook responde 503). */
@@ -40,7 +44,8 @@ export function configWhatsApp(): ConfigWhatsApp | null {
   ];
   if (!tokenVerificacion || !secretoApp || !token || !idNumero || !secretoServicio) return null;
   const urlGraph = (e.WHATSAPP_GRAPH_URL ?? "https://graph.facebook.com/v24.0").replace(/\/$/, "");
-  return { tokenVerificacion, secretoApp, token, idNumero, secretoServicio, urlGraph };
+  const urlAsistente = /^https:\/\/|^http:\/\/(127\.0\.0\.1|localhost)[:/]/.test(e.FORJA_WEBHOOK_URL ?? "") ? e.FORJA_WEBHOOK_URL! : null;
+  return { tokenVerificacion, secretoApp, token, idNumero, secretoServicio, urlGraph, urlAsistente };
 }
 
 /**
@@ -86,8 +91,14 @@ export async function atender(m: MensajeEntrante, cfg: ConfigWhatsApp, ahora = n
   };
 
   const estado = await rpc<Estado>("whatsapp_estado", {});
-  // Fase 2: los mensajes de números no registrados se reenviarán al asistente (Forja).
-  if (!estado.registrado) return { texto: TEXTOS.noRegistrado };
+  // Quien no es trabajador registrado (prospectos, curiosos) va al asistente, con límite por hora.
+  // Los mensajes de trabajadores NUNCA se reenvían: pueden ser una checada o una objeción.
+  if (!estado.registrado) {
+    if (!cfg.urlAsistente) return { texto: TEXTOS.noRegistrado };
+    const p = await rpc<{ permitido?: boolean; aviso?: boolean }>("whatsapp_permitir_reenvio", {});
+    if (p.permitido) return { texto: TEXTOS.noRegistrado, reenviar: true };
+    return p.aviso ? { texto: TEXTOS.limite } : { texto: "", silencio: true };
+  }
 
   const intencion = intencionDe(m, ahoraS);
 
@@ -234,4 +245,20 @@ export async function responder(telefono: string, r: Respuesta, cfg: ConfigWhats
         }
       : { type: "text", text: { body: r.texto } },
   );
+}
+
+/**
+ * Reenvía un mensaje al asistente con el formato y la firma de Meta (el asistente la verifica con el
+ * mismo secreto de la app). El asistente responde a la persona por su cuenta, con la API de WhatsApp.
+ */
+export async function reenviarAlAsistente(m: MensajeEntrante, cfg: ConfigWhatsApp): Promise<void> {
+  if (!cfg.urlAsistente) throw new Error("Asistente no configurado.");
+  const cuerpo = cuerpoParaAsistente(m);
+  const res = await fetch(cfg.urlAsistente, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Hub-Signature-256": firmar(cuerpo, cfg.secretoApp) },
+    body: cuerpo,
+    signal: AbortSignal.timeout(8000),
+  });
+  if (!res.ok) throw new Error(`El asistente respondió ${res.status}`);
 }

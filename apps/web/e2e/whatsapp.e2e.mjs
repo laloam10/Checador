@@ -5,6 +5,7 @@
 //   WHATSAPP_VERIFY_TOKEN=verificacion-e2e WHATSAPP_APP_SECRET=secreto-app-e2e WHATSAPP_TOKEN=token-e2e
 //   WHATSAPP_PHONE_ID=100200300 WHATSAPP_GRAPH_URL=http://127.0.0.1:54399
 //   WHATSAPP_SECRETO_SERVICIO=secreto-de-servicio-e2e-0123456789abcdef
+//   FORJA_WEBHOOK_URL=http://127.0.0.1:54398/webhooks/whatsapp
 // Uso: node apps/web/e2e/whatsapp.e2e.mjs
 import { execFileSync } from "node:child_process";
 import { createServer } from "node:http";
@@ -34,6 +35,22 @@ const servidor = createServer((req, res) => {
   });
 });
 await new Promise((r) => servidor.listen(54399, "127.0.0.1", r));
+
+// --- Asistente (Forja) simulado: verifica la firma como el real ---
+const alAsistente = [];
+let asistenteCaido = false;
+const asistente = createServer((req, res) => {
+  let cuerpo = "";
+  req.on("data", (c) => (cuerpo += c));
+  req.on("end", () => {
+    const firma = "sha256=" + createHmac("sha256", SECRETO_APP).update(cuerpo).digest("hex");
+    if (asistenteCaido) return res.writeHead(500).end("caído");
+    if (req.url !== "/webhooks/whatsapp" || req.headers["x-hub-signature-256"] !== firma) return res.writeHead(403).end("bad signature");
+    alAsistente.push(JSON.parse(cuerpo).entry[0].changes[0].value);
+    res.writeHead(200).end("EVENT_RECEIVED");
+  });
+});
+await new Promise((r) => asistente.listen(54398, "127.0.0.1", r));
 
 const ahoraS = () => Math.floor(Date.now() / 1000);
 /** Envía un mensaje al webhook y devuelve la respuesta que el bot mandó a WhatsApp. */
@@ -94,9 +111,26 @@ try {
   r = await enviar(deWhatsApp, { texto: "entrada" }, { idNumero: "999" });
   afirmar(r.http === 200 && r.respuestas === 0, "se ignoran mensajes dirigidos a otro número");
 
-  // --- Número desconocido ---
-  r = await enviar("5215500000001", { texto: "hola" });
-  afirmar(r.texto.includes("no está registrado") && r.para === "5215500000001", "a un número desconocido se le explica que no está registrado");
+  // --- Número desconocido: va al asistente ---
+  const extrano = "52155" + String(Date.now()).slice(-8);
+  r = await enviar(extrano, { texto: "¿Qué es Checador?" });
+  afirmar(r.http === 200 && r.respuestas === 0 && alAsistente.length === 1, "el mensaje de un número desconocido se reenvía al asistente y Checador no responde");
+  afirmar(
+    alAsistente[0].messages.length === 1 && alAsistente[0].messages[0].from === extrano && alAsistente[0].messages[0].text.body === "¿Qué es Checador?"
+      && alAsistente[0].metadata.phone_number_id === ID_NUMERO,
+    "el asistente recibe el mensaje íntegro, en el formato de Meta y con firma válida",
+  );
+  asistenteCaido = true;
+  r = await enviar(extrano, { texto: "hola" });
+  afirmar(r.texto.includes("no está registrado") && r.para === extrano, "si el asistente no responde, la persona recibe la respuesta fija");
+  asistenteCaido = false;
+  for (let i = 0; i < 18; i++) await enviar(extrano, { texto: `mensaje ${i}` });
+  afirmar(alAsistente.length === 19, "hasta 20 mensajes por hora se reenvían");
+  r = await enviar(extrano, { texto: "otro más" });
+  afirmar(r.texto.includes("muchos mensajes") && alAsistente.length === 19, "el mensaje 21 ya no se reenvía y se avisa una vez");
+  r = await enviar(extrano, { texto: "y otro" });
+  afirmar(r.respuestas === 0 && alAsistente.length === 19, "después se guarda silencio: ni reenvío ni respuesta");
+  const reenviados = alAsistente.length;
 
   // --- Activación con código de un solo uso ---
   r = await enviar(deWhatsApp, { texto: "entrada" });
@@ -195,12 +229,16 @@ try {
   afirmar(r.texto.startsWith("No tienes semanas por revisar."), "no quedan semanas por revisar");
 
   // --- El empleador cambia el celular: el anterior deja de servir ---
+  afirmar(alAsistente.length === reenviados && !JSON.stringify(alAsistente).includes(cel), "ningún mensaje de la trabajadora (checadas, código, objeción) llegó al asistente");
+
   const antes = eventos();
   sql(`select set_config('request.jwt.claim.sub', '${dueno}', false); set role authenticated; update public.trabajadores set telefono = null where id = '${trabajador}';`);
   r = await enviar(deWhatsApp, { texto: "entrada" });
-  afirmar(r.texto.includes("no está registrado") && eventos() === antes, "al quitar el celular de la ficha ya no se puede checar");
+  afirmar(r.respuestas === 0 && eventos() === antes && alAsistente.length === reenviados + 1,
+    "al quitar el celular de la ficha ya no se puede checar: ese número se trata como desconocido");
 
   console.log("\nWhatsApp: todo correcto.");
 } finally {
   servidor.close();
+  asistente.close();
 }

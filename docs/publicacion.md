@@ -213,6 +213,29 @@ el siguiente mensaje). El bot **no puede escribir primero**: WhatsApp solo permi
 siguientes al último mensaje de la persona, salvo con plantillas aprobadas y de pago, que no se usan. Por eso los
 recordatorios de conformidad siguen saliendo por correo (1.8); quien solo usa WhatsApp y no checa, no recibe aviso.
 
+**Asistente para quien no es trabajador (Forja, opcional).** Los mensajes de números que no están en ninguna ficha
+(prospectos, curiosos) se reenvían a un bot de Forja publicado en tu Cloudflare; ese bot responde por su cuenta. Los
+mensajes de trabajadores registrados **nunca** se reenvían: pueden ser una checada o una objeción.
+
+1. Publica el bot con `npx forjabot` y configúrale el **mismo** número: `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_ACCESS_TOKEN` y
+   `WHATSAPP_APP_SECRET` iguales a los de Checador (Checador vuelve a firmar cada mensaje con ese secreto).
+2. **No registres el webhook de Forja en Meta.** Meta solo entrega a una URL por app y debe seguir siendo la de
+   Checador; si la cambias, se dejan de registrar las checadas.
+3. En Vercel agrega `FORJA_WEBHOOK_URL=https://<tu-bot>.workers.dev/webhooks/whatsapp` y vuelve a desplegar. Sin esa
+   variable, los números desconocidos reciben una respuesta fija.
+4. Instrucciones mínimas para el bot (en el panel de Forja). Ajusta el texto, pero conserva las prohibiciones:
+   - Eres el asistente de Checador, un sistema de registro electrónico de jornada para empresas en México.
+   - Explica qué hace el producto y cómo pedir una demostración. No inventes precios ni funciones.
+   - **No digas que Checador garantiza o certifica el cumplimiento de la ley**, ni des asesoría legal: sugiere
+     consultar a un abogado laboralista.
+   - No puedes registrar entradas ni salidas, ni consultar registros de nadie. Si alguien quiere checar y recibe
+     esta respuesta, su empresa aún no capturó su celular: que lo pida a su empresa.
+   - No pidas ni aceptes PIN, códigos de activación ni contraseñas.
+
+Límites: 20 mensajes por hora por número y 300 por hora en total; al pasar el límite se avisa una vez y luego no se
+responde. Si Forja no contesta en 8 segundos, la persona recibe la respuesta fija. De quien no es usuario solo se guarda
+la huella del teléfono, un día. Además, fija un presupuesto mensual de IA en el panel de Forja.
+
 Por qué un secreto de servicio: el webhook no tiene sesión de usuario y la app nunca usa la llave `service_role`. Las
 funciones `whatsapp_*()` son las únicas ejecutables sin sesión y no hacen ni revelan nada sin ese secreto;
 `verificar-seguridad.sql` comprueba que todas lo exijan. Para rotarlo, repite el paso 2 (primero la base, luego Vercel).
