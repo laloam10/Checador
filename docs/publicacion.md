@@ -184,6 +184,32 @@ Qué se envía: un correo por persona con correo registrado que tenga semanas te
 
 ---
 
+### 1.9 Checada por WhatsApp (opcional)
+
+Un solo número de WhatsApp atiende a todas las empresas. Meta entrega cada mensaje a `/api/whatsapp/webhook`; la app
+verifica la firma y registra con reglas fijas (sin IA). Si falta cualquier variable, el canal queda apagado (503).
+
+1. **Meta** (developers.facebook.com): crea una app de tipo *Business*, agrega el producto **WhatsApp** y anota el
+   *identificador del número de teléfono* y la *clave secreta de la app* (Configuración → Básica). Para producción crea
+   un **usuario del sistema** con un token permanente con permiso `whatsapp_business_messaging` (el token temporal dura 24 h).
+2. **Secreto de servicio**: genera uno (`openssl rand -hex 32`) y guárdalo en dos lugares:
+   - Supabase → SQL Editor: `select public.configurar_secreto_servicio('whatsapp', '<secreto>');` (solo se guarda su huella SHA-256).
+   - Vercel → variable `WHATSAPP_SECRETO_SERVICIO` (ámbito del entorno que corresponda).
+3. **Vercel**: agrega además `WHATSAPP_VERIFY_TOKEN` (un texto que inventas), `WHATSAPP_APP_SECRET`, `WHATSAPP_TOKEN` y
+   `WHATSAPP_PHONE_ID`. Ninguna lleva prefijo `NEXT_PUBLIC_`. Vuelve a desplegar.
+4. **Webhook en Meta** (WhatsApp → Configuración): URL `https://<dominio>/api/whatsapp/webhook`, el mismo token de
+   verificación, y suscribe el campo **messages**.
+5. **Prueba**: captura tu celular en la ficha de un trabajador de prueba con PIN, escribe al número y sigue el flujo
+   (PIN → Entrada). Hazlo en el proyecto de pruebas, nunca con datos de prueba en producción (la bitácora es inmutable).
+
+Por qué un secreto de servicio: el webhook no tiene sesión de usuario y la app nunca usa la llave `service_role`. Las
+funciones `whatsapp_*()` son las únicas ejecutables sin sesión y no hacen ni revelan nada sin ese secreto;
+`verificar-seguridad.sql` comprueba que todas lo exijan. Para rotarlo, repite el paso 2 (primero la base, luego Vercel).
+
+Antes de ofrecerlo a clientes: el aviso de privacidad debe mencionar el número de celular y la transmisión por WhatsApp
+(Meta), y el acuerdo de registro incluye el método solo para quien tiene celular capturado (esos acuerdos quedan
+"desactualizados" hasta que se firme la nueva versión).
+
 ## 2. Vercel
 
 ### 2.1 Importar el proyecto

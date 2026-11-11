@@ -30,7 +30,7 @@ export interface Trabajador {
 export interface FilaEvento {
   id: number;
   tipo: EventoBitacora["tipo"];
-  origen: "pwa" | "kiosco" | "panel";
+  origen: "pwa" | "kiosco" | "panel" | "whatsapp";
   hora_efectiva: string;
   hora_servidor: string;
   puede_salir: boolean | null;

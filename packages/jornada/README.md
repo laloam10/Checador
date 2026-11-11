@@ -45,6 +45,7 @@ Son decisiones del motor que la ley no resuelve de forma literal:
 5. **Turnos nocturnos:** se atribuyen al día en que inician. El tipo de jornada se clasifica con el turno completo, incluidas las pausas.
 6. **Exceso sobre el límite legal:** se reporta al triple y genera alerta. La ley prohíbe ese exceso, pero las horas trabajadas deben pagarse igual.
 7. **Más de un día de descanso:** el art. 69 exige un día por cada seis de trabajo. El empleador marca cuál es el **descanso semanal obligatorio**; trabajarlo genera la alerta del art. 73 (salario doble). Los **días adicionales pactados** (p. ej., el sábado en una semana de 5 días) son un beneficio del contrato: trabajarlos genera una alerta distinta que no afirma el pago doble, y sus horas cuentan para el máximo semanal como cualquier otra.
+8. **Checada por WhatsApp:** el art. 132 fr. XXXIV exige un registro electrónico, sin fijar el medio. Se interpreta que un mensaje enviado desde el celular de la persona (activado una vez con su PIN y pactado en el acuerdo de registro) es un medio válido. La hora del registro es la del servidor al recibir el mensaje; un mensaje que WhatsApp entrega con más de 5 minutos de retraso **no se registra** (se pide reenviarlo), para no asentar una hora que no corresponde. Ningún modelo de IA interviene en el registro. Límite conocido: quien tenga el teléfono desbloqueado puede checar por la persona, igual que quien conoce un PIN de kiosco; lo mitiga la conformidad semanal.
 
 ## Fuera de alcance (por ahora)
 

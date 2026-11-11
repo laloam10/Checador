@@ -32,7 +32,7 @@ export const MODALIDAD: Record<Firma["modalidad"], string> = {
 };
 
 const SELECT_DATOS =
-  "id, empresa_id, nombre, numero_empleado, curp, email, dia_descanso, dias_descanso_adicionales, jornada_pactada_min, empresas(razon_social, rfc), centros_trabajo(nombre, direccion, pausa_puede_salir, zona_horaria)";
+  "id, empresa_id, nombre, numero_empleado, curp, email, telefono, dia_descanso, dias_descanso_adicionales, jornada_pactada_min, empresas(razon_social, rfc), centros_trabajo(nombre, direccion, pausa_puede_salir, zona_horaria)";
 
 type FilaDatos = {
   id: string;
@@ -41,6 +41,7 @@ type FilaDatos = {
   numero_empleado: string | null;
   curp: string | null;
   email: string | null;
+  telefono: string | null;
   dia_descanso: number;
   dias_descanso_adicionales: number[] | null;
   jornada_pactada_min: unknown;
@@ -77,6 +78,7 @@ function construirDatos(data: FilaDatos) {
         numeroEmpleado: data.numero_empleado,
         curp: data.curp,
         email: data.email,
+        telefono: data.telefono,
         diaDescanso: data.dia_descanso,
         diasDescansoAdicionales: data.dias_descanso_adicionales ?? [],
         jornadaPactadaMin: data.jornada_pactada_min as Record<string, number> | null,

@@ -13,7 +13,7 @@ export default async function FichaTrabajador({ params }: { params: Promise<{ id
   const [{ data: t }, { data: centros }, { data: conPin }, { data: historial }] = await Promise.all([
     ctx.supabase
       .from("trabajadores")
-      .select("id, nombre, numero_empleado, email, curp, user_id, centro_trabajo_id, fecha_ingreso, fecha_baja, dia_descanso, dias_descanso_adicionales, jornada_pactada_min")
+      .select("id, nombre, numero_empleado, email, telefono, telefono_verificado_en, curp, user_id, centro_trabajo_id, fecha_ingreso, fecha_baja, dia_descanso, dias_descanso_adicionales, jornada_pactada_min")
       .eq("id", id)
       .eq("empresa_id", ctx.empresa.id)
       .maybeSingle(),
@@ -40,7 +40,8 @@ export default async function FichaTrabajador({ params }: { params: Promise<{ id
       </p>
       <p className="ayuda">
         App del celular: {t.user_id ? "vinculada" : t.email ? `pendiente (entrará con ${t.email})` : "sin correo"} ·
-        PIN de kiosco: {tienePin ? "asignado" : "sin asignar"}
+        PIN: {tienePin ? "asignado" : "sin asignar"} ·
+        WhatsApp: {!t.telefono ? "sin celular" : t.telefono_verificado_en ? "activado" : tienePin ? "pendiente (debe escribir su PIN al número de Checador)" : "pendiente (falta asignar PIN)"}
       </p>
 
       {t.fecha_baja && (
@@ -91,7 +92,7 @@ export default async function FichaTrabajador({ params }: { params: Promise<{ id
             <CamposTrabajador centros={centros ?? []} t={{ ...t, jornada_pactada_min: t.jornada_pactada_min as Record<string, number> | null }} />
           </FormAccion>
 
-          <h2>PIN para el kiosco</h2>
+          <h2>PIN para el kiosco y WhatsApp</h2>
           <FormAccion accion={asignarPin} boton={tienePin ? "Reemplazar PIN" : "Asignar PIN"} className="form-panel form-linea" limpiar>
             <input type="hidden" name="trabajador_id" value={t.id} />
             <label>

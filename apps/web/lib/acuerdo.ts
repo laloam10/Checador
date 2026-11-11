@@ -27,6 +27,8 @@ export interface DatosAcuerdo {
     numeroEmpleado: string | null;
     curp: string | null;
     email: string | null;
+    /** Celular para checar por WhatsApp; sin él, el texto es idéntico al de antes (no desactualiza acuerdos). */
+    telefono?: string | null;
     diaDescanso: number;
     /** Descansos adicionales pactados; si no hay, el texto es idéntico al de antes (no desactualiza acuerdos). */
     diasDescansoAdicionales?: number[];
@@ -72,6 +74,11 @@ export function generarTextoAcuerdo(d: DatosAcuerdo): string {
       `${metodos.length ? "b" : "a"}) Kiosco instalado en el centro de trabajo, con su número de empleado ${t.numeroEmpleado} y un PIN personal, confidencial e intransferible.`,
     );
   }
+  if (t.telefono) {
+    metodos.push(
+      `${"abc"[metodos.length]}) Mensajes de WhatsApp enviados desde su teléfono celular con número ${t.telefono} al número de WhatsApp del sistema, previa activación con su PIN personal, confidencial e intransferible.`,
+    );
+  }
   if (!metodos.length) metodos.push("a) Captura en el sistema por parte de la persona empleadora, con el motivo de cada registro.");
 
   const pactada = t.jornadaPactadaMin && Object.keys(t.jornadaPactadaMin).length
@@ -110,7 +117,7 @@ SÉPTIMA. Consulta y conformidad. La persona trabajadora puede consultar sus reg
 
 OCTAVA. Integridad y conservación. Los registros se almacenan de forma que cualquier alteración posterior sea detectable. Se conservarán al menos durante la relación de trabajo y un año después de su terminación, conforme al artículo 804 de la Ley Federal del Trabajo, y se proporcionarán a la autoridad cuando lo requiera.
 
-NOVENA. Datos personales. Para este registro se tratan: nombre, número de empleado, correo electrónico, horarios registrados y, por cada registro, la dirección IP y el tipo de dispositivo. No se recaban datos biométricos ni de ubicación. La finalidad es cumplir las obligaciones laborales de la persona empleadora. El tratamiento se rige por el aviso de privacidad de la persona empleadora.
+NOVENA. Datos personales. Para este registro se tratan: nombre, número de empleado, correo electrónico, ${t.telefono ? "número de teléfono celular, " : ""}horarios registrados y, por cada registro, la dirección IP y el tipo de dispositivo${t.telefono ? " o, en los registros por WhatsApp, el número de teléfono y el identificador del mensaje. Los mensajes de WhatsApp se transmiten por medio de ese servicio, operado por un tercero (Meta Platforms)" : ""}. No se recaban datos biométricos ni de ubicación. La finalidad es cumplir las obligaciones laborales de la persona empleadora. El tratamiento se rige por el aviso de privacidad de la persona empleadora.
 
 DÉCIMA. Derechos irrenunciables. Nada de lo previsto en este acuerdo implica renuncia de derechos de la persona trabajadora, en términos de los artículos 5 y 33 de la Ley Federal del Trabajo, ni limita las pruebas que pueda ofrecer.
 

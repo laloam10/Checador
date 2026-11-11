@@ -27,12 +27,14 @@ function traducir(error: { code?: string; message: string }): string {
   if (error.code === "23505") {
     if (error.message.includes("numero_empleado")) return "Ya existe un trabajador con ese número de empleado.";
     if (error.message.includes("email")) return "Ese correo ya está registrado o tiene una invitación pendiente.";
+    if (error.message.includes("telefono")) return "Ese celular ya está registrado para otra persona activa.";
     return "Ese registro ya existe.";
   }
   if (error.code === "42501") return "No tienes permiso para hacer esto.";
   if (error.code === "23514") {
     if (error.message.includes("rfc")) return "El RFC no tiene un formato válido.";
     if (error.message.includes("curp")) return "La CURP no tiene un formato válido.";
+    if (error.message.includes("telefono")) return "El celular no es válido: escribe los 10 dígitos.";
     if (error.message.includes("email")) return "El correo no tiene un formato válido.";
     return error.message;
   }
@@ -146,6 +148,7 @@ export async function guardarTrabajador(_: Estado, fd: FormData): Promise<Estado
     numero_empleado: texto(fd, "numero_empleado") || null,
     email: texto(fd, "email").toLowerCase() || null,
     curp: texto(fd, "curp").toUpperCase() || null,
+    telefono: texto(fd, "telefono").replace(/[^0-9]/g, "") || null,
     centro_trabajo_id: texto(fd, "centro_trabajo_id"),
     fecha_ingreso: texto(fd, "fecha_ingreso"),
     dia_descanso: Number(texto(fd, "dia_descanso") || 0),
@@ -158,6 +161,7 @@ export async function guardarTrabajador(_: Estado, fd: FormData): Promise<Estado
   // El descanso obligatorio no se repite como adicional (art. 69: uno por cada seis días de trabajo).
   datos.dias_descanso_adicionales = datos.dias_descanso_adicionales.filter((d) => d !== datos.dia_descanso);
   if (datos.dias_descanso_adicionales.length > 3) return fallo("Máximo 3 días de descanso adicionales.");
+  if (datos.telefono && !/^[0-9]{10,15}$/.test(datos.telefono)) return fallo("El celular no es válido: escribe los 10 dígitos.");
   if (!datos.centro_trabajo_id) return fallo("Elige el centro de trabajo.");
   if (!/^\d{4}-\d{2}-\d{2}$/.test(datos.fecha_ingreso)) return fallo("Indica la fecha de ingreso.");
   if (datos.numero_empleado && !/^[0-9A-Za-z-]{1,20}$/.test(datos.numero_empleado)) {

@@ -17,6 +17,8 @@ Bitácora de lo aplicado en los proyectos en la nube. No contiene secretos.
 | Secretos de Vault para recordatorios (guía, sección 1.8) | ✅ llave `checador-recordatorios-pruebas`; envío de prueba aceptado por Resend (2026-11-10) | ✅ llave `checador-recordatorios-produccion` |
 | Migración 16: revisar recordatorios cada hora (`20261117000001`) | ✅ aplicada por API (2026-11-10) | ✅ aplicada por API (2026-11-10) |
 | Migración 17: días de descanso adicionales (`20261118000001`) | ✅ aplicada por API (2026-11-10) | ✅ aplicada por API (2026-11-10) |
+| Migración 18: checada por WhatsApp (`20261119000001`) | ✅ aplicada por API (2026-11-11) | ⏳ pendiente (se aplica al llevar WhatsApp a producción) |
+| Secreto de servicio de WhatsApp (`configurar_secreto_servicio`) y variables `WHATSAPP_*` en Vercel | ⏳ pendiente | ⏳ pendiente |
 | `verificar-seguridad.sql` | ✅ 0 hallazgos | ✅ 0 hallazgos |
 | Asesor de Supabase | ✅ 16 avisos esperados (sección 1.7 de la guía) | ✅ 16 avisos esperados |
 | Verificación externa (`verificar-despliegue.sh`, `SOLO_SUPABASE=1`) | ✅ sin fallas | ✅ sin fallas |

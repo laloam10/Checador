@@ -160,7 +160,7 @@ export const ETIQUETA_TIPO: Record<string, string> = {
   correccion: "Corrección",
   anulacion: "Anulación",
 };
-export const ETIQUETA_ORIGEN: Record<string, string> = { pwa: "App", kiosco: "Kiosco", panel: "Panel" };
+export const ETIQUETA_ORIGEN: Record<string, string> = { pwa: "App", kiosco: "Kiosco", panel: "Panel", whatsapp: "WhatsApp" };
 
 const ENCABEZADO_BITACORA = [
   "numero_empleado", "trabajador", "secuencia_cadena", "id_evento", "tipo", "origen",

@@ -5,6 +5,7 @@ export interface DatosTrabajador {
   nombre?: string;
   numero_empleado?: string | null;
   email?: string | null;
+  telefono?: string | null;
   curp?: string | null;
   centro_trabajo_id?: string;
   fecha_ingreso?: string;
@@ -30,6 +31,15 @@ export function CamposTrabajador({ t, centros }: { t?: DatosTrabajador; centros:
             {t?.id
               ? "Si lo cambias, la cuenta del correo anterior pierde el acceso y la persona entra con el nuevo."
               : "Para entrar a la app desde su celular."}
+          </span>
+        </label>
+        <label>
+          Celular para WhatsApp (opcional)
+          <input name="telefono" type="tel" inputMode="tel" autoComplete="off" placeholder="10 dígitos"
+            defaultValue={t?.telefono ? t.telefono.replace(/^52(?=\d{10}$)/, "") : ""} />
+          <span className="ayuda">
+            Para checar por WhatsApp. La persona lo activa una vez con su PIN; si cambias o borras el número, deja de poder
+            checar desde el anterior.
           </span>
         </label>
         <label>CURP (opcional)<input name="curp" maxLength={18} defaultValue={t?.curp ?? ""} /></label>

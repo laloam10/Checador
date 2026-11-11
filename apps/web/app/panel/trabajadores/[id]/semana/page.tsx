@@ -13,7 +13,7 @@ const ETIQUETA: Record<string, string> = {
   inicio_pausa: "Inicio de pausa",
   fin_pausa: "Fin de pausa",
 };
-const ORIGEN: Record<string, string> = { pwa: "celular", kiosco: "kiosco", panel: "panel" };
+const ORIGEN: Record<string, string> = { pwa: "celular", kiosco: "kiosco", panel: "panel", whatsapp: "WhatsApp" };
 const MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
 const DIAS = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 const partes = (f: string) => ({ d: Number(f.slice(8, 10)), m: MESES[Number(f.slice(5, 7)) - 1]!, a: f.slice(0, 4) });
