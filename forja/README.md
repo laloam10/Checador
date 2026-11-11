@@ -10,7 +10,7 @@ Aquí solo vive lo que es de Checador. La plantilla de Forja no se copia al repo
 |---|---|
 | `member/config.local.ts` | Datos del negocio y **reglas del asistente** (lo que no debe decir ni hacer) |
 | `member/kb/*.md` | Base de conocimiento: qué es Checador, cómo se checa por WhatsApp, preguntas frecuentes |
-| `aplicar.sh` | Copia lo anterior a una instalación de Forja y pone el nombre del bot |
+| `aplicar.sh`, `aplicar.ps1` | Copian lo anterior a una instalación de Forja y ponen el nombre del bot (la segunda, para Windows; no se ha probado en una máquina real) |
 
 Comprobado contra la plantilla 1.0.77: compila, genera la base de conocimiento y acepta los mensajes que
 Checador firma y reenvía.
@@ -19,11 +19,29 @@ Checador firma y reenvía.
 
 Ningún secreto se pega en un chat ni se guarda en un archivo: van con `wrangler secret put`, que los pide oculto.
 
-1. **Instala el bot** con el CLI de Forja (`npx forjabot init`) y anota la carpeta que crea.
-2. **Aplica esta configuración**, con un correo al que el asistente pueda remitir a un prospecto:
+1. **Instala el bot** con el CLI de Forja dentro de `forja-bot/`, en la raíz de tu copia del repositorio. Esa
+   carpeta está en `.gitignore`: la plantilla es código con licencia de Forja y no se sube al repositorio.
    ```bash
-   forja/aplicar.sh <carpeta-del-bot> contacto@tu-dominio.mx
+   mkdir forja-bot
    ```
+   ```bash
+   cd forja-bot
+   ```
+   ```bash
+   npx forjabot init
+   ```
+   El CLI pide la licencia y crea una subcarpeta con el bot (por ejemplo `forja-bot/crm`).
+2. **Aplica esta configuración** desde la raíz del repositorio, con un correo al que el asistente pueda
+   remitir a un prospecto. En Windows (PowerShell):
+   ```bash
+   .\forja\aplicar.ps1 -Bot .\forja-bot\crm -Correo contacto@tu-dominio.mx
+   ```
+   En macOS, Linux o Git Bash:
+   ```bash
+   forja/aplicar.sh forja-bot/crm contacto@tu-dominio.mx
+   ```
+   Si PowerShell bloquea el script, ejecútalo así:
+   `powershell -ExecutionPolicy Bypass -File .\forja\aplicar.ps1 -Bot .\forja-bot\crm -Correo contacto@tu-dominio.mx`
 3. **Provisiona y publica** siguiendo la fase 1 de Forja (base D1, Vectorize, `pnpm run deploy`). Cloudflare pide
    una tarjeta para Vectorize aunque el uso quede en $0.
 4. **Guarda los secretos** en la carpeta del bot, uno por uno:
@@ -68,4 +86,4 @@ Ningún secreto se pega en un chat ni se guarda en un archivo: van con `wrangler
 ## Al actualizar
 
 `forjabot update` no toca `member/`. Si cambian estos archivos en el repositorio, vuelve a correr
-`aplicar.sh` (deja un respaldo del anterior en `member/.respaldo-*`) y repite el paso 5.
+`aplicar.sh` o `aplicar.ps1` (deja un respaldo del anterior en `member/.respaldo-*`) y repite el paso 5.

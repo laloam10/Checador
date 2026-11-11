@@ -14,3 +14,5 @@ e2e-fallo.png
 next-env.d.ts
 node_modules/
 .claude/settings.local.json
+# Instalación local de la plantilla de Forja (código con licencia de terceros; no se versiona)
+/forja-bot/
