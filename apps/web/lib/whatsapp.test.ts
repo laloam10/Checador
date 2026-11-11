@@ -7,6 +7,12 @@ import {
   idBoton,
   idClienteDe,
   intencionDe,
+  conAviso,
+  huellaResumen,
+  rangoSemana,
+  revisionSemana,
+  textoSemana,
+  VIGENCIA_REVISION_S,
   mensajesDe,
   menu,
   VIGENCIA_BOTON_S,
@@ -82,7 +88,7 @@ describe("intencionDe", () => {
   it("los botones vencen", () => {
     const boton = idBoton("entrada", AHORA);
     expect(intencionDe(msj({ boton }), AHORA + VIGENCIA_BOTON_S)).toEqual({ clase: "checar", tipo: "entrada" });
-    expect(intencionDe(msj({ boton }), AHORA + VIGENCIA_BOTON_S + 1)).toEqual({ clase: "boton_vencido", tipo: "entrada" });
+    expect(intencionDe(msj({ boton }), AHORA + VIGENCIA_BOTON_S + 1)).toEqual({ clase: "boton_vencido" });
     expect(intencionDe(msj({ boton: "chk:correccion:9999999999" }), AHORA)).toEqual({ clase: "otro" });
   });
 });
@@ -105,5 +111,61 @@ describe("respuestas", () => {
     expect(idClienteDe("wamid.A")).toBe(idClienteDe("wamid.A"));
     expect(idClienteDe("wamid.A")).not.toBe(idClienteDe("wamid.B"));
     expect(idClienteDe("wamid.A")).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-8[0-9a-f]{3}-[0-9a-f]{12}$/);
+  });
+});
+
+describe("conformidad semanal", () => {
+  const semana = {
+    dias: [
+      { fecha: "2026-11-02", diaSemana: 1, tipo: "diurna", trabajadoMin: 480, ordinariaMin: 480, extraDobleMin: 0, extraTripleMin: 0 },
+      { fecha: "2026-11-03", diaSemana: 2, tipo: "diurna", trabajadoMin: 0, ordinariaMin: 0, extraDobleMin: 0, extraTripleMin: 0 },
+      { fecha: "2026-11-04", diaSemana: 3, tipo: "nocturna", trabajadoMin: 540, ordinariaMin: 420, extraDobleMin: 120, extraTripleMin: 0 },
+    ],
+    totales: { trabajadoMin: 1020, ordinariaMin: 900, extraDobleMin: 120, extraTripleMin: 0 },
+  } as Parameters<typeof textoSemana>[1];
+  const turnos = [
+    { inicio: "2026-11-02T09:00", fin: "2026-11-02T18:00", pausas: [{ inicio: "2026-11-02T13:00", fin: "2026-11-02T14:00", puedeSalir: true }] },
+    { inicio: "2026-11-04T22:00", fin: "2026-11-05T07:00" },
+  ];
+
+  it("el resumen lista turnos, pausas, total, extras e incidencias", () => {
+    const t = textoSemana("2026-11-02", semana, turnos, [{ codigo: "ENTRADA_SIN_SALIDA", eventoId: 1, mensaje: "Entrada sin salida." }]);
+    expect(t.split("\n")).toEqual([
+      "*Semana del 2 al 8 de nov*",
+      "Lun 2: 09:00–18:00 (pausa 13:00–14:00) · 8 h 00",
+      "Mié 4: 22:00–07:00 (+1) · 9 h 00",
+      "Total trabajado: 17 h 00",
+      "Ordinario 15 h 00 · extra doble 2 h 00 · extra triple 0 h 00",
+      "⚠ Entrada sin salida.",
+    ]);
+    expect(rangoSemana("2026-11-30")).toBe("30 de nov al 6 de dic");
+  });
+  it("los botones de conformidad llevan la semana y la huella de lo mostrado", () => {
+    const huella = huellaResumen({ semana: "2026-11-02", eventoIds: [1, 2] });
+    expect(huella).toMatch(/^[0-9a-f]{12}$/);
+    expect(huella).not.toBe(huellaResumen({ semana: "2026-11-02", eventoIds: [1, 3] }));
+    const r = revisionSemana("2026-11-02", "resumen", huella, AHORA);
+    expect(r.texto).toContain("Si no respondes, no cuenta como conformidad.");
+    expect(r.extra!.map((b) => b.titulo)).toEqual(["Estoy conforme", "No es correcto"]);
+    expect(intencionDe(msj({ boton: r.extra![0]!.id }), AHORA)).toEqual({ clase: "conforme", lunes: "2026-11-02", huella });
+    expect(intencionDe(msj({ boton: r.extra![1]!.id }), AHORA)).toEqual({ clase: "objetar", lunes: "2026-11-02" });
+    expect(intencionDe(msj({ boton: r.extra![0]!.id }), AHORA + VIGENCIA_REVISION_S + 1)).toEqual({ clase: "boton_vencido" });
+  });
+  it("un resumen largo va en un mensaje aparte", () => {
+    const r = revisionSemana("2026-11-02", "x".repeat(1200), "0".repeat(12), AHORA);
+    expect(r.previo).toHaveLength(1200);
+    expect(r.texto.length).toBeLessThan(200);
+  });
+  it("la conformidad no se acepta por texto, solo se puede pedir ver la semana", () => {
+    for (const t of ["conforme", "estoy conforme", "sí", "ok"]) expect(intencionDe(msj({ texto: t }), AHORA)).toEqual({ clase: "otro" });
+    expect(intencionDe(msj({ texto: "Revisar semana" }), AHORA)).toEqual({ clase: "ver_semana", lunes: null });
+  });
+  it("el aviso agrega el botón solo si cabe (máximo 3)", () => {
+    const pendientes = [{ lunes: "2026-11-02" }, { lunes: "2026-11-09" }];
+    const r = conAviso({ texto: "Hola", botones: ["inicio_pausa", "salida"] }, pendientes, AHORA);
+    expect(r.texto).toContain("Tienes 2 semanas por revisar.");
+    expect(r.extra).toEqual([{ id: `sem:2026-11-02:${AHORA + VIGENCIA_REVISION_S}`, titulo: "Revisar semana" }]);
+    expect(conAviso({ texto: "Hola" }, [], AHORA)).toEqual({ texto: "Hola" });
+    expect(conAviso({ texto: "Hola", botones: ["entrada"], extra: [{ id: "a", titulo: "A" }, { id: "b", titulo: "B" }] }, pendientes, AHORA).extra).toHaveLength(2);
   });
 });

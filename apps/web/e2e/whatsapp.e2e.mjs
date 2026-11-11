@@ -140,10 +140,65 @@ try {
     "la evidencia guarda el teléfono y el identificador del mensaje",
   );
 
+  // --- Conformidad semanal ---
+  // Dos semanas pasadas con checadas (capturadas por el panel para poder fecharlas).
+  const lunesDe = (semanasAtras) => sql(`select (date_trunc('week', now() at time zone 'America/Mexico_City')::date - ${7 * semanasAtras})::text`);
+  const [pasada, antepasada] = [lunesDe(1), lunesDe(2)];
+  const checada = (lunes, dia, hora, tipo) =>
+    sql(`select set_config('request.jwt.claim.sub', '${dueno}', false); set role authenticated;
+         insert into public.eventos (empresa_id, trabajador_id, tipo, origen, motivo, hora_efectiva)
+         select empresa_id, id, '${tipo}', 'panel', 'Prueba', (('${lunes}'::date + ${dia})::timestamp + time '${hora}') at time zone 'America/Mexico_City'
+           from public.trabajadores where id = '${trabajador}' returning id;`).split("\n").pop();
+  checada(antepasada, 0, "09:00", "entrada");
+  checada(antepasada, 0, "17:00", "salida");
+  checada(pasada, 1, "08:00", "entrada");
+  const salidaPasada = checada(pasada, 1, "16:30", "salida");
+  const conformidades = () => sql(`select coalesce(string_agg(respuesta || ':' || periodo_inicio || ':' || coalesce(comentario, '-'), ' | ' order by respondido_en), '') from public.conformidades where trabajador_id = '${trabajador}'`);
+
+  r = await enviar(deWhatsApp, { texto: "hola" });
+  afirmar(r.texto.includes("Tienes 2 semanas por revisar.") && r.botones.at(-1).title === "Revisar semana", "el menú avisa de las semanas pendientes y ofrece revisarlas");
+  r = await enviar(deWhatsApp, { boton: r.botones.at(-1).id });
+  afirmar(/Lun \d+: 09:00–17:00 · 8 h 00/.test(r.texto) && r.texto.includes("Total trabajado: 8 h 00"), "muestra la semana más antigua con sus turnos y el total");
+  afirmar(r.botones.map((b) => b.title).join() === "Estoy conforme,No es correcto" && r.texto.includes("no cuenta como conformidad"), "pregunta por la conformidad, sin aceptación tácita");
+  r = await enviar(deWhatsApp, { texto: "estoy conforme" });
+  afirmar(conformidades() === "", "escribir «estoy conforme» no registra nada: solo vale el botón del resumen");
+  r = await enviar(deWhatsApp, { texto: "revisar semana" });
+  r = await enviar(deWhatsApp, { boton: r.botones[0].id });
+  afirmar(/✅ Conformidad registrada: semana del .* · comprobante n\.º \d+/.test(r.texto), "el botón registra la conformidad con comprobante");
+  afirmar(conformidades() === `conforme:${antepasada}:-` && r.texto.includes("Tienes la semana del"), "queda en la base y avisa de la semana que falta");
+
+  // El empleador corrige después de que la persona vio el resumen: el botón viejo ya no vale.
+  r = await enviar(deWhatsApp, { texto: "semana" });
+  afirmar(/Mar \d+: 08:00–16:30 · 8 h 30/.test(r.texto), "muestra la semana pasada");
+  const botonConforme = r.botones[0].id;
+  sql(`select set_config('request.jwt.claim.sub', '${dueno}', false); set role authenticated;
+       insert into public.eventos (empresa_id, trabajador_id, tipo, origen, motivo, hora_efectiva, corrige_evento_id)
+       select empresa_id, id, 'correccion', 'panel', 'Salió antes', (('${pasada}'::date + 1)::timestamp + time '15:00') at time zone 'America/Mexico_City', ${salidaPasada}
+         from public.trabajadores where id = '${trabajador}';`);
+  r = await enviar(deWhatsApp, { boton: botonConforme });
+  afirmar(r.texto.startsWith("Tus registros de esa semana cambiaron") && r.texto.includes("08:00–15:00") && conformidades() === `conforme:${antepasada}:-`,
+    "si los registros cambiaron, no registra la conformidad y los muestra de nuevo");
+
+  // Objeción: botón, y el siguiente mensaje es la explicación.
+  r = await enviar(deWhatsApp, { boton: r.botones[1].id });
+  afirmar(r.texto.startsWith("Escribe en un solo mensaje qué no es correcto") && r.botones.length === 0, "al objetar pide la explicación");
+  r = await enviar(deWhatsApp, { texto: "Ese martes salí a las 16:30, no a las 15:00" });
+  afirmar(/^Objeción registrada: semana del .* · comprobante n\.º \d+/.test(r.texto), "el siguiente mensaje se registra como objeción");
+  afirmar(conformidades() === `conforme:${antepasada}:- | objeta:${pasada}:Ese martes salí a las 16:30, no a las 15:00`, "la objeción queda con su comentario");
+  afirmar(
+    sql(`select evidencia ->> 'modalidad' || ' ' || (resumen -> 'totales' ->> 'trabajadoMin') from public.conformidades where trabajador_id = '${trabajador}' order by respondido_en desc limit 1`) === "whatsapp 420",
+    "se guarda la modalidad y el resumen que se mostró (7 h tras la corrección)",
+  );
+  r = await enviar(deWhatsApp, { texto: "otra cosa" });
+  afirmar(!r.texto.includes("por revisar") && conformidades().split(" | ").length === 2, "sin semanas pendientes, un texto libre ya no registra nada");
+  r = await enviar(deWhatsApp, { texto: "semana" });
+  afirmar(r.texto.startsWith("No tienes semanas por revisar."), "no quedan semanas por revisar");
+
   // --- El empleador cambia el celular: el anterior deja de servir ---
+  const antes = eventos();
   sql(`select set_config('request.jwt.claim.sub', '${dueno}', false); set role authenticated; update public.trabajadores set telefono = null where id = '${trabajador}';`);
   r = await enviar(deWhatsApp, { texto: "entrada" });
-  afirmar(r.texto.includes("no está registrado") && eventos() === "entrada:whatsapp,salida:whatsapp", "al quitar el celular de la ficha ya no se puede checar");
+  afirmar(r.texto.includes("no está registrado") && eventos() === antes, "al quitar el celular de la ficha ya no se puede checar");
 
   console.log("\nWhatsApp: todo correcto.");
 } finally {

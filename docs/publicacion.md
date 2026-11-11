@@ -207,6 +207,12 @@ verifica la firma y registra con reglas fijas (sin IA). Si falta cualquier varia
 La activación no usa el PIN del kiosco: un PIN es reutilizable y quedaría escrito en el chat. El código sirve una vez,
 vence en 24 horas, se anula al quinto intento fallido y está atado al celular capturado.
 
+**Conformidad semanal.** Cuando la persona checa y tiene semanas terminadas sin responder, el bot le ofrece
+"Revisar semana": muestra los turnos y el total, y pide "Estoy conforme" o "No es correcto" (la objeción se escribe en
+el siguiente mensaje). El bot **no puede escribir primero**: WhatsApp solo permite responder dentro de las 24 horas
+siguientes al último mensaje de la persona, salvo con plantillas aprobadas y de pago, que no se usan. Por eso los
+recordatorios de conformidad siguen saliendo por correo (1.8); quien solo usa WhatsApp y no checa, no recibe aviso.
+
 Por qué un secreto de servicio: el webhook no tiene sesión de usuario y la app nunca usa la llave `service_role`. Las
 funciones `whatsapp_*()` son las únicas ejecutables sin sesión y no hacen ni revelan nada sin ese secreto;
 `verificar-seguridad.sql` comprueba que todas lo exijan. Para rotarlo, repite el paso 2 (primero la base, luego Vercel).

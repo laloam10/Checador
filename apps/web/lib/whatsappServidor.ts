@@ -2,11 +2,17 @@ import "server-only";
 
 import { createClient } from "@supabase/supabase-js";
 import { aHoraLocal, reconstruirTurnos } from "@checador/jornada";
+import { calcularSemanaDesdeFilas, configDe, resumenConformidad, type FilaEvento } from "./datos";
 import { configSupabase } from "./supabase/config";
 import {
   ETIQUETA,
   RETRASO_MAXIMO_S,
   TEXTOS,
+  TEXTOS_SEMANA,
+  conAviso,
+  huellaResumen,
+  revisionSemana,
+  textoSemana,
   accionesValidas,
   confirmacion,
   idBoton,
@@ -55,6 +61,8 @@ interface Estado {
   nombre?: string;
   empresa?: string;
   zona_horaria?: string;
+  semanas_por_revisar?: { lunes: string; clase: string }[];
+  objecion_pendiente?: string | null;
   eventos?: {
     id: number;
     tipo: "entrada" | "salida" | "inicio_pausa" | "fin_pausa" | "correccion" | "anulacion";
@@ -99,21 +107,86 @@ export async function atender(m: MensajeEntrante, cfg: ConfigWhatsApp, ahora = n
 
   const { estado: est, enCurso } = reconstruir(estado, ahora);
   const nombre = estado.nombre ?? "";
-  if (intencion.clase === "boton_vencido") return menu(nombre, est, enCurso, "Ese botón ya venció. ");
-  if (intencion.clase !== "checar") return menu(nombre, est, enCurso);
+  const pendientes = estado.semanas_por_revisar ?? [];
+  const evidencia = { wamid: m.id, enviado_en: new Date(m.enviadoEn * 1000).toISOString(), medio: m.boton ? "boton" : "texto" };
+  const conMenu = (prefijo = "", semanas = pendientes) => conAviso(menu(nombre, est, enCurso, prefijo), semanas, ahoraS);
+
+  /** Una semana pendiente, calculada con el mismo motor que la app y el kiosco. */
+  const semana = async (lunes: string) => {
+    const s = await rpc<{ eventos?: FilaEvento[]; zona_horaria?: string; dia_descanso?: number; dias_descanso_adicionales?: number[]; jornada_pactada_min?: unknown }>(
+      "whatsapp_semana", { p_lunes: lunes });
+    if (!s.ok) return null;
+    const calculo = calcularSemanaDesdeFilas(
+      s.eventos ?? [],
+      { zonaHoraria: s.zona_horaria ?? "America/Mexico_City", config: configDe(s.dia_descanso ?? 0, s.jornada_pactada_min, s.dias_descanso_adicionales ?? []) },
+      lunes,
+    );
+    const resumen = resumenConformidad(lunes, calculo);
+    return {
+      resumen,
+      huella: huellaResumen(resumen),
+      texto: textoSemana(lunes, calculo.semana, calculo.reconstruccion.turnos, calculo.reconstruccion.incidencias),
+    };
+  };
+  const responderSemana = async (lunes: string, respuesta: "conforme" | "objeta", comentario: string | null, resumen: unknown) => {
+    const c = await rpc<{ cadena_secuencia?: number }>("whatsapp_conformidad", {
+      p_lunes: lunes, p_respuesta: respuesta, p_comentario: comentario, p_resumen: resumen, p_evidencia: evidencia,
+    });
+    if (!c.ok) return c.codigo === "SEMANA" ? conMenu(`${TEXTOS_SEMANA.yaNoPendiente} `) : { texto: TEXTOS.error };
+    const hecho = (respuesta === "conforme" ? TEXTOS_SEMANA.conforme : TEXTOS_SEMANA.objecion)(lunes, c.cadena_secuencia ?? "");
+    return conMenu(`${hecho}\n\n`, pendientes.filter((p) => p.lunes !== lunes));
+  };
+
+  if (intencion.clase === "boton_vencido") return conMenu("Ese botón ya venció. ");
+
+  if (intencion.clase === "ver_semana") {
+    const lunes = intencion.lunes ?? pendientes[0]?.lunes;
+    if (!lunes) return conMenu(`${TEXTOS_SEMANA.sinPendientes} `);
+    const s = await semana(lunes);
+    return s ? revisionSemana(lunes, s.texto, s.huella, ahoraS) : conMenu(`${TEXTOS_SEMANA.yaNoPendiente} `);
+  }
+
+  if (intencion.clase === "conforme") {
+    const s = await semana(intencion.lunes);
+    if (!s) return conMenu(`${TEXTOS_SEMANA.yaNoPendiente} `);
+    // La conformidad vale solo para lo que la persona vio: si los registros cambiaron, se muestran de nuevo.
+    if (s.huella !== intencion.huella) return revisionSemana(intencion.lunes, s.texto, s.huella, ahoraS, TEXTOS_SEMANA.cambio);
+    return responderSemana(intencion.lunes, "conforme", null, s.resumen);
+  }
+
+  if (intencion.clase === "objetar") {
+    const e = await rpc<object>("whatsapp_esperar_objecion", { p_lunes: intencion.lunes });
+    return e.ok ? { texto: TEXTOS_SEMANA.pedirObjecion(intencion.lunes) } : conMenu(`${TEXTOS_SEMANA.yaNoPendiente} `);
+  }
+
+  if (intencion.clase !== "checar") {
+    // Texto libre mientras se espera la explicación de una objeción: ese texto ES la objeción.
+    const comentario = (m.texto ?? "").trim();
+    if (estado.objecion_pendiente && comentario.length >= 3) {
+      const s = await semana(estado.objecion_pendiente);
+      if (!s) return conMenu(`${TEXTOS_SEMANA.yaNoPendiente} `);
+      return responderSemana(estado.objecion_pendiente, "objeta", comentario, s.resumen);
+    }
+    return conMenu();
+  }
+
   if (!accionesValidas(est).includes(intencion.tipo)) {
-    return menu(nombre, est, enCurso, `No se puede registrar "${ETIQUETA[intencion.tipo]}" ahora. `);
+    return conMenu(`No se puede registrar "${ETIQUETA[intencion.tipo]}" ahora. `);
   }
   if (ahoraS - m.enviadoEn > RETRASO_MAXIMO_S) return { texto: TEXTOS.tarde, botones: accionesValidas(est) };
 
   const c = await rpc<{ hora_efectiva?: string; secuencia?: number; duplicado?: boolean }>("whatsapp_checar", {
     p_tipo: intencion.tipo,
     p_id_cliente: idClienteDe(m.id),
-    p_evidencia: { wamid: m.id, enviado_en: new Date(m.enviadoEn * 1000).toISOString(), medio: m.boton ? "boton" : "texto" },
+    p_evidencia: evidencia,
   });
   if (!c.ok || !c.hora_efectiva) return { texto: TEXTOS.error };
   const zona = estado.zona_horaria ?? "America/Mexico_City";
-  return confirmacion(intencion.tipo, aHoraLocal(c.hora_efectiva, zona), c.secuencia ?? "", estado.empresa ?? "", c.duplicado ?? false);
+  return conAviso(
+    confirmacion(intencion.tipo, aHoraLocal(c.hora_efectiva, zona), c.secuencia ?? "", estado.empresa ?? "", c.duplicado ?? false),
+    pendientes,
+    ahoraS,
+  );
 }
 
 function reconstruir(e: Estado, ahora = new Date()) {
@@ -135,23 +208,30 @@ function reconstruir(e: Estado, ahora = new Date()) {
 /** Envía la respuesta por la API de WhatsApp (Graph API). Hasta 3 botones de respuesta rápida. */
 export async function responder(telefono: string, r: Respuesta, cfg: ConfigWhatsApp, ahora = new Date()): Promise<void> {
   const ahoraS = Math.floor(ahora.getTime() / 1000);
-  const mensaje = r.botones?.length
-    ? {
-        type: "interactive",
-        interactive: {
-          type: "button",
-          body: { text: r.texto },
-          action: {
-            buttons: r.botones.slice(0, 3).map((t) => ({ type: "reply", reply: { id: idBoton(t, ahoraS), title: ETIQUETA[t] } })),
+  const botones = [
+    ...(r.botones ?? []).map((t) => ({ id: idBoton(t, ahoraS), titulo: ETIQUETA[t] })),
+    ...(r.extra ?? []),
+  ].slice(0, 3);
+  const enviar = async (mensaje: object) => {
+    const res = await fetch(`${cfg.urlGraph}/${cfg.idNumero}/messages`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${cfg.token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ messaging_product: "whatsapp", recipient_type: "individual", to: telefono, ...mensaje }),
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) throw new Error(`WhatsApp respondió ${res.status}: ${(await res.text()).slice(0, 300)}`);
+  };
+  if (r.previo) await enviar({ type: "text", text: { body: r.previo } });
+  await enviar(
+    botones.length
+      ? {
+          type: "interactive",
+          interactive: {
+            type: "button",
+            body: { text: r.texto },
+            action: { buttons: botones.map((b) => ({ type: "reply", reply: { id: b.id, title: b.titulo } })) },
           },
-        },
-      }
-    : { type: "text", text: { body: r.texto } };
-  const res = await fetch(`${cfg.urlGraph}/${cfg.idNumero}/messages`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${cfg.token}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ messaging_product: "whatsapp", recipient_type: "individual", to: telefono, ...mensaje }),
-    signal: AbortSignal.timeout(8000),
-  });
-  if (!res.ok) throw new Error(`WhatsApp respondió ${res.status}: ${(await res.text()).slice(0, 300)}`);
+        }
+      : { type: "text", text: { body: r.texto } },
+  );
 }

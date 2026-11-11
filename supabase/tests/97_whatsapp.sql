@@ -19,6 +19,7 @@ select public.configurar_secreto_servicio('whatsapp', :'secreto');
 
 set role authenticated;
 select set_config('request.jwt.claim.sub', :'u_prop', false) \gset
+select set_config('request.jwt.claim.sub', :'u_prop', false) \gset
 select tests.debe_fallar($$select count(*) from public.secretos_servicio$$, 'leer la huella del secreto por la API');
 select tests.debe_fallar($$select public.configurar_secreto_servicio('whatsapp', repeat('x', 40))$$, 'cambiar el secreto por la API');
 
@@ -44,6 +45,7 @@ select set_config('request.jwt.claim.sub', :'u_prop', false) \gset
 
 \echo '--- Sin el secreto no hay nada'
 set role anon;
+select set_config('request.jwt.claim.sub', '', false) \gset
 select tests.afirmar(public.whatsapp_estado(:'malo', '5215512345678') ->> 'codigo' = 'NO_AUTORIZADO', 'estado con secreto incorrecto');
 select tests.afirmar(public.whatsapp_vincular(:'malo', '5215512345678', '7391') ->> 'codigo' = 'NO_AUTORIZADO', 'vincular con secreto incorrecto');
 select tests.afirmar(
@@ -59,9 +61,11 @@ select tests.afirmar(
   'sin vincular no se revela nombre ni empresa');
 select tests.afirmar(public.whatsapp_vincular(:'secreto', '5215512345678', '123456') ->> 'codigo' = 'SIN_CODIGO', 'sin código generado no se activa');
 set role authenticated;
+select set_config('request.jwt.claim.sub', :'u_prop', false) \gset
 select public.generar_codigo_whatsapp(:'w') as codigo \gset
 select tests.afirmar(:'codigo' ~ '^[0-9]{6}$', 'el código es de 6 dígitos');
 set role anon;
+select set_config('request.jwt.claim.sub', '', false) \gset
 select tests.afirmar((public.whatsapp_estado(:'secreto', '5215512345678') ->> 'tiene_codigo')::boolean, 'el estado indica que hay un código vigente');
 select tests.afirmar(
   public.whatsapp_checar(:'secreto', '5215512345678', 'entrada', '00000000-0000-4000-8000-000000000970') ->> 'codigo' = 'NO_VINCULADO',
@@ -109,37 +113,47 @@ select tests.afirmar(
 \echo '--- Cambio de teléfono, intentos y vencimiento'
 set role authenticated;
 select set_config('request.jwt.claim.sub', :'u_prop', false) \gset
+select set_config('request.jwt.claim.sub', :'u_prop', false) \gset
 select public.generar_codigo_whatsapp(:'w') as viejo \gset
 update public.trabajadores set telefono = '5587654321' where id = :'w';
 select tests.afirmar((select telefono_verificado_en is null from public.trabajadores where id = :'w'),
   'cambiar el teléfono quita la verificación');
 set role anon;
+select set_config('request.jwt.claim.sub', '', false) \gset
 select tests.afirmar(public.whatsapp_estado(:'secreto', '5215512345678') = '{"ok": true, "registrado": false}'::jsonb,
   'el teléfono anterior deja de estar registrado');
 select tests.afirmar(public.whatsapp_vincular(:'secreto', '525587654321', :'viejo') ->> 'codigo' = 'SIN_CODIGO',
   'un código generado para el celular anterior no activa el nuevo');
 set role authenticated;
+select set_config('request.jwt.claim.sub', :'u_prop', false) \gset
 select public.generar_codigo_whatsapp(:'w') as codigo \gset
 set role anon;
+select set_config('request.jwt.claim.sub', '', false) \gset
 select public.whatsapp_vincular(:'secreto', '525587654321', 'xxxxxx') from generate_series(1, 5) \g /dev/null
 select tests.afirmar(public.whatsapp_vincular(:'secreto', '525587654321', :'codigo') ->> 'codigo' = 'SIN_CODIGO',
   'cinco intentos fallidos anulan el código, aunque el sexto sea correcto');
 set role authenticated;
+select set_config('request.jwt.claim.sub', :'u_prop', false) \gset
 select public.generar_codigo_whatsapp(:'w') as codigo \gset
 reset role;
 update public.codigos_whatsapp set expira_en = now() - interval '1 minute' where trabajador_id = :'w';
 set role anon;
+select set_config('request.jwt.claim.sub', '', false) \gset
 select tests.afirmar(public.whatsapp_vincular(:'secreto', '525587654321', :'codigo') ->> 'codigo' = 'SIN_CODIGO', 'un código vencido no activa');
 
 \echo '--- La baja corta el acceso'
 set role authenticated;
+select set_config('request.jwt.claim.sub', :'u_prop', false) \gset
 select public.generar_codigo_whatsapp(:'w') as codigo \gset
 set role anon;
+select set_config('request.jwt.claim.sub', '', false) \gset
 select tests.afirmar((public.whatsapp_vincular(:'secreto', '525587654321', :'codigo') ->> 'ok')::boolean, 'se activa de nuevo');
 set role authenticated;
+select set_config('request.jwt.claim.sub', :'u_prop', false) \gset
 update public.trabajadores set fecha_baja = current_date where id = :'w';
 select tests.debe_fallar(format($$select public.generar_codigo_whatsapp(%L)$$, :'w'), 'generar código para una persona dada de baja');
 set role anon;
+select set_config('request.jwt.claim.sub', '', false) \gset
 select tests.afirmar(
   public.whatsapp_checar(:'secreto', '525587654321', 'salida', '00000000-0000-4000-8000-000000000974') ->> 'codigo' = 'NO_VINCULADO',
   'una persona dada de baja no checa');

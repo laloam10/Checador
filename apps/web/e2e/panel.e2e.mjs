@@ -16,6 +16,14 @@ const EMPRESA = `Panadería El Trigo ${sufijo}`;
 const NUMERO = String(Date.now()).slice(-6); // el teclado del kiosco es numérico
 const ZONA = "America/Mexico_City";
 
+// La prueba corrige checadas a las 07:00 y 08:00 de hoy, y la app rechaza horas futuras:
+// antes de las 08:05 (hora de México) fallaría por la hora del día, no por un defecto.
+const horaLocal = new Intl.DateTimeFormat("en-GB", { timeZone: ZONA, hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date());
+if (horaLocal < "08:05") {
+  console.error(`Esta prueba solo corre después de las 08:05 hora de México (ahora son las ${horaLocal}).`);
+  process.exit(2);
+}
+
 const paso = (t) => console.log(`✓ ${t}`);
 const sql = (q) => execFileSync("psql", [DB_URL, "-XtAc", q], { encoding: "utf8" }).trim();
 const hoyLocal = new Intl.DateTimeFormat("en-CA", { timeZone: ZONA, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
