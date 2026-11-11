@@ -51,6 +51,22 @@ export function FormAccion({
           {estado.mensaje}
         </p>
       )}
+      {estado?.ok && estado.activacion && (
+        <div className="activacion-whatsapp">
+          {/* eslint-disable-next-line @next/next/no-img-element -- SVG generado en el servidor, como data URI */}
+          <img src={estado.activacion.qr} width={180} height={180} alt="Código QR para activar WhatsApp" />
+          <div>
+            <p>
+              <strong>Más fácil:</strong> que la persona escanee este QR con la cámara de <em>su</em> celular. Se abre WhatsApp
+              con el mensaje listo; solo tiene que enviarlo.
+            </p>
+            <p className="ayuda">
+              Solo funciona desde el celular capturado en esta ficha. Si estás en ese celular,{" "}
+              <a href={estado.activacion.enlace} target="_blank" rel="noopener noreferrer">abre WhatsApp aquí</a>.
+            </p>
+          </div>
+        </div>
+      )}
     </form>
   );
 }

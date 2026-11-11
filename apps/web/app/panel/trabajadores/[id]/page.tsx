@@ -113,7 +113,7 @@ export default async function FichaTrabajador({ params }: { params: Promise<{ id
               <p className="ayuda">
                 {t.telefono_verificado_en
                   ? "Ya está activado: puede checar escribiendo al número de WhatsApp de Checador. Genera un código solo si necesita activarlo de nuevo."
-                  : "Genera un código y entrégalo en persona. La persona lo escribe al número de WhatsApp de Checador desde su celular y queda activado."}{" "}
+                  : "Genera un código: la persona escanea el QR con su celular (o escribe el código al número de WhatsApp de Checador) y queda activado."}{" "}
                 El código sirve una sola vez, vence en 24 horas y se anula al quinto intento fallido. Para cortar el acceso, borra o
                 cambia el celular en los datos.
               </p>

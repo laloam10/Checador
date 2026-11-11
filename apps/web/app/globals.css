@@ -422,3 +422,8 @@ label > input, label > select, label > textarea { min-width: 0; }
 .interruptor[aria-checked="true"] .interruptor-perilla { transform: translateX(1.3rem); }
 .interruptor:disabled { cursor: wait; }
 .dias-semana { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; margin: 0.25rem 0; }
+
+/* Activación de WhatsApp: QR con el enlace wa.me */
+.activacion-whatsapp { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; flex-basis: 100%; margin-top: .5rem; }
+.activacion-whatsapp img { background: #fff; border: 1px solid var(--borde, #d8dee9); border-radius: 8px; flex: none; }
+.activacion-whatsapp > div { flex: 1 1 16rem; }

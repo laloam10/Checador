@@ -1,5 +1,6 @@
 "use server";
 
+import QRCode from "qrcode";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -17,7 +18,12 @@ import { crearClienteServidor, usuarioActual } from "@/lib/supabase/server";
  * políticas RLS y las funciones de la base.
  */
 
-export type Estado = { ok: boolean; mensaje: string } | null;
+export type Estado = {
+  ok: boolean;
+  mensaje: string;
+  /** Enlace de wa.me y su QR (SVG como data URI) para activar WhatsApp sin dictar el código. */
+  activacion?: { enlace: string; qr: string };
+} | null;
 
 const ok = (mensaje: string): Estado => ({ ok: true, mensaje });
 const fallo = (mensaje: string): Estado => ({ ok: false, mensaje });
@@ -243,9 +249,14 @@ export async function generarCodigoWhatsApp(_: Estado, fd: FormData): Promise<Es
   if (error) return fallo(traducir(error));
   refrescar();
   const codigo = String(data);
-  return ok(
-    `Código de activación: ${codigo.slice(0, 3)} ${codigo.slice(3)}. Entrégalo en persona: sirve una sola vez, vence en 24 horas y no se vuelve a mostrar.`,
-  );
+  const mensaje = `Código de activación: ${codigo.slice(0, 3)} ${codigo.slice(3)}. Sirve una sola vez, vence en 24 horas y no se vuelve a mostrar.`;
+  // Número de WhatsApp de Checador (no es secreto). Sin él solo se muestra el código.
+  const numero = (process.env.WHATSAPP_NUMERO ?? "").replace(/[^0-9]/g, "");
+  if (!/^[0-9]{10,15}$/.test(numero)) return ok(`${mensaje} Entrégalo en persona.`);
+  // El QR se genera aquí, en el servidor: el código nunca se envía a un servicio externo.
+  const enlace = `https://wa.me/${numero}?text=${encodeURIComponent(`activar ${codigo}`)}`;
+  const svg = await QRCode.toString(enlace, { type: "svg", errorCorrectionLevel: "M", margin: 2 });
+  return { ok: true, mensaje, activacion: { enlace, qr: `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}` } };
 }
 
 export async function darDeBaja(_: Estado, fd: FormData): Promise<Estado> {

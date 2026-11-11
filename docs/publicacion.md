@@ -196,7 +196,8 @@ verifica la firma y registra con reglas fijas (sin IA). Si falta cualquier varia
    - Supabase → SQL Editor: `select public.configurar_secreto_servicio('whatsapp', '<secreto>');` (solo se guarda su huella SHA-256).
    - Vercel → variable `WHATSAPP_SECRETO_SERVICIO` (ámbito del entorno que corresponda).
 3. **Vercel**: agrega además `WHATSAPP_VERIFY_TOKEN` (un texto que inventas), `WHATSAPP_APP_SECRET`, `WHATSAPP_TOKEN` y
-   `WHATSAPP_PHONE_ID`. Ninguna lleva prefijo `NEXT_PUBLIC_`. Vuelve a desplegar.
+   `WHATSAPP_PHONE_ID`. Opcional: `WHATSAPP_NUMERO` (el número de WhatsApp con código de país, solo dígitos; no es
+   secreto) para que la ficha muestre el QR y el enlace de activación. Ninguna lleva prefijo `NEXT_PUBLIC_`. Vuelve a desplegar.
 4. **Webhook en Meta** (WhatsApp → Configuración): URL `https://<dominio>/api/whatsapp/webhook`, el mismo token de
    verificación, y suscribe el campo **messages**.
 5. **Prueba**: captura tu celular en la ficha de un trabajador de prueba, pulsa **Generar código de activación**, escribe

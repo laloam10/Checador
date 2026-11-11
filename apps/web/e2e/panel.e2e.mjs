@@ -78,7 +78,17 @@ try {
   await dueno.getByRole("heading", { name: "Carla Ruiz" }).waitFor();
   await dueno.getByText("WhatsApp: pendiente de activar").waitFor();
   await dueno.getByRole("button", { name: "Generar código de activación" }).click();
-  await mensaje(dueno, /Código de activación: \d{3} \d{3}\. Entrégalo en persona/);
+  await mensaje(dueno, /Código de activación: \d{3} \d{3}\. Sirve una sola vez/);
+  if (process.env.WHATSAPP_NUMERO) {
+    // La app debe correr con el mismo WHATSAPP_NUMERO: la ficha muestra el QR y el enlace de wa.me.
+    const codigo = (await dueno.getByRole("status").filter({ hasText: "Código de activación" }).innerText()).match(/(\d{3}) (\d{3})/);
+    const enlace = await dueno.getByRole("link", { name: "abre WhatsApp aquí" }).getAttribute("href");
+    if (enlace !== `https://wa.me/${process.env.WHATSAPP_NUMERO}?text=activar%20${codigo[1]}${codigo[2]}`) throw new Error(`Enlace inesperado: ${enlace}`);
+    const qr = dueno.getByAltText("Código QR para activar WhatsApp");
+    if (!(await qr.evaluate((i) => i.complete && i.naturalWidth > 0))) throw new Error("El QR no se dibujó (¿lo bloqueó la CSP?)");
+    await dueno.screenshot({ path: process.env.CAPTURA_QR ?? "/dev/null", fullPage: true }).catch(() => {});
+    paso("la ficha muestra el QR y el enlace de wa.me con el código prellenado");
+  }
   paso("celular capturado; el código de activación de WhatsApp se muestra una sola vez");
   await dueno.getByLabel("Nuevo PIN (4 a 6 dígitos)").fill("0000");
   await dueno.getByRole("button", { name: "Asignar PIN" }).click();
