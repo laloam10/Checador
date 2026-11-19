@@ -247,6 +247,41 @@ Antes de ofrecerlo a clientes: el aviso de privacidad debe mencionar el número 
 (Meta), y el acuerdo de registro incluye el método solo para quien tiene celular capturado (esos acuerdos quedan
 "desactualizados" hasta que se firme la nueva versión).
 
+### 1.10 Avisos por notificación (opcional)
+
+La persona trabajadora puede activar avisos en su teléfono desde **Avisos** en su app: semana por revisar, acuerdo
+por firmar y cambios de la empresa en sus registros. Usa Web Push: funciona en Android con Chrome y en iPhone solo si
+Checador está en la pantalla de inicio (iOS 16.4 o posterior). Diseño y reglas: `docs/plan-app-movil.md`.
+
+1. **Llaves VAPID** (una pareja por proyecto). En tu computadora:
+   ```bash
+   npx web-push generate-vapid-keys
+   ```
+   La pública no es secreta; la privada sí (no la pegues en chats ni la subas al repositorio).
+2. **Secreto de servicio** (otro distinto al de WhatsApp):
+   ```bash
+   openssl rand -hex 32
+   ```
+   Guárdalo en tres lugares:
+   - Supabase → SQL Editor: `select public.configurar_secreto_servicio('avisos', '<secreto>');`
+   - Supabase → SQL Editor: `select vault.create_secret('<secreto>', 'checador_avisos_secreto');` (la base lo manda a la
+     app al pedir el envío; usa también `checador_url_app` de la sección 1.8).
+   - Vercel → `AVISOS_SECRETO_SERVICIO`.
+3. **Vercel**: `VAPID_PUBLICA`, `VAPID_PRIVADA` y, opcional, `VAPID_CONTACTO` (un `mailto:` o una URL `https://` para que
+   los servicios de Google y Apple puedan contactarte). Ninguna con prefijo `NEXT_PUBLIC_`. Vuelve a desplegar.
+4. **Prueba**: entra como una persona trabajadora de prueba, abre **Avisos** y actívalos; luego, desde el panel,
+   corrige uno de sus registros. El aviso llega en un máximo de 10 minutos si es de 09:00 a 19:59 en la zona del centro y
+   no es día de descanso de esa persona. Hazlo en el proyecto de pruebas.
+
+Cómo funciona: pg_cron revisa cada hora las semanas pendientes y, cada 10 minutos, si hay avisos para alguien con un
+teléfono activado, llama a `/api/avisos/enviar` con el secreto. La app cifra y entrega cada aviso al servicio del
+navegador (Google, Apple, Mozilla o Microsoft; ningún otro destino se acepta). Varios avisos del mismo tipo llegan como
+uno. Lo que no se pudo entregar en 7 días se descarta. Sin la configuración, la página Avisos lo indica y nada se envía.
+
+Antes de ofrecerlo a clientes: el aviso de privacidad debe mencionar que, si la persona activa los avisos, se guarda un
+identificador de su navegador y que el aviso pasa por el servicio de notificaciones de Google, Apple, Mozilla o
+Microsoft (el contenido va cifrado y no lleva horas ni datos de su jornada).
+
 ## 2. Vercel
 
 ### 2.1 Importar el proyecto

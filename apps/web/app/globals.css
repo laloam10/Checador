@@ -519,3 +519,13 @@ body:has(main.kiosco) { background: var(--noche); color: var(--noche-tinta); }
 .kiosco .vacio { color: var(--noche-sub); }
 /* El estado ("Fuera de turno", "Trabajando…") va centrado como el resto del kiosco. */
 .kiosco-paso .estado { justify-self: center; }
+
+/* ---- Avisos (app del trabajador) ---- */
+.avisos { display: grid; gap: 0.85rem; }
+.avisos .aviso ol { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+.avisos .aviso p { margin: 0; }
+.avisos-tipos { gap: 0.6rem; }
+.avisos-tipo { align-items: flex-start; }
+.avisos-tipo input { margin-top: 0.2rem; flex: none; }
+.avisos-tipo > span { display: grid; gap: 0.1rem; }
+.avisos .estado { margin: 0; justify-self: center; }

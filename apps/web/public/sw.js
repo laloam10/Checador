@@ -16,6 +16,37 @@ self.addEventListener("activate", (event) => {
   );
 });
 
+// Avisos (Web Push). El contenido lo arma el servidor sin horas ni datos personales.
+self.addEventListener("push", (event) => {
+  let aviso = { titulo: "Checador", cuerpo: "Tienes algo pendiente en Checador.", url: "/", etiqueta: "checador" };
+  try {
+    aviso = { ...aviso, ...event.data.json() };
+  } catch {}
+  event.waitUntil(
+    self.registration.showNotification(aviso.titulo, {
+      body: aviso.cuerpo,
+      icon: "/icon-192.png",
+      badge: "/icon-192.png",
+      tag: aviso.etiqueta,
+      data: { url: aviso.url },
+    }),
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  // Solo rutas propias: nunca se abre un sitio externo desde un aviso.
+  const ruta = typeof event.notification.data?.url === "string" && /^\/(?![/\\])/.test(event.notification.data.url) ? event.notification.data.url : "/";
+  const destino = new URL(ruta, self.location.origin).href;
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((ventanas) => {
+      const abierta = ventanas.find((v) => v.url.startsWith(self.location.origin));
+      if (abierta) return abierta.navigate(destino).then((v) => (v || abierta).focus());
+      return self.clients.openWindow(destino);
+    }),
+  );
+});
+
 self.addEventListener("fetch", (event) => {
   const req = event.request;
   if (req.method !== "GET") return;

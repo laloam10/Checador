@@ -41,6 +41,9 @@ export function Navegacion({ panel = false }: { panel?: boolean }) {
       <Link href="/acuerdo" className={ruta.startsWith("/acuerdo") ? "activo" : ""}>
         Acuerdo
       </Link>
+      <Link href="/avisos" className={ruta.startsWith("/avisos") ? "activo" : ""}>
+        Avisos
+      </Link>
       {panel && <Link href="/panel">Panel</Link>}
       <button className="enlace" onClick={salir}>
         Salir

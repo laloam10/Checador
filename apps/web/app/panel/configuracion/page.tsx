@@ -23,7 +23,7 @@ export default async function Configuracion() {
       )}
 
       <section className="ajuste-seccion">
-        <h2>Recordatorios por correo</h2>
+        <h2>Recordatorios de conformidad</h2>
         {gestor ? (
           <InterruptorRecordatorios inicial={recordatorios} />
         ) : (
@@ -37,7 +37,8 @@ export default async function Configuracion() {
           como máximo un correo por persona a la semana. Solo lo recibe quien tiene correo registrado; quien checa únicamente
           en el kiosco ve sus semanas pendientes ahí, al identificarse con su PIN. Responder sigue siendo voluntario y el
           correo lo dice así. El resultado de cada envío está en{" "}
-          <Link href="/panel/objeciones#recordatorios">Objeciones</Link>.
+          <Link href="/panel/objeciones#recordatorios">Objeciones</Link>. Este interruptor también controla el aviso en el
+          teléfono de «semana por revisar», para quien activó los avisos en su app.
         </p>
       </section>
 

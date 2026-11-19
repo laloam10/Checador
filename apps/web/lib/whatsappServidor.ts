@@ -1,9 +1,8 @@
 import "server-only";
 
-import { createClient } from "@supabase/supabase-js";
 import { aHoraLocal, reconstruirTurnos } from "@checador/jornada";
 import { calcularSemanaDesdeFilas, configDe, resumenConformidad, type FilaEvento } from "./datos";
-import { configSupabase } from "./supabase/config";
+import { clienteSinSesion } from "./supabase/servicio";
 import {
   ETIQUETA,
   RETRASO_MAXIMO_S,
@@ -48,14 +47,6 @@ export function configWhatsApp(): ConfigWhatsApp | null {
   return { tokenVerificacion, secretoApp, token, idNumero, secretoServicio, urlGraph, urlAsistente };
 }
 
-/**
- * Cliente sin sesión (rol anon): el webhook no tiene usuario. Solo puede ejecutar las funciones
- * whatsapp_*(), que exigen el secreto de servicio. Nunca se usa la llave service_role.
- */
-function clienteBase() {
-  const { url, key } = configSupabase();
-  return createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
-}
 
 interface Estado {
   ok: boolean;
@@ -80,7 +71,7 @@ interface Estado {
 
 /** Atiende un mensaje y devuelve la respuesta para la persona. */
 export async function atender(m: MensajeEntrante, cfg: ConfigWhatsApp, ahora = new Date()): Promise<Respuesta> {
-  const base = clienteBase();
+  const base = clienteSinSesion();
   const ahoraS = Math.floor(ahora.getTime() / 1000);
   const rpc = async <T>(fn: string, args: Record<string, unknown>) => {
     const { data, error } = await base.rpc(fn, { p_secreto: cfg.secretoServicio, p_telefono: m.telefono, ...args });

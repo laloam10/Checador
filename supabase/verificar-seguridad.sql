@@ -34,12 +34,18 @@ select 'ALTO', 'anon puede ejecutar la función', proname || '(' || args || ')'
   from funciones
  where has_function_privilege('anon', oid, 'EXECUTE')
    and proname not in ('whatsapp_estado', 'whatsapp_vincular', 'whatsapp_checar',
-                       'whatsapp_semana', 'whatsapp_esperar_objecion', 'whatsapp_conformidad', 'whatsapp_permitir_reenvio')
+                       'whatsapp_semana', 'whatsapp_esperar_objecion', 'whatsapp_conformidad', 'whatsapp_permitir_reenvio',
+     'avisos_por_enviar', 'avisos_registrar_envio', 'registrar_suscripcion_push', 'quitar_suscripcion_push',
+                       'avisos_por_enviar', 'avisos_registrar_envio')
 union all
 -- 3b. Las funciones del webhook deben verificar el secreto de servicio antes de hacer nada.
 select 'CRITICO', 'Función de WhatsApp sin verificación del secreto de servicio', proname || '(' || args || ')'
   from funciones
  where proname like 'whatsapp\_%' and prosrc not like '%_servicio_autorizado(''whatsapp'', p_secreto)%'
+union all
+select 'CRITICO', 'Función de avisos sin verificación del secreto de servicio', proname || '(' || args || ')'
+  from funciones
+ where proname like 'avisos\_%' and prosrc not like '%_servicio_autorizado(''avisos'', p_secreto)%'
 union all
 -- 4. Las funciones SECURITY DEFINER deben fijar search_path (evita secuestro por objetos homónimos).
 select 'ALTO', 'SECURITY DEFINER sin search_path fijo', proname || '(' || args || ')'
@@ -88,6 +94,7 @@ select 'ALTO', 'Función privilegiada ejecutable por authenticated sin estar en 
      'kiosco_identificar', 'kiosco_checar', 'kiosco_firmar_acuerdo', 'kiosco_semana', 'kiosco_conformidad', 'revertir_baja', 'miembros_de_empresa',
      'whatsapp_estado', 'whatsapp_vincular', 'whatsapp_checar', 'generar_codigo_whatsapp',
      'whatsapp_semana', 'whatsapp_esperar_objecion', 'whatsapp_conformidad', 'whatsapp_permitir_reenvio',
+     'avisos_por_enviar', 'avisos_registrar_envio', 'registrar_suscripcion_push', 'quitar_suscripcion_push',
      'trabajadores_con_pin', 'mi_rol', 'es_gestor', 'puede_consultar', 'soy_trabajador', 'trabajo_en')
 union all
 -- 11. Solo vincular_mi_cuenta() liga una ficha de trabajador a una cuenta (si no, el empleador
