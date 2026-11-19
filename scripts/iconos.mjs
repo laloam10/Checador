@@ -9,7 +9,7 @@ const web = fileURLToPath(new URL("../apps/web/", import.meta.url));
 const svg = readFileSync(`${web}app/icon.svg`, "utf8");
 // Contenido del ícono sin el fondo redondeado, para las variantes a sangre completa.
 const interior = svg.replace(/<rect[^>]*\/>/, "").replace(/^<svg[^>]*>|<\/svg>$/g, "");
-const VERDE = "#0E6B50";
+const VERDE = "#2F6E10";
 
 const variantes = [
   // iOS redondea por su cuenta y no admite transparencia: fondo completo.

@@ -1,12 +1,14 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Manrope } from "next/font/google";
+import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import { connection } from "next/server";
 import { RegistrarServiceWorker } from "@/components/RegistrarServiceWorker";
 import "./globals.css";
 
 // Se descargan al compilar y se sirven desde el mismo dominio (la CSP solo permite font-src 'self').
 const texto = Inter({ subsets: ["latin"], display: "swap", variable: "--fuente-texto" });
-const titulos = Manrope({ subsets: ["latin"], display: "swap", variable: "--fuente-titulos" });
+const titulos = Space_Grotesk({ subsets: ["latin"], display: "swap", variable: "--fuente-titulos" });
+// Horas, folios y etiquetas: cifras de ancho fijo para que las columnas no "bailen".
+const mono = JetBrains_Mono({ subsets: ["latin"], display: "swap", variable: "--fuente-mono" });
 
 export const metadata: Metadata = {
   title: "Checador",
@@ -16,7 +18,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0E6B50",
+  themeColor: "#0A2103",
   width: "device-width",
   initialScale: 1,
 };
@@ -26,7 +28,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   // el nonce de la Content Security Policy (ver proxy.ts).
   await connection();
   return (
-    <html lang="es-MX" className={`${texto.variable} ${titulos.variable}`}>
+    <html lang="es-MX" className={`${texto.variable} ${titulos.variable} ${mono.variable}`}>
       <body>
         {children}
         <RegistrarServiceWorker />

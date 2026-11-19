@@ -25,7 +25,7 @@ export function Navegacion({ panel = false }: { panel?: boolean }) {
   }
 
   return (
-    <nav className="nav">
+    <nav className="nav nav-app">
       <Link href="/" className="marca-enlace" aria-label="Checador: inicio">
         <Isotipo tamano={28} />
       </Link>

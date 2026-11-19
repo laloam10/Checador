@@ -10,8 +10,13 @@ export default async function LayoutPanel({ children }: { children: React.ReactN
   const objeciones = await objecionesPendientes(ctx);
   return (
     <div className="panel">
-      <CabeceraPanel empresa={ctx.empresa.razonSocial} rol={ROL[ctx.rol]} />
-      <NavPanel objeciones={objeciones.length} />
+      {/* Banda de marca (verde Jemba) a todo lo ancho; el contenido sigue centrado. */}
+      <div className="banda">
+        <div className="banda-interior">
+          <CabeceraPanel empresa={ctx.empresa.razonSocial} rol={ROL[ctx.rol]} />
+          <NavPanel objeciones={objeciones.length} />
+        </div>
+      </div>
       <main className="panel-contenido">{children}</main>
     </div>
   );
