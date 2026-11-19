@@ -22,7 +22,7 @@ Bitácora de lo aplicado en los proyectos en la nube. No contiene secretos.
 | Migración 19: código de activación de WhatsApp (`20261120000001`) | ✅ aplicada por API (2026-11-11) | ⏳ pendiente (junto con la 18) |
 | Migración 20: conformidad semanal por WhatsApp (`20261121000001`) | ✅ aplicada por API (2026-11-11) | ⏳ pendiente (junto con la 18 y la 19) |
 | Migración 21: límite de reenvíos al asistente (`20261122000001`) | ✅ aplicada por API (2026-11-11) | ⏳ pendiente (junto con la 18, 19 y 20) |
-| Migración 22: avisos por notificación (`20261123000001`) | ⏳ pendiente (token de administración) | ⏳ pendiente |
+| Migración 22: avisos por notificación (`20261123000001`) | ✅ aplicada por API (2026-11-19) | ⏳ pendiente |
 | Avisos: secreto `avisos`, `checador_avisos_secreto` en Vault y `VAPID_*` en Vercel (guía, 1.10) | ⏳ pendiente | ⏳ pendiente |
 | Secreto de servicio de WhatsApp (`configurar_secreto_servicio`) y variables `WHATSAPP_*` en Vercel | ⏳ pendiente | ⏳ pendiente |
 | `verificar-seguridad.sql` | ✅ 0 hallazgos | ✅ 0 hallazgos |
@@ -37,7 +37,7 @@ Bitácora de lo aplicado en los proyectos en la nube. No contiene secretos.
 | Site URL y URLs permitidas | ✅ `https://checador-pruebas.vercel.app` | ✅ `https://checador.jemba.mx` |
 | Llaves heredadas (legacy) desactivadas | ⏳ manual, en el dashboard | ⏳ manual |
 | Network restrictions | ⏳ manual, en el dashboard | ⏳ manual |
-| Token de administración | `checador-configuracion-2` ya no es válido (2026-11-18); crear uno nuevo para las migraciones 18–21 de producción | |
+| Token de administración | `checador-migraciones` (guardado en el entorno de Claude el 2026-11-19); `checador-configuracion-2` ya no es válido: bórralo de Supabase | |
 
 ## Pendiente: producción sin base de datos (desde el 2026-11-16)
 
