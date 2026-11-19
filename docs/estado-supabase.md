@@ -7,6 +7,7 @@ Bitácora de lo aplicado en los proyectos en la nube. No contiene secretos.
 | Project Ref | `iydppfmwuktjlgtvrdif` | `ajfplcfirscvxhrmqhhr` |
 | Región / Postgres | us-east-1 / 17.11 | us-east-1 / 17.11 |
 | Plan de la organización | Gratuito (subir a **Pro** antes del primer cliente) | ídem |
+| Estado del proyecto | ✅ activo (2026-11-18) | ⛔ **sin respuesta desde el 2026-11-16**, probablemente pausado por inactividad. Pendiente: reactivarlo al pasar a Pro (ver abajo) |
 | Migraciones (10) | ✅ aplicadas por API | ✅ aplicadas por API |
 | Migración 11: recordatorios de conformidad (`20261112000001`) | ✅ aplicada por API (2026-11-09); tareas de pg_cron creadas | ✅ aplicada por API (2026-11-10); tareas de pg_cron creadas |
 | Migración 12: conformidad en el kiosco (`20261113000001`, requiere la 11) | ✅ aplicada por API (2026-11-09) | ✅ aplicada por API (2026-11-10) |
@@ -34,7 +35,23 @@ Bitácora de lo aplicado en los proyectos en la nube. No contiene secretos.
 | Site URL y URLs permitidas | ✅ `https://checador-pruebas.vercel.app` | ✅ `https://checador.jemba.mx` |
 | Llaves heredadas (legacy) desactivadas | ⏳ manual, en el dashboard | ⏳ manual |
 | Network restrictions | ⏳ manual, en el dashboard | ⏳ manual |
-| Token de administración | `checador-configuracion-2` activo → **revocar al terminar** | |
+| Token de administración | `checador-configuracion-2` ya no es válido (2026-11-18); crear uno nuevo para las migraciones 18–21 de producción | |
+
+## Pendiente: producción sin base de datos (desde el 2026-11-16)
+
+La verificación semanal (`verificar-produccion.yml`, lunes 07:17 hora del centro) falló el 2026-11-16: la app
+responde, pero `ajfplcfirscvxhrmqhhr.supabase.co` no acepta conexiones. El proyecto de pruebas sí responde.
+Causa más probable: pausa por inactividad del plan gratuito. Se reactivará al pasar la organización a **Pro**.
+
+Mientras siga así: nadie puede iniciar sesión ni checar en `checador.jemba.mx`, los recordatorios de conformidad
+no se envían, y la verificación de cada lunes fallará. Los datos no se pierden por la pausa, pero en el plan
+gratuito un proyecto pausado más de 90 días ya no se reactiva desde el panel (hay que restaurar un respaldo).
+
+Al reactivar:
+1. Pasar la organización a Pro y pulsar **Restore project** en el proyecto de producción.
+2. Lanzar `Verificar producción` (Actions → Run workflow): deben pasar las 40 comprobaciones.
+3. Revisar en `recordatorios_conformidad` que los envíos de las semanas pausadas no queden a medias.
+4. Crear un token de administración nuevo para aplicar las migraciones 18–21 cuando WhatsApp pase a producción.
 
 ## Aplicación (Vercel, equipo Checador · Pro)
 
