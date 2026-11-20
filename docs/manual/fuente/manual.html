@@ -57,6 +57,13 @@
   .indice a { color: inherit; text-decoration: none; }
   .roles { display: flex; gap: 4mm; margin: 4mm 0; }
   .rol { flex: 1; border: 1px solid var(--borde); border-radius: 8px; padding: 3mm 4mm; font-size: 9.3pt; }
+  .chat { border: 1px solid var(--borde); border-radius: 10px; padding: 3mm; background: var(--superficie-2); font-size: 9pt; display: grid; gap: 1.6mm; page-break-inside: avoid; margin: 3mm 0; }
+  .chat .msg { max-width: 82%; padding: 1.6mm 2.6mm; border-radius: 8px; line-height: 1.35; white-space: pre-line; }
+  .chat .yo { justify-self: end; background: var(--marca-claro); border: 1px solid #cfdcae; }
+  .chat .bot { justify-self: start; background: white; border: 1px solid var(--borde); }
+  .chat .btns { display: flex; gap: 1.5mm; flex-wrap: wrap; margin-top: 1.4mm; }
+  .chat .btns span { border: 1px solid var(--marca); color: var(--marca); border-radius: 5px; padding: 0 2mm; font-weight: 600; font-size: 8.5pt; }
+  .chat .quien { font-family: var(--mono); font-size: 7.5pt; color: var(--gris); text-transform: uppercase; letter-spacing: 0.08em; }
   .rol strong { display: block; color: var(--marca); font-size: 11pt; margin-bottom: 1mm; font-family: var(--titulos); }
 </style>
 </head>
@@ -92,12 +99,16 @@
       <li>3.7 Centros de trabajo · 3.8 Tablero · 3.9 Registros semanales</li>
       <li>3.10 Corregir checadas · 3.11 Objeciones · 3.12 Exportar para inspección o juicio</li>
       <li>3.13 Accesos y roles · 3.14 Dar de baja (y deshacerla) · 3.15 Configuración · 3.16 El panel en el celular</li>
+      <li>3.17 Checada por WhatsApp</li>
     </ol>
   </li>
-  <li><a href="#trabajador">4. Guía del trabajador (app en el celular)</a></li>
+  <li><a href="#trabajador">4. Guía del trabajador (app en el celular)</a>
+    <ol><li>4.1 Firmar tu acuerdo · 4.2 Checar · 4.3 Revisar tus registros · 4.4 Tu PIN · 4.5 Avisos en tu teléfono</li></ol>
+  </li>
   <li><a href="#kiosco">5. Guía del kiosco</a></li>
-  <li><a href="#faq">6. Preguntas frecuentes y solución de problemas</a></li>
-  <li><a href="#glosario">7. Glosario</a></li>
+  <li><a href="#whatsapp">6. Checar por WhatsApp (trabajador)</a></li>
+  <li><a href="#faq">7. Preguntas frecuentes y solución de problemas</a></li>
+  <li><a href="#glosario">8. Glosario</a></li>
 </ol>
 </section>
 
@@ -108,7 +119,7 @@
 <h2>Tres formas de usarlo</h2>
 <div class="roles">
   <div class="rol"><strong>Empleador</strong>Dueño, administrador o supervisor. Usa el <b>panel</b> desde la computadora: da de alta al personal, firma acuerdos, corrige checadas y exporta reportes.</div>
-  <div class="rol"><strong>Trabajador</strong>Usa la <b>app en su celular</b>: registra entrada, pausas y salida, revisa sus horarios, da su conformidad y firma su acuerdo.</div>
+  <div class="rol"><strong>Trabajador</strong>Usa la <b>app en su celular</b>: registra entrada, pausas y salida, revisa sus horarios, da su conformidad y firma su acuerdo. Si su empresa lo activa, también puede checar <b>por WhatsApp</b>.</div>
   <div class="rol"><strong>Kiosco</strong>Una <b>tableta fija</b> en el centro de trabajo, para quien no tiene celular o correo: se checa con número de empleado y PIN.</div>
 </div>
 
@@ -332,7 +343,7 @@
 <p>En <span class="menu">Configuración</span> (en el celular, dentro de <b>Más</b>) el propietario o un administrador controlan:</p>
 <figure><img src="img/28-configuracion.png"><figcaption>Configuración: interruptor de recordatorios y datos de la empresa.</figcaption></figure>
 <ul>
-  <li><b>Recordatorios por correo</b>: un interruptor que se guarda al tocarlo. Apagado, el envío de los lunes no incluye a tu empresa.</li>
+  <li><b>Recordatorios de conformidad</b>: un interruptor que se guarda al tocarlo. Apagado, el correo de los lunes no incluye a tu empresa y tampoco se envía el aviso de "semana por revisar" a los teléfonos de tu personal (sección 4.5).</li>
   <li><b>Datos de la empresa</b>: razón social, RFC y zona horaria.</li>
 </ul>
 <div class="importante"><b>Antes de cambiar la razón social o el RFC</b>Aparecen en el acuerdo de registro de cada persona. Al cambiarlos, los acuerdos de todo tu personal quedan <b>desactualizados</b> y hay que firmar una versión nueva (la anterior sigue vigente mientras tanto). Hazlo solo si el dato estaba mal o cambió de verdad.</div>
@@ -345,6 +356,27 @@
     <p>Las listas se ven como <b>tarjetas</b>, con cada dato y su etiqueta, para que nada quede cortado. Para dar de alta a mucha gente conviene más la computadora (alta desde Excel).</p>
   </div>
 </div>
+
+<h2>3.17 Checada por WhatsApp</h2>
+<p>Además de la app y el kiosco, tu personal puede checar escribiendo al <b>número de WhatsApp de Checador</b>, el mismo para todas las empresas. Checador reconoce a cada persona por su número de celular. La checada no la decide ninguna inteligencia artificial: solo se registra lo que la persona toca o escribe, con la hora del servidor.</p>
+<h3>Activar a una persona</h3>
+<div class="fila">
+  <figure style="flex:0.55"><img src="img/31-ficha-celular.png"><figcaption>Campo del celular en la ficha.</figcaption></figure>
+  <div style="flex:1.45; font-size:10pt">
+    <ol>
+      <li>En su ficha, sección <b>Datos</b>, escribe su <b>Celular para WhatsApp</b> (10 dígitos) y presiona <span class="boton">Guardar cambios</span>. Arriba verás <b>WhatsApp: pendiente de activar</b>.</li>
+      <li>En la sección <b>WhatsApp</b> de la ficha, presiona <span class="boton">Generar código de activación</span>.</li>
+      <li>Entrega el código <b>en persona</b>. Lo más fácil: que la persona escanee el QR con la cámara de <b>su</b> celular; se abre WhatsApp con el mensaje listo y solo tiene que enviarlo. También puede escribir el código de 6 dígitos al número de Checador.</li>
+      <li>Al activarse, su ficha dice <b>WhatsApp: activado</b>.</li>
+    </ol>
+  </div>
+</div>
+<figure><img src="img/32-whatsapp-codigo.png"><figcaption>El código y su QR aparecen una sola vez al generarlos (en este manual el QR está difuminado).</figcaption></figure>
+<div class="nota"><b>Cómo funciona el código</b>Sirve <b>una sola vez</b>, vence en <b>24 horas</b> y se anula al quinto intento equivocado. Solo funciona desde el celular capturado en la ficha. Si se pierde o vence, genera uno nuevo: el anterior deja de servir.</div>
+<h3>Quitar el acceso o cambiar de número</h3>
+<p>Borra o cambia el celular en la ficha. Desde ese momento el número anterior ya no puede checar; si pusiste uno nuevo, genera otro código para activarlo. Al dar de baja a una persona, su WhatsApp deja de funcionar.</p>
+<div class="importante"><b>Al capturar el celular, el acuerdo de esa persona queda desactualizado</b>El acuerdo de registro incluye WhatsApp como método solo para quien tiene celular capturado. Por eso, al agregarlo (o cambiarlo), hay que firmar una versión nueva del acuerdo (sección 3.5). La anterior sigue vigente mientras tanto.</div>
+<div class="consejo"><b>Qué ves tú</b>Las checadas por WhatsApp aparecen en la bitácora con la etiqueta <b>WhatsApp</b>, igual que las del celular o el kiosco, y se corrigen igual. Si la persona da su conformidad por WhatsApp, queda registrada como las demás.</div>
 
 <!-- ======================= 4. TRABAJADOR ======================= -->
 <h1 id="trabajador">4. Guía del trabajador (app en el celular)</h1>
@@ -394,6 +426,22 @@
 <figure class="celular"><img src="img/15-app-pin.png"><figcaption>Sección PIN.</figcaption></figure>
 <p>Si en tu centro hay kiosco, en la sección <b>PIN</b> puedes elegir tu propio PIN de 4 a 6 dígitos. <b>No lo compartas</b>: quien lo conozca puede checar por ti.</p>
 
+<h2>4.5 Avisos en tu teléfono</h2>
+<div class="fila">
+  <figure class="celular"><img src="img/33-app-avisos.png"><figcaption>Sección Avisos.</figcaption></figure>
+  <div style="flex:1.3; font-size:10pt">
+    <p>Checador puede avisarte en tu teléfono cuando tengas algo pendiente:</p>
+    <ul>
+      <li><b>Semanas por revisar</b>: terminó una semana que no has revisado, o tu empresa corrigió una que objetaste.</li>
+      <li><b>Acuerdo por firmar</b>: tu empresa firmó un acuerdo que espera tu firma.</li>
+      <li><b>Cambios en tus registros</b>: tu empresa corrigió, anuló o agregó uno de tus registros.</li>
+    </ul>
+    <p>Para activarlos, entra a la sección <b>Avisos</b>, presiona <span class="boton">Activar avisos en este teléfono</span> y acepta el permiso. Ahí mismo eliges qué avisos quieres recibir.</p>
+    <p>Los avisos llegan de <b>9:00 a 20:00</b> y nunca en tus días de descanso. No muestran tus horas: solo te invitan a abrir Checador. Tu empresa no puede mandarte mensajes por aquí.</p>
+  </div>
+</div>
+<div class="nota"><b>En iPhone</b>Los avisos solo llegan si Checador está en tu pantalla de inicio (iOS 16.4 o posterior): en Safari toca <b>Compartir → Agregar a pantalla de inicio</b>, abre Checador desde ese ícono y activa los avisos. En Android funcionan con Chrome.</div>
+
 <!-- ======================= 5. KIOSCO ======================= -->
 <h1 id="kiosco">5. Guía del kiosco</h1>
 <p>Para checar en la tableta del centro de trabajo solo necesitas tu <b>número de empleado</b> y tu <b>PIN</b>.</p>
@@ -427,7 +475,41 @@
 <div class="nota"><b>Sin internet</b>El kiosco guarda la checada y verifica tu PIN cuando vuelve la conexión. Si el PIN era incorrecto, la checada se rechaza y aparece abajo en la pantalla para que el supervisor la capture con su motivo.</div>
 
 <!-- ======================= 6. FAQ ======================= -->
-<h1 id="faq">6. Preguntas frecuentes y solución de problemas</h1>
+<!-- ======================= 6. WHATSAPP ======================= -->
+<h1 id="whatsapp">6. Checar por WhatsApp (trabajador)</h1>
+<p>Si tu empresa lo activó, puedes registrar tu jornada escribiendo al <b>número de WhatsApp de Checador</b> que te indique tu empresa, desde el celular que registraste con ella.</p>
+
+<h2>6.1 Activar tu WhatsApp (una sola vez)</h2>
+<p>Tu empresa te da un <b>código de activación</b> de 6 dígitos, en persona o con un QR. Escanea el QR con la cámara de tu celular y envía el mensaje que aparece, o escribe el código al número de Checador. Listo: no tienes que volver a hacerlo.</p>
+<p>El código sirve una vez y vence en 24 horas. Si te dice que es incorrecto o que se anuló, pide uno nuevo a tu empresa. No compartas tu código con nadie.</p>
+
+<h2>6.2 Checar</h2>
+<p>Escribe cualquier mensaje y Checador te contesta con tu estado y los <b>botones</b> de lo que puedes registrar en ese momento. Toca el que corresponde. También puedes escribir directamente: <b>Entrada</b>, <b>Salida</b>, <b>Comida</b> (inicio de pausa) o <b>Regresé</b> (fin de pausa).</p>
+<div class="chat">
+  <div class="quien">Ejemplo de conversación</div>
+  <div class="msg yo">Hola</div>
+  <div class="msg bot">María, no tienes un turno abierto.
+¿Qué quieres registrar?<div class="btns"><span>Entrada</span></div></div>
+  <div class="msg yo">Entrada</div>
+  <div class="msg bot">✅ Entrada registrada a las 08:02 del 26/10.
+Tortillería Doña Lupita · registro n.º 41<div class="btns"><span>Iniciar pausa</span><span>Salida</span></div></div>
+</div>
+<p>La confirmación trae la hora y el <b>número de registro</b>: es tu comprobante. Si no la recibes, tu checada no se registró.</p>
+<ul>
+  <li>Los botones <b>vencen a los 10 minutos</b>. Si tocas uno viejo, Checador te muestra los botones actuales.</li>
+  <li>Si tu mensaje llega con <b>más de 5 minutos de retraso</b> (por ejemplo, por mala señal), no se registra: Checador te pide enviarlo de nuevo para que quede la hora real.</li>
+  <li>Solo se registra lo que corresponde a tu estado: no puedes marcar dos entradas seguidas. Una pregunta como "¿ya quedó mi entrada?" no registra nada; solo te muestra tu estado.</li>
+</ul>
+
+<h2>6.3 Revisar tu semana</h2>
+<p>Cuando tengas semanas terminadas sin revisar, Checador te lo dice al checar y te ofrece el botón <b>Revisar semana</b> (también puedes escribir <b>semana</b>). Verás tus turnos de cada día y el total. Después:</p>
+<ul>
+  <li>Si está bien, toca <b>Estoy conforme</b>.</li>
+  <li>Si algo falla, toca <b>No es correcto</b> y escribe <b>en un solo mensaje</b> qué está mal (día y hora). Tienes 15 minutos.</li>
+</ul>
+<p>Recibes un comprobante con número. Escribir "conforme" sin tocar el botón no registra nada. Si tu empresa cambia tus registros después de que los viste, Checador te los muestra de nuevo antes de aceptar tu conformidad. Responder es voluntario: si no respondes, no significa que estés de acuerdo.</p>
+
+<h1 id="faq">7. Preguntas frecuentes y solución de problemas</h1>
 <table>
   <tr><th style="width:36%">Situación</th><th>Qué hacer</th></tr>
   <tr><td>No me llega el código</td><td>Espera un par de minutos y revisa spam o promociones. Verifica que el correo esté bien escrito. Si pediste muchos códigos, espera unos minutos.</td></tr>
@@ -446,10 +528,14 @@
   <tr><td>Cambié la jornada o los días de descanso de alguien</td><td>Su acuerdo queda <b>desactualizado</b>: firma la nueva versión y pídele que la firme. La anterior sigue vigente mientras tanto.</td></tr>
   <tr><td>El kiosco dice "Este dispositivo no está configurado"</td><td>La cuenta con la que se entró en la tableta no tiene el rol de kiosco. Invítala desde <b>Accesos</b> y vuelve a cargar la página.</td></tr>
   <tr><td>"Verificar ahora" muestra una alerta de alteración</td><td>No corrijas nada. Exporta los registros y contacta a soporte de inmediato.</td></tr>
+  <tr><td>WhatsApp dice que mi número no está registrado</td><td>Tu empresa aún no captura tu celular, o lo cambió. Pídele que lo registre en tu ficha y te dé un código de activación.</td></tr>
+  <tr><td>El código de activación no funciona</td><td>Pudo vencer (dura 24 horas), haberse usado o anulado tras 5 intentos, o haberse generado para otro número. Pide uno nuevo a tu empresa.</td></tr>
+  <tr><td>Cambié de número de celular</td><td>Avisa a tu empresa: cambia el número en tu ficha y te da un código nuevo. El número anterior deja de funcionar.</td></tr>
+  <tr><td>No me llegan los avisos</td><td>Revisa en <b>Avisos</b> que digan "activados en este teléfono" y que el tipo de aviso esté marcado. Solo llegan de 9:00 a 20:00 y no en tus días de descanso. En iPhone, Checador debe estar en la pantalla de inicio. Si bloqueaste las notificaciones, permítelas en la configuración del teléfono.</td></tr>
 </table>
 
 <!-- ======================= 7. GLOSARIO ======================= -->
-<h1 id="glosario">7. Glosario</h1>
+<h1 id="glosario">8. Glosario</h1>
 <table>
   <tr><th style="width:28%">Término</th><th>Significado</th></tr>
   <tr><td>Bitácora</td><td>Lista de todas las checadas, correcciones y anulaciones, en el orden en que ocurrieron. No se puede borrar ni modificar.</td></tr>
@@ -461,6 +547,8 @@
   <tr><td>Sin conexión (diferida)</td><td>Checada hecha sin internet y enviada después. Se guardan la hora del dispositivo y la hora en que llegó.</td></tr>
   <tr><td>Descanso semanal obligatorio / adicional</td><td>El obligatorio es el día que exige la ley por cada seis de trabajo (art. 69); trabajarlo se paga doble (art. 73). Los adicionales son días extra que pactas, como el sábado en una semana de 5 días.</td></tr>
   <tr><td>Kiosco</td><td>Tableta compartida donde se checa con número de empleado y PIN.</td></tr>
+  <tr><td>Código de activación</td><td>Código de 6 dígitos que genera el empleador para que una persona active su checada por WhatsApp. Sirve una vez y vence en 24 horas.</td></tr>
+  <tr><td>Aviso</td><td>Notificación en el teléfono que invita a revisar, firmar o consultar algo en Checador. No tiene efecto legal: no sustituye la conformidad ni la firma.</td></tr>
   <tr><td>Jornada ordinaria / tiempo extra</td><td>Horas normales de trabajo y horas adicionales. El extra se paga al doble y, por encima de los límites, al triple (arts. 66 y 68 LFT).</td></tr>
   <tr><td>Huella digital (SHA-256)</td><td>Código que identifica de forma única el contenido de un registro o archivo. Cualquier cambio produce una huella distinta.</td></tr>
 </table>

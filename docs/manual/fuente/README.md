@@ -27,7 +27,7 @@ Hazlo cuando cambien pantallas o textos de la app. `capturas.cjs` recorre la app
 Requisitos (los mismos que las pruebas de punta a punta, ver `apps/web/README.md`):
 
 1. Supabase local con las migraciones (`npx supabase start`), incluido Mailpit en el puerto 54324 para leer los códigos.
-2. La app en `http://127.0.0.1:3000` con el `.env.local` de Supabase local:
+2. La app en `http://127.0.0.1:3000` con el `.env.local` de Supabase local y, para las capturas de WhatsApp y Avisos, con `WHATSAPP_NUMERO=5215500000000` (número de ejemplo; el QR se difumina) y `VAPID_PUBLICA=<cualquier llave pública VAPID>` en el entorno:
 
    ```bash
    npm run build -w @checador/web && npm run start -w @checador/web

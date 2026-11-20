@@ -262,6 +262,31 @@ const estado = (p, t) => p.getByRole("status").filter({ hasText: t }).first().wa
   await shot(pc, "30-panel-celular");
   log("panel");
 
+  // ---------- WhatsApp (la app debe correr con WHATSAPP_NUMERO; ver README) ----------
+  // Al final para no cambiar las capturas anteriores: capturar el celular deja el acuerdo de José desactualizado.
+  await d.goto(`${APP}/panel/trabajadores/${jose}`);
+  await d.getByLabel("Celular para WhatsApp (opcional)").fill(`55${String(Date.now()).slice(-8)}`);
+  await d.getByRole("button", { name: "Guardar cambios" }).click();
+  await estado(d, "Datos actualizados");
+  await d.getByText("WhatsApp: pendiente de activar").waitFor();
+  await shotEl(d.getByLabel("Celular para WhatsApp (opcional)").locator("xpath=ancestor::label[1]"), "31-ficha-celular");
+  await d.getByRole("button", { name: "Generar código de activación" }).click();
+  await d.getByAltText("Código QR para activar WhatsApp").waitFor();
+  // El QR apunta a un número de ejemplo: se difumina para que nadie lo escanee desde el manual.
+  await d.addStyleTag({ content: ".activacion-whatsapp img { filter: blur(5px); }" });
+  await shotEl(d.locator("h2", { hasText: "WhatsApp" }).locator("xpath=following-sibling::form[1]"), "32-whatsapp-codigo");
+  log("whatsapp");
+
+  // ---------- Avisos de la trabajadora (la app debe correr con VAPID_PUBLICA) ----------
+  // Chromium sin pantalla reporta el permiso de notificaciones como negado: se muestra como "aún no decidido".
+  await celular.addInitScript(() => {
+    if (self.Notification) Object.defineProperty(Notification, "permission", { get: () => "default" });
+  });
+  await m.goto(`${APP}/avisos`);
+  await m.getByRole("button", { name: "Activar avisos en este teléfono" }).waitFor();
+  await shot(m, "33-app-avisos", { fullPage: true });
+  log("avisos");
+
   await b.close();
   console.log("Capturas en", OUT);
 })().catch((e) => { console.error("FALLÓ:", e.message); process.exit(1); });
