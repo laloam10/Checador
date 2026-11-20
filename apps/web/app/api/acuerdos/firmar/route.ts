@@ -1,12 +1,13 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { evidenciaDe } from "@/lib/evidencia";
 import { misTrabajadores } from "@/lib/datos";
-import { crearClienteServidor, usuarioActual } from "@/lib/supabase/server";
+import { clienteDeSolicitud, usuarioActual } from "@/lib/supabase/server";
 
 /** Firma electrónica del acuerdo por la persona trabajadora (su cuenta, verificada por correo). */
 export async function POST(request: NextRequest) {
-  const supabase = await crearClienteServidor();
-  const userId = await usuarioActual(supabase);
+  // PWA (cookie) o app instalada (token): RLS aplica igual en los dos casos.
+  const { supabase, token } = await clienteDeSolicitud(request);
+  const userId = await usuarioActual(supabase, token);
   if (!userId) return NextResponse.json({ ok: false, error: "Sesión expirada. Vuelve a entrar." }, { status: 401 });
 
   const { acuerdoId, acepto } = (await request.json().catch(() => ({}))) as { acuerdoId?: unknown; acepto?: unknown };

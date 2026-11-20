@@ -289,6 +289,13 @@ Antes de ofrecerlo a clientes: el aviso de privacidad debe mencionar que, si la 
 identificador de su navegador y que el aviso pasa por el servicio de notificaciones de Google, Apple, Mozilla o
 Microsoft (el contenido va cifrado y no lleva horas ni datos de su jornada).
 
+### 1.11 App instalada desde las tiendas (preparación)
+
+Las rutas del trabajador ya aceptan el token de sesión de una app con Capacitor (ver `docs/plan-app-movil.md`, fase
+2). En Vercel, cuando exista la app, agrega `APP_VERSION_MINIMA` (por ejemplo `1.0.0`): la app la consulta en
+`/api/app/version` y pide actualizar si es más vieja. Sin la variable, el servidor acepta cualquier versión. No hay que
+configurar nada más mientras no haya app publicada.
+
 ## 2. Vercel
 
 ### 2.1 Importar el proyecto

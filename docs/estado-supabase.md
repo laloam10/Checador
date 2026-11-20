@@ -24,6 +24,7 @@ Bitácora de lo aplicado en los proyectos en la nube. No contiene secretos.
 | Migración 21: límite de reenvíos al asistente (`20261122000001`) | ✅ aplicada por API (2026-11-11) | ⏳ pendiente (junto con la 18, 19 y 20) |
 | Migración 22: avisos por notificación (`20261123000001`) | ✅ aplicada por API (2026-11-19) | ⏳ pendiente |
 | Migración 23: bypass de Vercel en el disparador de avisos (`20261124000001`) | ✅ aplicada por API (2026-11-20) | ⏳ pendiente (no lo necesita, pero va con la 22) |
+| Migración 24: origen `app` en la bitácora (`20261125000001`) | ✅ aplicada por API (2026-11-20) | ⏳ pendiente (junto con la 18–23) |
 | Avisos: secreto `avisos`, `checador_avisos_secreto` en Vault y `VAPID_*` en Vercel (guía, 1.10) | ✅ (2026-11-20), con `checador_vercel_bypass`; aviso real entregado en Android | ⏳ pendiente |
 | Secreto de servicio de WhatsApp (`configurar_secreto_servicio`) y variables `WHATSAPP_*` en Vercel | ⏳ pendiente | ⏳ pendiente |
 | `verificar-seguridad.sql` | ✅ 0 hallazgos | ✅ 0 hallazgos |

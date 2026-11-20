@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { crearClienteServidor, usuarioActual } from "@/lib/supabase/server";
+import { clienteApp } from "@/lib/appMovil";
+import { clienteDeSolicitud, usuarioActual } from "@/lib/supabase/server";
 import { evidenciaDe } from "@/lib/evidencia";
 
 const TIPOS = new Set(["entrada", "salida", "inicio_pausa", "fin_pausa"]);
@@ -13,10 +14,13 @@ interface Cuerpo {
   horaDispositivo?: unknown;
 }
 
-/** Registra una checada del trabajador (PWA). La hora la fija el servidor. */
+/**
+ * Registra una checada del trabajador desde la PWA (cookie) o desde la app instalada (token).
+ * La hora la fija el servidor. El origen queda en la bitácora: 'pwa' o 'app'.
+ */
 export async function POST(request: NextRequest) {
-  const supabase = await crearClienteServidor();
-  const userId = await usuarioActual(supabase);
+  const { supabase, token } = await clienteDeSolicitud(request);
+  const userId = await usuarioActual(supabase, token);
   if (!userId) return error(401, "Sesión expirada. Vuelve a entrar.");
 
   let cuerpo: Cuerpo;
@@ -47,12 +51,14 @@ export async function POST(request: NextRequest) {
     empresa_id: trabajador.empresa_id,
     trabajador_id: trabajadorId,
     tipo,
-    origen: "pwa",
+    origen: token ? "app" : "pwa",
     // puede_salir lo impone el centro de trabajo en la base (art. 64).
     diferido: esDiferido,
     hora_dispositivo: esDiferido ? horaDispositivo : null,
     id_cliente: idCliente,
-    evidencia: evidenciaDe(request),
+    evidencia: token
+      ? { ...evidenciaDe(request), ...clienteApp(request.headers.get("x-checador-plataforma"), request.headers.get("x-checador-version")) }
+      : evidenciaDe(request),
   });
 
   if (errInsert) {

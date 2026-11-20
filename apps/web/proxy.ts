@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { cabecerasCors, origenAppPermitido, rutaDeApp } from "@/lib/appMovil";
 
 /**
  * Corre antes de cada petición:
@@ -7,8 +8,16 @@ import { NextResponse, type NextRequest } from "next/server";
  *     con ese nonce; solo se conecta al propio dominio y a Supabase).
  *  2. Refresca la sesión de Supabase.
  *  3. Redirige a /entrar si no hay sesión (las rutas /api responden 401 por sí mismas).
+ *  4. CORS solo para la app instalada desde las tiendas (orígenes de Capacitor) y solo en las
+ *     rutas que usa (lib/appMovil.ts). La app manda su token en Authorization, sin cookies.
  */
 export async function proxy(request: NextRequest) {
+  const origen = request.headers.get("origin");
+  const cors = rutaDeApp(request.nextUrl.pathname) && origenAppPermitido(origen, process.env.APP_ORIGENES_EXTRA)
+    ? cabecerasCors(origen!)
+    : null;
+  if (cors && request.method === "OPTIONS") return new NextResponse(null, { status: 204, headers: cors });
+
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
   const csp = politicaSeguridad(nonce, request.nextUrl.protocol === "https:");
 
@@ -50,6 +59,7 @@ export async function proxy(request: NextRequest) {
     return redireccion;
   }
   response.headers.set("Content-Security-Policy", csp);
+  if (cors) for (const [k, v] of Object.entries(cors)) response.headers.set(k, v);
   return response;
 }
 

@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { aHoraLocal } from "@checador/jornada";
-import { crearClienteServidor, usuarioActual } from "@/lib/supabase/server";
+import { clienteDeSolicitud, usuarioActual } from "@/lib/supabase/server";
 import { lunesDe, misTrabajadores, resumenConformidad, semanaDeTrabajador, sumarDias } from "@/lib/datos";
 import { evidenciaDe } from "@/lib/evidencia";
 
@@ -10,8 +10,9 @@ import { evidenciaDe } from "@/lib/evidencia";
  * muestra la pantalla de registros, no lo que envíe el navegador.
  */
 export async function POST(request: NextRequest) {
-  const supabase = await crearClienteServidor();
-  const userId = await usuarioActual(supabase);
+  // PWA (cookie) o app instalada (token): RLS aplica igual en los dos casos.
+  const { supabase, token } = await clienteDeSolicitud(request);
+  const userId = await usuarioActual(supabase, token);
   if (!userId) return error(401, "Sesión expirada. Vuelve a entrar.");
 
   let cuerpo: { trabajadorId?: unknown; semana?: unknown; respuesta?: unknown; comentario?: unknown };

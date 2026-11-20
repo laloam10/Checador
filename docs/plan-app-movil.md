@@ -19,12 +19,23 @@ Android e iOS es el medio para hacerlas confiables, no un fin en sí.
   bypass de la protección de Vercel en Vault. Primer aviso real ("semana por revisar") entregado y mostrado en un
   Android con Chrome. Falta probar en iPhone (pantalla de inicio) y llevarlo a producción con las migraciones 18 a 23.
 
+- **Fase 2 terminada** (2026-11-20, rama `pruebas`): las rutas del trabajador (`/api/eventos`, `/api/conformidades`,
+  `/api/acuerdos/firmar`) aceptan el token de sesión en `Authorization: Bearer`; CORS solo para los orígenes de
+  Capacitor (`capacitor://localhost`, `https://localhost`) y solo en esas rutas más `/api/hora` y `/api/app/version`
+  (versión mínima, variable `APP_VERSION_MINIMA`); migración 24: origen `app` en la bitácora, con plataforma y
+  versión en la evidencia. La app lee sus registros directo de Supabase con su sesión (RLS). Reglas en
+  `apps/web/lib/appMovil.ts`; prueba `apps/web/e2e/app-movil.e2e.mjs`.
+
 ## Decisiones pendientes
 
 - Aviso de **turno abierto** muchas horas: solo si antes existe una forma de que la persona pida una corrección. No
   debe invitar a "registrar la salida ahora", porque asentaría una hora falsa y tiempo extra inexistente.
 - Cuentas de tiendas: a nombre de una organización (Jemba) o personal.
 - Si las pantallas del trabajador se comparten entre la PWA y la app nativa (recomendado) o se duplican.
+- **Texto del acuerdo antes de publicar la app** (riesgo ya listado abajo): la cláusula SEGUNDA dice "Aplicación web
+  en su teléfono celular". Una app instalada desde una tienda no es "web". Hay que decidir con el abogado si se
+  redacta de forma general ("aplicación en su teléfono celular") antes de la fase 3; cambiarla deja desactualizados
+  todos los acuerdos firmados.
 
 ## Reglas de los avisos
 

@@ -1,4 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
+import { createClient } from "@supabase/supabase-js";
+import { tokenDe } from "@/lib/appMovil";
 import { cookies } from "next/headers";
 import { configSupabase } from "./config";
 
@@ -22,9 +24,32 @@ export async function crearClienteServidor() {
   });
 }
 
-/** Devuelve el id del usuario autenticado (JWT verificado) o null. */
-export async function usuarioActual(supabase: Awaited<ReturnType<typeof crearClienteServidor>>) {
-  const { data } = await supabase.auth.getClaims();
-  const sub = data?.claims?.sub;
-  return typeof sub === "string" ? sub : null;
+type Cliente = Awaited<ReturnType<typeof crearClienteServidor>>;
+
+/**
+ * Cliente para una ruta de la API que usan tanto la PWA (sesión en cookies) como la app
+ * instalada desde las tiendas (token en `Authorization: Bearer`). Con token, las consultas
+ * llevan ese token y RLS aplica igual; la app nunca recibe ni usa la llave service_role.
+ */
+export async function clienteDeSolicitud(request: Request): Promise<{ supabase: Cliente; token: string | null }> {
+  const token = tokenDe(request.headers.get("authorization"));
+  if (!token) return { supabase: await crearClienteServidor(), token: null };
+  const { url, key } = configSupabase();
+  const supabase = createClient(url, key, {
+    global: { headers: { Authorization: `Bearer ${token}` } },
+    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+  });
+  return { supabase: supabase as unknown as Cliente, token };
+}
+
+/** Devuelve el id del usuario autenticado (JWT verificado) o null. Con `token`, verifica ese. */
+export async function usuarioActual(supabase: Cliente, token?: string | null) {
+  try {
+    const { data } = await supabase.auth.getClaims(token ?? undefined);
+    const sub = data?.claims?.sub;
+    return typeof sub === "string" ? sub : null;
+  } catch {
+    // Un token mal formado hace que la verificación lance un error: es "sin sesión" (401), no un 500.
+    return null;
+  }
 }
