@@ -199,7 +199,9 @@ verifica la firma y registra con reglas fijas (sin IA). Si falta cualquier varia
    `WHATSAPP_PHONE_ID`. Opcional: `WHATSAPP_NUMERO` (el número de WhatsApp con código de país, solo dígitos; no es
    secreto) para que la ficha muestre el QR y el enlace de activación. Ninguna lleva prefijo `NEXT_PUBLIC_`. Vuelve a desplegar.
 4. **Webhook en Meta** (WhatsApp → Configuración): URL `https://<dominio>/api/whatsapp/webhook`, el mismo token de
-   verificación, y suscribe el campo **messages**.
+   verificación, y suscribe el campo **messages**. En el proyecto de pruebas, que está protegido por Vercel
+   Authentication, Meta no puede mandar encabezados: agrega a la URL `?x-vercel-protection-bypass=<secreto>` (el mismo
+   "Protection Bypass for Automation" de la sección 1.10).
 5. **Prueba**: captura tu celular en la ficha de un trabajador de prueba, pulsa **Generar código de activación**, escribe
    ese código al número y sigue el flujo (código → Entrada). Hazlo en el proyecto de pruebas, nunca con datos de prueba
    en producción (la bitácora es inmutable).
@@ -269,7 +271,12 @@ Checador está en la pantalla de inicio (iOS 16.4 o posterior). Diseño y reglas
    - Vercel → `AVISOS_SECRETO_SERVICIO`.
 3. **Vercel**: `VAPID_PUBLICA`, `VAPID_PRIVADA` y, opcional, `VAPID_CONTACTO` (un `mailto:` o una URL `https://` para que
    los servicios de Google y Apple puedan contactarte). Ninguna con prefijo `NEXT_PUBLIC_`. Vuelve a desplegar.
-4. **Prueba**: entra como una persona trabajadora de prueba, abre **Avisos** y actívalos; luego, desde el panel,
+4. **Solo en el proyecto de pruebas** (`checador-pruebas.vercel.app` es un despliegue protegido por Vercel
+   Authentication y rechaza con 401 la llamada de la base): en Vercel → **Settings → Deployment Protection →
+   Protection Bypass for Automation**, genera un secreto y guárdalo en el Vault del proyecto de pruebas:
+   `select vault.create_secret('<secreto de Vercel>', 'checador_vercel_bypass');`. La base lo manda en el encabezado
+   `x-vercel-protection-bypass`. Producción (`checador.jemba.mx`, dominio propio) no lo necesita.
+5. **Prueba**: entra como una persona trabajadora de prueba, abre **Avisos** y actívalos; luego, desde el panel,
    corrige uno de sus registros. El aviso llega en un máximo de 10 minutos si es de 09:00 a 19:59 en la zona del centro y
    no es día de descanso de esa persona. Hazlo en el proyecto de pruebas.
 
