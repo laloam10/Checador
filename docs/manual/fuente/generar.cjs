@@ -5,8 +5,8 @@ const path = require("path");
 
 const FUENTE = __dirname;
 const SALIDA = path.join(__dirname, "..");
-const PIE = '<div style="font-size:8pt;color:#888;width:100%;text-align:center;font-family:sans-serif"><span class="pageNumber"></span> / <span class="totalPages"></span></div>';
-const CABEZA = '<div style="font-size:7.5pt;color:#888;width:100%;padding:0 18mm;text-align:right;font-family:sans-serif">Checador · Manual de usuario</div>';
+const PIE = '<div style="font-size:8pt;color:#586a4a;width:100%;text-align:center;font-family:sans-serif"><span class="pageNumber"></span> / <span class="totalPages"></span></div>';
+const CABEZA = '<div style="font-size:7.5pt;color:#586a4a;width:100%;padding:0 18mm;text-align:right;font-family:sans-serif">Checador por Jemba · Manual de usuario</div>';
 
 const documentos = [
   { html: "manual.html", pdf: "manual-de-usuario.pdf", numerar: true },

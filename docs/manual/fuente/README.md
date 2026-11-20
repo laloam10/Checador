@@ -8,7 +8,7 @@ De aquí salen los tres PDF de `docs/manual/`:
 | `hoja-trabajador.pdf` | `hojas/trabajador.html` |
 | `hoja-kiosco.pdf` | `hojas/kiosco.html` |
 
-Las tres usan las capturas de `img/` y el ícono de la app (`apps/web/public/icon-512.png`).
+Las tres usan las capturas de `img/`, el ícono de la app (`apps/web/public/icon-512.png`) y las tipografías de la identidad de Jemba que están en `fuentes/` (Space Grotesk, Inter y JetBrains Mono, con licencia SIL Open Font License; se incluyen para generar los PDF sin internet). Los colores están en `fuentes/fuentes.css` y son los mismos de `apps/web/app/globals.css`: si cambian en la app, cámbialos ahí también.
 
 ## Cambiar solo el texto
 

@@ -1,0 +1,21 @@
+/* Tipografías de la identidad de Jemba, incluidas para generar los PDF sin internet.
+   Licencia SIL Open Font License 1.1 (ver LICENCIA-*.txt). */
+@font-face { font-family: "Space Grotesk"; font-weight: 400; src: url("space-grotesk-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Space Grotesk"; font-weight: 500; src: url("space-grotesk-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "Space Grotesk"; font-weight: 700; src: url("space-grotesk-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-weight: 400; src: url("inter-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-weight: 600; src: url("inter-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-weight: 700; src: url("inter-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "JetBrains Mono"; font-weight: 400; src: url("jetbrains-mono-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "JetBrains Mono"; font-weight: 500; src: url("jetbrains-mono-latin-500-normal.woff2") format("woff2"); }
+
+/* Paleta (la misma de apps/web/app/globals.css). */
+:root {
+  --marca: #2f6e10; --marca-claro: #e7efcf; --lima: #c8e600;
+  --noche: #0a2103; --noche-tinta: #eaf2d6; --noche-sub: #9db08a;
+  --tinta: #13280a; --gris: #586a4a; --borde: #dce5c1; --superficie-2: #f1f5e4;
+  --ambar: #8a5300; --ambar-claro: #fff3d6; --rojo: #b42318; --rojo-claro: #fdecea;
+  --titulos: "Space Grotesk", "DejaVu Sans", sans-serif;
+  --texto: "Inter", "DejaVu Sans", Arial, sans-serif;
+  --mono: "JetBrains Mono", "DejaVu Sans Mono", monospace;
+}

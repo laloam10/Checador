@@ -3,68 +3,79 @@
 <head>
 <meta charset="utf-8">
 <title>Checador · Manual de usuario</title>
+<link rel="stylesheet" href="fuentes/fuentes.css">
 <style>
   @page { size: A4; margin: 22mm 18mm 20mm 18mm; }
-  :root { --verde: #0f5132; --verde-claro: #d1e7dd; --ambar: #664d03; --ambar-claro: #fff3cd; --rojo: #842029; --rojo-claro: #f8d7da; --gris: #6c757d; --borde: #dee2e6; }
+  :root { --verde: var(--marca); --verde-claro: var(--marca-claro); }
   * { box-sizing: border-box; }
-  body { font-family: "DejaVu Sans", "Segoe UI", Arial, sans-serif; font-size: 10.5pt; line-height: 1.5; color: #212529; margin: 0; }
-  h1 { font-size: 22pt; color: var(--verde); margin: 0 0 6mm; page-break-before: always; border-bottom: 2px solid var(--verde); padding-bottom: 2mm; }
-  h2 { font-size: 14pt; color: var(--verde); margin: 7mm 0 2mm; page-break-after: avoid; }
+  body { font-family: var(--texto); font-size: 10pt; line-height: 1.5; color: var(--tinta); margin: 0; }
+  h1, h2, h3 { font-family: var(--titulos); letter-spacing: -0.01em; }
+  h1 { font-size: 22pt; color: var(--tinta); margin: 0 0 6mm; page-break-before: always; border-bottom: 3px solid var(--lima); padding-bottom: 2mm; }
+  h2 { font-size: 14pt; color: var(--marca); margin: 7mm 0 2mm; page-break-after: avoid; }
   h3 { font-size: 11.5pt; margin: 5mm 0 1.5mm; page-break-after: avoid; }
   p, li { orphans: 3; widows: 3; }
   ol, ul { padding-left: 6mm; margin: 1.5mm 0; }
   li { margin: 0.8mm 0; }
-  .boton { display: inline-block; background: var(--verde); color: white; border-radius: 4px; padding: 0 6px; font-weight: 600; font-size: 9.5pt; white-space: nowrap; }
-  .menu { font-weight: 600; color: var(--verde); }
-  code, .dir { font-family: "DejaVu Sans Mono", monospace; font-size: 9pt; background: #f1f3f5; padding: 0 3px; border-radius: 3px; }
-  .nota, .importante, .consejo { border-radius: 5px; padding: 3mm 4mm; margin: 3mm 0; page-break-inside: avoid; font-size: 10pt; }
-  .nota { background: #eef4ff; border-left: 4px solid #3d6fd6; }
+  .boton { display: inline-block; background: var(--marca); color: white; border-radius: 5px; padding: 0 6px; font-weight: 600; font-size: 9.5pt; white-space: nowrap; }
+  .menu { font-weight: 600; color: var(--marca); }
+  code, .dir { font-family: var(--mono); font-size: 8.8pt; background: var(--superficie-2); padding: 0 3px; border-radius: 3px; }
+  .nota, .importante, .consejo { border-radius: 6px; padding: 3mm 4mm; margin: 3mm 0; page-break-inside: avoid; font-size: 9.6pt; }
+  .nota { background: var(--superficie-2); border-left: 4px solid var(--gris); }
   .importante { background: var(--rojo-claro); border-left: 4px solid var(--rojo); }
-  .consejo { background: var(--verde-claro); border-left: 4px solid var(--verde); }
-  .nota b:first-child, .importante b:first-child, .consejo b:first-child { display: block; margin-bottom: 1mm; }
+  .consejo { background: var(--marca-claro); border-left: 4px solid var(--marca); }
+  .nota b:first-child, .importante b:first-child, .consejo b:first-child { display: block; margin-bottom: 1mm; font-family: var(--titulos); }
   figure { margin: 4mm 0; text-align: center; page-break-inside: avoid; }
-  figure img { max-width: 100%; border: 1px solid var(--borde); border-radius: 4px; }
+  figure img { max-width: 100%; border: 1px solid var(--borde); border-radius: 6px; }
   figure.celular img { max-width: 50mm; border-radius: 10px; }
   figure.tableta img { max-width: 95mm; }
   figure.media img { max-width: 120mm; }
   figcaption { font-size: 8.5pt; color: var(--gris); margin-top: 1.5mm; }
   .fila { display: flex; gap: 6mm; justify-content: center; align-items: flex-start; page-break-inside: avoid; }
   .fila figure { flex: 1; margin: 2mm 0; }
-  table { width: 100%; border-collapse: collapse; margin: 3mm 0; font-size: 9.5pt; page-break-inside: avoid; }
+  table { width: 100%; border-collapse: collapse; margin: 3mm 0; font-size: 9.3pt; page-break-inside: avoid; }
   th, td { border: 1px solid var(--borde); padding: 1.6mm 2.2mm; text-align: left; vertical-align: top; }
-  th { background: #f1f3f5; }
-  td.si { color: var(--verde); font-weight: 700; text-align: center; }
+  th { background: var(--superficie-2); font-family: var(--titulos); }
+  td.si { color: var(--marca); font-weight: 700; text-align: center; }
   td.no { color: var(--gris); text-align: center; }
-  /* Portada */
-  .portada { height: 250mm; display: flex; flex-direction: column; justify-content: center; text-align: center; }
-  .portada .logo { width: 34mm; height: 34mm; margin: 0 auto 8mm; }
-  .portada h1 { page-break-before: avoid; border: none; font-size: 34pt; margin: 0; }
-  .portada .sub { font-size: 15pt; color: var(--gris); margin: 3mm 0 18mm; }
-  .portada .datos { font-size: 10.5pt; color: #495057; line-height: 1.9; }
+  /* Portada: banda verde noche con la marca, como la barra de la app */
+  .portada { height: 250mm; display: flex; flex-direction: column; justify-content: center; }
+  .portada .banda { background: var(--noche); color: var(--noche-tinta); border-radius: 10px; padding: 16mm 14mm; }
+  .portada .marca { display: flex; align-items: center; gap: 6mm; }
+  .portada .logo { width: 26mm; height: 26mm; border-radius: 6mm; }
+  .portada h1 { page-break-before: avoid; border: none; font-size: 38pt; margin: 0; padding: 0; color: var(--noche-tinta); line-height: 1; }
+  .portada .firma { font-family: var(--mono); font-size: 9pt; letter-spacing: 0.14em; text-transform: uppercase; color: var(--noche-sub); margin-top: 2mm; }
+  .portada .sub { font-family: var(--titulos); font-size: 18pt; color: var(--lima); margin: 12mm 0 3mm; }
+  .portada .datos { font-size: 10.5pt; color: var(--noche-tinta); line-height: 1.8; }
+  .portada .datos b { color: var(--lima); }
+  .portada .version { font-family: var(--mono); font-size: 9pt; color: var(--noche-sub); margin-top: 8mm; letter-spacing: 0.06em; }
   /* Índice */
   .indice { page-break-before: always; }
   .indice h1 { page-break-before: avoid; }
   .indice ol { list-style: none; padding: 0; }
-  .indice > ol > li { font-weight: 700; margin-top: 3mm; }
-  .indice li li { font-weight: 400; padding-left: 6mm; margin: 0.6mm 0; }
+  .indice > ol > li { font-weight: 700; margin-top: 3mm; font-family: var(--titulos); }
+  .indice li li { font-weight: 400; padding-left: 6mm; margin: 0.6mm 0; font-family: var(--texto); }
   .indice a { color: inherit; text-decoration: none; }
   .roles { display: flex; gap: 4mm; margin: 4mm 0; }
-  .rol { flex: 1; border: 1px solid var(--borde); border-radius: 6px; padding: 3mm 4mm; font-size: 9.5pt; }
-  .rol strong { display: block; color: var(--verde); font-size: 11pt; margin-bottom: 1mm; }
+  .rol { flex: 1; border: 1px solid var(--borde); border-radius: 8px; padding: 3mm 4mm; font-size: 9.3pt; }
+  .rol strong { display: block; color: var(--marca); font-size: 11pt; margin-bottom: 1mm; font-family: var(--titulos); }
 </style>
 </head>
 <body>
 
 <!-- ======================= PORTADA ======================= -->
 <section class="portada">
-  <img class="logo" src="../../../apps/web/public/icon-512.png" alt="">
-  <h1>Checador</h1>
-  <div class="sub">Manual de usuario</div>
-  <div class="datos">
-    Registro electrónico de la jornada de trabajo<br>
-    conforme al artículo 132, fracción XXXIV, de la Ley Federal del Trabajo<br><br>
-    <b>Aplicación:</b> https://checador.jemba.mx<br>
-    Versión 1.1 · noviembre de 2026
+  <div class="banda">
+    <div class="marca">
+      <img class="logo" src="../../../apps/web/public/icon-512.png" alt="">
+      <div><h1>checador</h1><div class="firma">por Jemba</div></div>
+    </div>
+    <div class="sub">Manual de usuario</div>
+    <div class="datos">
+      Registro electrónico de la jornada de trabajo<br>
+      conforme al artículo 132, fracción XXXIV, de la Ley Federal del Trabajo<br><br>
+      <b>Aplicación:</b> https://checador.jemba.mx
+    </div>
+    <div class="version">Versión 1.2 · noviembre de 2026</div>
   </div>
 </section>
 
@@ -453,7 +464,7 @@
   <tr><td>Jornada ordinaria / tiempo extra</td><td>Horas normales de trabajo y horas adicionales. El extra se paga al doble y, por encima de los límites, al triple (arts. 66 y 68 LFT).</td></tr>
   <tr><td>Huella digital (SHA-256)</td><td>Código que identifica de forma única el contenido de un registro o archivo. Cualquier cambio produce una huella distinta.</td></tr>
 </table>
-<p style="margin-top:10mm; font-size:9pt; color:#6c757d">Checador es una herramienta de registro y no sustituye la asesoría legal. Las referencias a la Ley Federal del Trabajo corresponden al texto vigente tras la reforma publicada en el DOF el 1 de mayo de 2026.</p>
+<p style="margin-top:10mm; font-size:9pt; color:var(--gris)">Checador es una herramienta de registro y no sustituye la asesoría legal. Las referencias a la Ley Federal del Trabajo corresponden al texto vigente tras la reforma publicada en el DOF el 1 de mayo de 2026.</p>
 
 </body>
 </html>
