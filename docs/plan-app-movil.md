@@ -15,7 +15,9 @@ Android e iOS es el medio para hacerlas confiables, no un fin en sí.
 
 - **Fase 1 terminada en código** (2026-11-19, rama `pruebas`): migración `20261123000001_avisos_push.sql`, página
   **Avisos** de la persona trabajadora, envío en `/api/avisos/enviar` y configuración en `docs/publicacion.md` §1.10.
-  Pendiente: aplicar la migración y configurar llaves y secretos en el proyecto de pruebas, y probar en un teléfono real.
+- **Fase 1 funcionando en pruebas** (2026-11-20): migraciones 22 y 23 aplicadas, llaves VAPID y secretos configurados,
+  bypass de la protección de Vercel en Vault. Primer aviso real ("semana por revisar") entregado y mostrado en un
+  Android con Chrome. Falta probar en iPhone (pantalla de inicio) y llevarlo a producción con las migraciones 18 a 23.
 
 ## Decisiones pendientes
 
