@@ -529,3 +529,14 @@ body:has(main.kiosco) { background: var(--noche); color: var(--noche-tinta); }
 .avisos-tipo input { margin-top: 0.2rem; flex: none; }
 .avisos-tipo > span { display: grid; gap: 0.1rem; }
 .avisos .estado { margin: 0; justify-self: center; }
+
+/* Barra del trabajador en celulares: arriba el logo y "Salir"; abajo las secciones, que
+   pasan a otro renglón si no caben (ninguna queda oculta ni hay que deslizar). */
+@media (max-width: 30rem) {
+  .nav-app { flex-wrap: wrap; overflow: visible; row-gap: 0.35rem; }
+  .nav-app > .marca-enlace { order: -3; }
+  .nav-app > .enlace { order: -2; margin-left: auto; }
+  .nav-app::before { content: ""; order: -1; flex-basis: 100%; height: 0; }
+  .nav-app { column-gap: 0.1rem; }
+  .nav-app a:not(.marca-enlace) { padding: 0.35rem 0.5rem; font-size: 0.88rem; }
+}

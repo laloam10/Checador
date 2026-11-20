@@ -25,7 +25,8 @@
   .consejo { background: var(--marca-claro); border-left: 4px solid var(--marca); }
   .nota b:first-child, .importante b:first-child, .consejo b:first-child { display: block; margin-bottom: 1mm; font-family: var(--titulos); }
   figure { margin: 4mm 0; text-align: center; page-break-inside: avoid; }
-  figure img { max-width: 100%; border: 1px solid var(--borde); border-radius: 6px; }
+  /* Altura máxima: una captura muy alta no debe saltar completa a la página siguiente. */
+  figure img { max-width: 100%; max-height: 165mm; width: auto; border: 1px solid var(--borde); border-radius: 6px; }
   figure.celular img { max-width: 50mm; border-radius: 10px; }
   figure.tableta img { max-width: 95mm; }
   figure.media img { max-width: 120mm; }
@@ -35,6 +36,9 @@
   table { width: 100%; border-collapse: collapse; margin: 3mm 0; font-size: 9.3pt; page-break-inside: avoid; }
   th, td { border: 1px solid var(--borde); padding: 1.6mm 2.2mm; text-align: left; vertical-align: top; }
   th { background: var(--superficie-2); font-family: var(--titulos); }
+  /* Tablas largas (preguntas, glosario): se parten entre páginas, pero no a media fila. */
+  table.larga { page-break-inside: auto; }
+  table.larga tr { page-break-inside: avoid; }
   td.si { color: var(--marca); font-weight: 700; text-align: center; }
   td.no { color: var(--gris); text-align: center; }
   /* Portada: banda verde noche con la marca, como la barra de la app */
@@ -510,7 +514,7 @@ Tortillería Doña Lupita · registro n.º 41<div class="btns"><span>Iniciar pau
 <p>Recibes un comprobante con número. Escribir "conforme" sin tocar el botón no registra nada. Si tu empresa cambia tus registros después de que los viste, Checador te los muestra de nuevo antes de aceptar tu conformidad. Responder es voluntario: si no respondes, no significa que estés de acuerdo.</p>
 
 <h1 id="faq">7. Preguntas frecuentes y solución de problemas</h1>
-<table>
+<table class="larga">
   <tr><th style="width:36%">Situación</th><th>Qué hacer</th></tr>
   <tr><td>No me llega el código</td><td>Espera un par de minutos y revisa spam o promociones. Verifica que el correo esté bien escrito. Si pediste muchos códigos, espera unos minutos.</td></tr>
   <tr><td>"Código incorrecto o vencido"</td><td>El código dura 15 minutos y se usa una vez. Pide uno nuevo.</td></tr>
@@ -536,7 +540,7 @@ Tortillería Doña Lupita · registro n.º 41<div class="btns"><span>Iniciar pau
 
 <!-- ======================= 7. GLOSARIO ======================= -->
 <h1 id="glosario">8. Glosario</h1>
-<table>
+<table class="larga">
   <tr><th style="width:28%">Término</th><th>Significado</th></tr>
   <tr><td>Bitácora</td><td>Lista de todas las checadas, correcciones y anulaciones, en el orden en que ocurrieron. No se puede borrar ni modificar.</td></tr>
   <tr><td>Checada</td><td>Registro de entrada, salida, inicio o fin de pausa.</td></tr>
