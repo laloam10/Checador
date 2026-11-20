@@ -12,6 +12,7 @@ const documentos = [
   { html: "manual.html", pdf: "manual-de-usuario.pdf", numerar: true },
   { html: "hojas/trabajador.html", pdf: "hoja-trabajador.pdf", paginas: 1 },
   { html: "hojas/kiosco.html", pdf: "hoja-kiosco.pdf", paginas: 1 },
+  { html: "hojas/whatsapp.html", pdf: "hoja-whatsapp.pdf", paginas: 1 },
 ];
 
 (async () => {

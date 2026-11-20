@@ -1,0 +1,73 @@
+<!DOCTYPE html><html lang="es-MX"><head><meta charset="utf-8"><title>Checador · Cómo checar por WhatsApp</title>
+<link rel="stylesheet" href="comun.css">
+<style>
+ body { font-size: 9.6pt; }
+ .numero { display: flex; align-items: center; gap: 4mm; border: 2px dashed var(--marca); border-radius: 8px; padding: 3mm 4mm; margin-bottom: 4mm; }
+ .numero b { font-family: var(--titulos); font-size: 12pt; white-space: nowrap; }
+ .numero .linea { flex: 1; border-bottom: 1.5px solid var(--tinta); height: 7mm; }
+ .numero small { color: var(--gris); white-space: nowrap; }
+ .rejilla { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm 6mm; }
+ .paso { margin-bottom: 1mm; }
+ /* Ejemplo de conversación: recuadro propio, no imita la pantalla de WhatsApp. */
+ .chat { border: 1px solid var(--borde); border-radius: 8px; padding: 2.5mm; background: var(--superficie-2); font-size: 8.4pt; display: grid; gap: 1.4mm; margin-top: 2mm; }
+ .chat .msg { max-width: 86%; padding: 1.3mm 2.2mm; border-radius: 7px; line-height: 1.3; white-space: pre-line; }
+ .chat .yo { justify-self: end; background: var(--marca-claro); border: 1px solid #cfdcae; }
+ .chat .bot { justify-self: start; background: white; border: 1px solid var(--borde); }
+ .chat .btns { display: flex; gap: 1.2mm; flex-wrap: wrap; margin-top: 1.2mm; }
+ .chat .btns span { border: 1px solid var(--marca); color: var(--marca); border-radius: 5px; padding: 0 1.6mm; font-weight: 600; font-size: 8pt; }
+ .chat .quien { font-family: var(--mono); font-size: 7pt; color: var(--gris); text-transform: uppercase; letter-spacing: 0.08em; }
+ .palabras { display: grid; grid-template-columns: auto 1fr; gap: 0.8mm 3mm; margin: 1.5mm 0; }
+ .palabras code { font-family: var(--mono); background: var(--superficie-2); border-radius: 3px; padding: 0 1.5mm; font-weight: 500; }
+</style></head><body>
+<div class="cab"><img src="../../../../apps/web/public/icon-512.png"><div><h1>Cómo checar por WhatsApp</h1><div class="sub">Checador · registro de tu jornada de trabajo · <b>solo si tu empresa lo activó</b></div></div></div>
+
+<div class="numero"><b>Número de WhatsApp de Checador:</b><span class="linea"></span><small>te lo da tu empresa</small></div>
+
+<div class="rejilla">
+ <div>
+  <div class="paso"><div class="num">1</div><div><h2>Activa tu WhatsApp (una sola vez)</h2>
+  <p>Tu empresa registra tu celular y te da un <b>código de activación</b> de 6 dígitos, en persona o con un <b>QR</b>.</p>
+  <ul>
+   <li><b>Con QR:</b> escanéalo con la cámara de tu celular y envía el mensaje que aparece.</li>
+   <li><b>Sin QR:</b> escribe el código al número de Checador.</li>
+  </ul>
+  <p>El código sirve <b>una vez</b> y vence en <b>24 horas</b>. Debes enviarlo desde el celular que diste a tu empresa. No lo compartas.</p></div></div>
+
+  <div class="paso"><div class="num">2</div><div><h2>Checa con los botones</h2>
+  <p>Escribe cualquier mensaje: Checador te dice si estás en turno y te muestra <b>solo los botones que corresponden</b>. Toca el que necesites. También puedes escribir:</p>
+  <div class="palabras">
+   <code>Entrada</code><span>al llegar</span>
+   <code>Comida</code><span>al iniciar tu pausa</span>
+   <code>Regresé</code><span>al terminar tu pausa</span>
+   <code>Salida</code><span>al irte</span>
+  </div></div></div>
+ </div>
+
+ <div>
+  <div class="chat">
+   <div class="quien">Ejemplo</div>
+   <div class="msg yo">Hola</div>
+   <div class="msg bot">María, no tienes un turno abierto.
+¿Qué quieres registrar?<div class="btns"><span>Entrada</span></div></div>
+   <div class="msg yo">Entrada</div>
+   <div class="msg bot">✅ Entrada registrada a las 08:02 del 26/10.
+Tortillería Doña Lupita · registro n.º 41<div class="btns"><span>Iniciar pausa</span><span>Salida</span></div></div>
+  </div>
+
+  <div class="paso" style="margin-top:3mm"><div class="num">3</div><div><h2>Guarda la confirmación</h2>
+  <p>La respuesta con <b>✅, la hora y el número de registro</b> es tu comprobante. <b>Si no te llega, tu checada no quedó:</b> vuelve a escribir.</p></div></div>
+ </div>
+</div>
+
+<div class="paso" style="margin-top:3mm"><div class="num">4</div><div><h2>Revisa tu semana</h2>
+<p>Cuando tengas semanas sin revisar, Checador te lo dice al checar. Toca <b>Revisar semana</b> (o escribe <code>semana</code>) para ver tus turnos y el total. Si está bien, toca <b>Estoy conforme</b>. Si algo falla, toca <b>No es correcto</b> y escribe <b>en un solo mensaje</b> qué está mal (día y hora); tienes 15 minutos. Escribir "conforme" sin tocar el botón no cuenta. Responder es voluntario: si no respondes, no significa que estés de acuerdo.</p></div></div>
+
+<div class="caja azul"><b>Para que tu checada cuente</b>
+<ul>
+ <li>Los botones <b>vencen a los 10 minutos</b>: si tocas uno viejo, Checador te muestra los actuales.</li>
+ <li>Si tu mensaje llega con <b>más de 5 minutos de retraso</b> (mala señal), no se registra: envíalo de nuevo para que quede la hora real.</li>
+ <li>No puedes marcar dos entradas seguidas. Una pregunta como "¿ya quedó mi entrada?" no registra nada: solo te muestra tu estado.</li>
+</ul></div>
+<div class="caja verde"><b>¿Problemas?</b> <b>"Este número no está registrado":</b> pide a tu empresa que capture tu celular. <b>El código no funciona:</b> pudo vencer, usarse o anularse tras 5 intentos; pide uno nuevo. <b>¿Cambiaste de número?</b> Avisa a tu empresa: el anterior deja de funcionar. <b>¿Olvidaste checar o hay un error?</b> Tu empresa lo corrige con un motivo; nada se borra.</div>
+<div class="pie">Checador por Jemba · Hoja para la persona trabajadora (WhatsApp) · Más detalle en el Manual de usuario, capítulo 6</div>
+</body></html>
