@@ -355,7 +355,8 @@ ese desfase:
      10 segundos y como máximo una vez cada 10 minutos. Antes termina de enviar su cola; lo que quede sin enviar sigue
      guardado en el dispositivo y se envía después sin duplicarse.
    - Prueba: `apps/web/e2e/actualizacion.e2e.mjs`. A mano: abre la app, publica un commit nuevo y, cuando Vercel
-     termine, cambia de app y regresa; el aviso sale de inmediato. Una página abierta *después* de publicar no avisa.
+     termine, cambia de app y regresa; el aviso sale de inmediato. Una página abierta *después* de publicar no avisa, y
+     una abierta antes de que existiera el aviso tampoco: moverse entre pantallas no la recarga (ciérrala y ábrela).
 
 Si un despliegue tiene un error grave y las páginas abiertas no deben seguir usándolo, en la lista de despliegues
 abre el menú del despliegue que lo corrige → **Skew Protection Threshold** → **Set**.
