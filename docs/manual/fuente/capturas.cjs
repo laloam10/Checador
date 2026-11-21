@@ -53,6 +53,16 @@ async function entrar(page, correo, destino, capturas) {
 
 const shot = (page, nombre, opciones = {}) => page.screenshot({ path: `${OUT}/${nombre}.png`, ...opciones });
 const shotEl = (loc, nombre) => loc.screenshot({ path: `${OUT}/${nombre}.png` });
+/** Posición de un elemento dentro de la página completa (no de la ventana, que puede estar desplazada). */
+const caja = (loc) => loc.evaluate((e) => { const r = e.getBoundingClientRect(); return { x: r.left + scrollX, y: r.top + scrollY, width: r.width, height: r.height }; });
+/** Captura desde el borde superior de `arriba` hasta el inferior de `abajo`, con margen. */
+async function shotEntre(page, arriba, abajo, nombre, margen = 8) {
+  const a = await caja(arriba);
+  const b = await caja(abajo);
+  const x = Math.min(a.x, b.x) - margen;
+  const ancho = Math.max(a.x + a.width, b.x + b.width) + margen - x;
+  await page.screenshot({ path: `${OUT}/${nombre}.png`, fullPage: true, clip: { x, y: a.y - margen, width: ancho, height: b.y + b.height - a.y + 2 * margen } });
+}
 const estado = (p, t) => p.getByRole("status").filter({ hasText: t }).first().waitFor();
 
 (async () => {
@@ -286,6 +296,67 @@ const estado = (p, t) => p.getByRole("status").filter({ hasText: t }).first().wa
   await m.getByRole("button", { name: "Activar avisos en este teléfono" }).waitFor();
   await shot(m, "33-app-avisos", { fullPage: true });
   log("avisos");
+
+  // ---------- Horarios ----------
+  // Al final: el horario de la empresa recalcula la jornada pactada y deja acuerdos desactualizados.
+  await d.goto(`${APP}/panel/configuracion`);
+  const nuevoHorario = d.locator(".nuevo-horario");
+  await nuevoHorario.getByLabel("Nombre").fill("Matutino");
+  for (const dia of ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]) {
+    await nuevoHorario.getByLabel(`${dia}: entrada`).fill("08:00");
+    await nuevoHorario.getByLabel(`${dia}: salida`).fill("17:00");
+    await nuevoHorario.getByLabel(`${dia}: comida desde`).fill("13:00");
+    await nuevoHorario.getByLabel(`${dia}: comida hasta`).fill("14:00");
+  }
+  await nuevoHorario.getByRole("checkbox", { name: "Sábado" }).check();
+  await nuevoHorario.getByLabel("Sábado: entrada").fill("08:00");
+  await nuevoHorario.getByLabel("Sábado: salida").fill("13:00");
+  await nuevoHorario.getByLabel("Sábado: comida desde").fill("");
+  await nuevoHorario.getByLabel("Sábado: comida hasta").fill("");
+  await d.evaluate(() => document.activeElement?.blur());
+  await shotEl(nuevoHorario, "34-horario-nuevo");
+  await nuevoHorario.getByRole("button", { name: "Crear horario" }).click();
+  await d.locator(".horarios li", { hasText: "Matutino" }).waitFor();
+  await d.getByLabel("Horario de la empresa (para quien no tiene uno propio)").selectOption({ label: "Matutino" });
+  await d.getByRole("button", { name: "Guardar", exact: true }).click();
+  await estado(d, "Horario de la empresa guardado");
+  await d.reload();
+  await d.locator(".horarios li", { hasText: "De la empresa" }).waitFor();
+  // Lista y horario de la empresa, sin el formulario de alta que va debajo.
+  await shotEntre(d, d.locator("ul.horarios"), d.locator("form").filter({ has: d.getByLabel("Horario de la empresa (para quien no tiene uno propio)") }), "35-horarios-lista");
+  await d.goto(`${APP}/panel/trabajadores/${jose}`);
+  await d.getByLabel("Horario").waitFor();
+  await shotEl(d.getByLabel("Horario").locator("xpath=ancestor::label[1]"), "36-ficha-horario");
+  await d.goto(`${APP}/panel/trabajadores/${jose}/semana?semana=${LUNES}`);
+  await d.locator(".senales").first().waitFor();
+  await shotEl(d.locator(".semana-cabecera"), "37a-semana-horario");
+  // El día con señales, hasta su primera checada.
+  {
+    const dia = d.locator(".bitacora-dia").filter({ has: d.locator(".senales") }).first();
+    await shotEntre(d, dia.locator("h3"), dia.locator(".bitacora li").first(), "37-semana-senales", 12);
+  }
+  // Tablero: un turno que empezó hace 40 min (hora del centro), solo para la captura.
+  const ZONA_M = "America/Mexico_City";
+  const [ini, fin, dow, horaAhora] = sql(`select to_char(now() at time zone '${ZONA_M}' - interval '40 minutes', 'HH24:MI') || ' ' || to_char(now() at time zone '${ZONA_M}' + interval '4 hours', 'HH24:MI') || ' ' || extract(dow from now() at time zone '${ZONA_M}') || ' ' || extract(hour from now() at time zone '${ZONA_M}')`).split(" ");
+  if (Number(horaAhora) >= 1 && Number(horaAhora) <= 19) {
+    const rosaId = id("Rosa Díaz");
+    sql(`insert into public.horarios (empresa_id, nombre, dias) values ('${empresaId}', 'Vespertino', '{"${dow}": {"entrada": "${ini}", "salida": "${fin}"}}');
+         update public.trabajadores set horario_id = (select id from public.horarios where empresa_id = '${empresaId}' and nombre = 'Vespertino')
+          where id in ('${jose}', '${rosaId}');
+         insert into public.eventos (empresa_id, trabajador_id, tipo, origen, motivo, hora_efectiva)
+           values ('${empresaId}', '${rosaId}', 'entrada', 'panel', 'Ejemplo', now() - interval '18 minutes');
+         insert into public.trabajadores (empresa_id, centro_trabajo_id, nombre, numero_empleado, fecha_ingreso, dia_descanso, horario_id)
+           select '${empresaId}', centro_trabajo_id, 'Luis Pérez', '104', fecha_ingreso, (${dow} + 3) % 7, horario_id from public.trabajadores where id = '${rosaId}';`);
+    await d.goto(`${APP}/panel`);
+    await d.getByRole("heading", { name: "Frente al horario de hoy" }).waitFor();
+    await shotEntre(d, d.getByRole("heading", { name: "Frente al horario de hoy" }).locator("xpath=.."), d.locator(".horario-hoy").locator("xpath=following-sibling::p[1]"), "38-tablero-horario");
+  } else {
+    console.warn("· 38-tablero-horario no se tomó: córrelo entre la 1:00 y las 19:00 (hora del centro).");
+  }
+  await m.goto(APP);
+  await m.locator(".horario-trabajador").waitFor();
+  await shot(m, "39-app-horario");
+  log("horarios");
 
   await b.close();
   console.log("Capturas en", OUT);

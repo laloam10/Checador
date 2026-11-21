@@ -67,11 +67,11 @@ export function CamposTrabajador({
         <label>Fecha de ingreso<input name="fecha_ingreso" type="date" required defaultValue={t?.fecha_ingreso ?? ""} /></label>
         <input type="hidden" name="empresa_tiene_horario" value={deEmpresa ? "si" : "no"} />
         {horarios.length > 0 ? (
-          <label>
+          <label className="campo-ancho">
             Horario
             <select name="horario" defaultValue={t?.sin_horario_fijo ? "sin" : (t?.horario_id ?? "")}>
               {deEmpresa ? (
-                <option value="">El de la empresa ({deEmpresa.nombre})</option>
+                <option value="">De la empresa ({deEmpresa.nombre})</option>
               ) : (
                 <option value="" data-manual="">Sin horario (la empresa no tiene uno por omisión)</option>
               )}

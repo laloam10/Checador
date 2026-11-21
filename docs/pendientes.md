@@ -46,11 +46,6 @@ Jemba, WhatsApp, avisos ni el manual 1.2. Detalle técnico: `docs/estado-supabas
       checador-configuracion-2" en los secretos de red del entorno de Claude (el vigente es `checador-migraciones`).
 - [ ] Regenerar la licencia de Forja (quedó escrita en una conversación).
 
-## Documentación
-
-- [ ] **Manual: sección de horarios** (Configuración → Horarios, campo Horario en la ficha, señales en la semana,
-      "Frente al horario de hoy" en el tablero y "Tu horario de hoy" en la app), con capturas nuevas.
-
 ## Decisiones abiertas
 
 - [ ] Cuentas de Apple y Google Play: a nombre de una organización (Jemba) o personal (`docs/plan-app-movil.md`).

@@ -103,7 +103,7 @@
       <li>3.7 Centros de trabajo · 3.8 Tablero · 3.9 Registros semanales</li>
       <li>3.10 Corregir checadas · 3.11 Objeciones · 3.12 Exportar para inspección o juicio</li>
       <li>3.13 Accesos y roles · 3.14 Dar de baja (y deshacerla) · 3.15 Configuración · 3.16 El panel en el celular</li>
-      <li>3.17 Checada por WhatsApp</li>
+      <li>3.17 Checada por WhatsApp · 3.18 Horarios de trabajo</li>
     </ol>
   </li>
   <li><a href="#trabajador">4. Guía del trabajador (app en el celular)</a>
@@ -190,7 +190,8 @@
   <tr><td>Centro y fecha de ingreso</td><td>Necesarios para el cálculo de jornada y para el acuerdo.</td></tr>
   <tr><td>Descanso semanal obligatorio</td><td>El día de descanso que exige la ley: uno por cada seis de trabajo (art. 69). Si la persona lo trabaja, Checador avisa que se paga doble (art. 73).</td></tr>
   <tr><td>Días de descanso adicionales (opcional)</td><td>Para quien descansa más de un día, por ejemplo el sábado en una semana de 5 días. Es un beneficio pactado: si se trabaja, Checador lo señala y esas horas cuentan para el máximo semanal, pero no aplica el pago doble del art. 73.</td></tr>
-  <tr><td>Jornada pactada por día (opcional)</td><td>Si acordaron repartir las horas de otra forma (artículo 58 de la LFT), por ejemplo 9.6 horas de lunes a viernes. Si lo dejas vacío, se usa la jornada legal (8 h diurna, 7 h nocturna, 7.5 h mixta).</td></tr>
+  <tr><td>Horario</td><td>Aparece si tu empresa tiene horarios (sección 3.18): el de la empresa, uno específico o <b>Sin horario fijo</b>. Con horario, la jornada pactada se calcula sola.</td></tr>
+  <tr><td>Jornada pactada por día (opcional)</td><td>Solo para quien <b>no tiene horario</b>. Si acordaron repartir las horas de otra forma (artículo 58 de la LFT), por ejemplo 9.6 horas de lunes a viernes. Si lo dejas vacío, se usa la jornada legal (8 h diurna, 7 h nocturna, 7.5 h mixta).</td></tr>
 </table>
 <div class="consejo"><b>¿App o kiosco?</b>Cada persona necesita al menos una forma de checar: <b>correo</b> (app en el celular) o <b>número de empleado con PIN</b> (kiosco). Puede tener las dos.</div>
 
@@ -348,6 +349,7 @@
 <figure><img src="img/28-configuracion.png"><figcaption>Configuración: interruptor de recordatorios y datos de la empresa.</figcaption></figure>
 <ul>
   <li><b>Recordatorios de conformidad</b>: un interruptor que se guarda al tocarlo. Apagado, el correo de los lunes no incluye a tu empresa y tampoco se envía el aviso de "semana por revisar" a los teléfonos de tu personal (sección 4.5).</li>
+  <li><b>Horarios</b>: los horarios de trabajo de tu empresa (sección 3.18).</li>
   <li><b>Datos de la empresa</b>: razón social, RFC y zona horaria.</li>
 </ul>
 <div class="importante"><b>Antes de cambiar la razón social o el RFC</b>Aparecen en el acuerdo de registro de cada persona. Al cambiarlos, los acuerdos de todo tu personal quedan <b>desactualizados</b> y hay que firmar una versión nueva (la anterior sigue vigente mientras tanto). Hazlo solo si el dato estaba mal o cambió de verdad.</div>
@@ -382,6 +384,46 @@
 <div class="importante"><b>Al capturar el celular, el acuerdo de esa persona queda desactualizado</b>El acuerdo de registro incluye WhatsApp como método solo para quien tiene celular capturado. Por eso, al agregarlo (o cambiarlo), hay que firmar una versión nueva del acuerdo (sección 3.5). La anterior sigue vigente mientras tanto.</div>
 <div class="consejo"><b>Qué ves tú</b>Las checadas por WhatsApp aparecen en la bitácora con la etiqueta <b>WhatsApp</b>, igual que las del celular o el kiosco, y se corrigen igual. Si la persona da su conformidad por WhatsApp, queda registrada como las demás.</div>
 
+<h2>3.18 Horarios de trabajo</h2>
+<p>El horario dice a qué hora se espera que cada persona entre y salga. Sirve para ver quién llega tarde, sale antes o trabaja fuera de su horario. Es <b>informativo</b>: no impide checar, no descuenta nada y no cambia el pago de tiempo extra, que se sigue calculando por las horas trabajadas y no por la hora del reloj (arts. 66 a 68 de la LFT).</p>
+<h3>Crear un horario</h3>
+<p>En <span class="menu">Configuración → Horarios</span>, en <b>Nuevo horario</b>: escribe un nombre (por ejemplo, <i>Matutino</i>), marca los días de trabajo y anota la entrada, la salida y, si hay, la comida. Presiona <span class="boton">Crear horario</span>.</p>
+<figure class="media"><img src="img/34-horario-nuevo.png"><figcaption>Horario de lunes a viernes de 8:00 a 17:00 con comida, y sábado de 8:00 a 13:00.</figcaption></figure>
+<ul>
+  <li><b>Tolerancia</b>: minutos de gracia antes de marcar un retardo o una salida anticipada (10 por omisión).</li>
+  <li><b>Turnos nocturnos</b>: si la salida es anterior a la entrada (por ejemplo, 22:00 a 06:00), el turno termina al día siguiente.</li>
+  <li>Checador no acepta un horario sin sentido: comida fuera del turno, turnos de más de 16 horas o más de 12 horas de trabajo en un día.</li>
+</ul>
+<figure><img src="img/35-horarios-lista.png"><figcaption>El horario creado y el horario de la empresa.</figcaption></figure>
+<p>Abajo de la lista eliges el <b>horario de la empresa</b>: aplica a todas las personas que no tengan uno propio. Cada horario muestra cuántas personas lo usan; ábrelo para cambiarlo o borrarlo.</p>
+<h3>Asignar el horario a cada persona</h3>
+<div class="fila">
+  <figure style="flex:0.7"><img src="img/36-ficha-horario.png"><figcaption>Campo Horario en la ficha.</figcaption></figure>
+  <div style="flex:1.3; font-size:10pt">
+    <p>En la ficha de la persona, el campo <b>Horario</b> tiene tres opciones:</p>
+    <ul>
+      <li><b>De la empresa</b>: usa el horario de la empresa.</li>
+      <li><b>Un horario específico</b>, por ejemplo para quien trabaja en el turno de tarde.</li>
+      <li><b>Sin horario fijo</b>: para quien rota turnos. No tendrá señales de horario.</li>
+    </ul>
+  </div>
+</div>
+<div class="consejo"><b>La jornada pactada sale del horario</b>Con horario, ya no capturas la jornada pactada por día: Checador la calcula de la entrada a la salida, sin la comida si en su centro de trabajo se puede salir a comer (si no se puede, la comida cuenta como jornada, art. 64). Así no hay dos datos que puedan contradecirse.</div>
+<div class="importante"><b>Cambiar un horario deja acuerdos desactualizados</b>Si cambias las horas de un horario, se recalcula la jornada pactada de todas las personas que lo usan, y sus acuerdos de registro quedan <b>desactualizados</b> (sección 3.5). Configuración te avisa a cuántas personas afecta. Conviene definir bien los horarios antes de firmar los acuerdos.</div>
+<h3>Qué te muestra Checador</h3>
+<p>En los <b>registros semanales</b> de cada persona (sección 3.9) aparecen su horario y, en cada día, marcas como <i>"25 min tarde"</i>, <i>"salió 30 min antes"</i>, <i>"60 min fuera de horario"</i> (antes de la entrada o después de la salida) o <i>"día no programado"</i>.</p>
+<figure class="media"><img src="img/37-semana-senales.png"><figcaption>Un día en que José salió una hora antes y entró una hora antes de su horario.</figcaption></figure>
+<p>En el <b>tablero</b>, la sección <b>Frente al horario de hoy</b> muestra quién no ha checado entrada aunque su turno ya empezó (pasada la tolerancia) y quién llegó tarde.</p>
+<figure><img src="img/38-tablero-horario.png"><figcaption>Frente al horario de hoy, en el tablero.</figcaption></figure>
+<div class="nota"><b>Revísalo antes de actuar</b>Una entrada sin checar puede ser una falta, un permiso o una checada olvidada. Checador no descuenta salario: los descuentos están limitados por la ley (art. 110) y las sanciones solo caben conforme a un reglamento interior de trabajo (art. 423). Las marcas de horario tampoco aparecen en las exportaciones para la autoridad.</div>
+<div class="fila">
+  <figure class="celular"><img src="img/39-app-horario.png"><figcaption>La persona ve su horario de hoy.</figcaption></figure>
+  <div style="flex:1.3; font-size:10pt">
+    <p>Cada persona ve <b>su horario de hoy</b> arriba del reloj en su app, para saber qué espera la empresa. Si ese día no trabaja, dice "Hoy no tienes turno en tu horario".</p>
+    <p>El horario no cambia cómo se checa: la persona registra su entrada y salida reales, aunque sean fuera de horario.</p>
+  </div>
+</div>
+
 <!-- ======================= 4. TRABAJADOR ======================= -->
 <h1 id="trabajador">4. Guía del trabajador (app en el celular)</h1>
 <p>Entra con tu correo como se explica en la sección 2. La primera vez, tu cuenta se vincula sola con el registro que hizo tu empleador. Si te dice "Tu cuenta aún no está vinculada", pide a tu empleador que te dé de alta con ese mismo correo.</p>
@@ -408,7 +450,7 @@
       <li><b>Trabajando</b> → <span class="boton">Iniciar pausa</span> o <span class="boton">Registrar salida</span></li>
       <li><b>En pausa</b> → <span class="boton">Terminar pausa</span></li>
     </ul>
-    <p>Abajo aparecen tus registros del día.</p>
+    <p>Abajo aparecen tus registros del día. Si tu empresa te asignó un horario, arriba del reloj ves <b>tu horario de hoy</b>. Checa siempre a la hora real en que entras o sales, aunque no coincida con tu horario.</p>
     <div class="nota"><b>Sin internet</b>Si no hay conexión, la checada se guarda en tu teléfono y se envía sola cuando vuelva la señal. Queda marcada como <i>"sin conexión"</i> con la hora en que la hiciste. En iPhone se envía la próxima vez que abras la app.</div>
   </div>
 </div>
@@ -532,6 +574,9 @@ Tortillería Doña Lupita · registro n.º 41<div class="btns"><span>Iniciar pau
   <tr><td>Cambié la jornada o los días de descanso de alguien</td><td>Su acuerdo queda <b>desactualizado</b>: firma la nueva versión y pídele que la firme. La anterior sigue vigente mientras tanto.</td></tr>
   <tr><td>El kiosco dice "Este dispositivo no está configurado"</td><td>La cuenta con la que se entró en la tableta no tiene el rol de kiosco. Invítala desde <b>Accesos</b> y vuelve a cargar la página.</td></tr>
   <tr><td>"Verificar ahora" muestra una alerta de alteración</td><td>No corrijas nada. Exporta los registros y contacta a soporte de inmediato.</td></tr>
+  <tr><td>¿El horario cambia el pago de tiempo extra?</td><td>No. El tiempo extra se calcula por las horas trabajadas en el día y la semana, no por la hora del reloj. Entrar o salir fuera de horario solo genera una marca informativa.</td></tr>
+  <tr><td>Alguien aparece "Sin checar entrada" pero tenía permiso</td><td>No pasa nada: es una marca informativa que desaparece al terminar su turno. Checador no registra faltas ni descuentos.</td></tr>
+  <tr><td>Cambié un horario y varios acuerdos quedaron desactualizados</td><td>Es lo esperado: cambió su jornada pactada. Firma la nueva versión y pide a cada persona que la firme (sección 3.5). La anterior sigue vigente mientras tanto.</td></tr>
   <tr><td>WhatsApp dice que mi número no está registrado</td><td>Tu empresa aún no captura tu celular, o lo cambió. Pídele que lo registre en tu ficha y te dé un código de activación.</td></tr>
   <tr><td>El código de activación no funciona</td><td>Pudo vencer (dura 24 horas), haberse usado o anulado tras 5 intentos, o haberse generado para otro número. Pide uno nuevo a tu empresa.</td></tr>
   <tr><td>Cambié de número de celular</td><td>Avisa a tu empresa: cambia el número en tu ficha y te da un código nuevo. El número anterior deja de funcionar.</td></tr>
@@ -551,6 +596,8 @@ Tortillería Doña Lupita · registro n.º 41<div class="btns"><span>Iniciar pau
   <tr><td>Sin conexión (diferida)</td><td>Checada hecha sin internet y enviada después. Se guardan la hora del dispositivo y la hora en que llegó.</td></tr>
   <tr><td>Descanso semanal obligatorio / adicional</td><td>El obligatorio es el día que exige la ley por cada seis de trabajo (art. 69); trabajarlo se paga doble (art. 73). Los adicionales son días extra que pactas, como el sábado en una semana de 5 días.</td></tr>
   <tr><td>Kiosco</td><td>Tableta compartida donde se checa con número de empleado y PIN.</td></tr>
+  <tr><td>Horario</td><td>Hora de entrada, salida y comida que la empresa espera de una persona cada día. Define su jornada pactada y sirve para marcar retardos y trabajo fuera de horario, de forma informativa.</td></tr>
+  <tr><td>Tolerancia</td><td>Minutos de gracia de un horario antes de marcar un retardo o una salida anticipada.</td></tr>
   <tr><td>Código de activación</td><td>Código de 6 dígitos que genera el empleador para que una persona active su checada por WhatsApp. Sirve una vez y vence en 24 horas.</td></tr>
   <tr><td>Aviso</td><td>Notificación en el teléfono que invita a revisar, firmar o consultar algo en Checador. No tiene efecto legal: no sustituye la conformidad ni la firma.</td></tr>
   <tr><td>Jornada ordinaria / tiempo extra</td><td>Horas normales de trabajo y horas adicionales. El extra se paga al doble y, por encima de los límites, al triple (arts. 66 y 68 LFT).</td></tr>

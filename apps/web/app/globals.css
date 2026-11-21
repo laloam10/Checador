@@ -565,3 +565,5 @@ form:has(select[name="horario"] option[data-manual]:checked) .jornada-manual { d
 form:has(select[name="horario"] option[data-manual]:checked) .jornada-horario { display: none; }
 .jornada-manual.siempre { display: block; }
 .horario-trabajador { text-align: center; margin: 0.25rem 0 0; }
+/* Un campo que necesita más ancho que una columna de la rejilla (por ejemplo, el horario). */
+@media (min-width: 40rem) { .campos .campo-ancho { grid-column: span 2; } }
