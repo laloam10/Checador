@@ -24,6 +24,8 @@ Jemba, WhatsApp, avisos ni el manual 1.2. Detalle técnico: `docs/estado-supabas
 - [ ] **Forja**: instalar el bot desde una sesión de Claude Code en la computadora del usuario siguiendo
       `forja/README.md` (Remote Control no ofrece la carpeta a sesiones en la nube). Pasar a Claude la URL del bot para
       verificar el reenvío. No registrar el webhook de Forja en Meta ni guardar `WHATSAPP_VERIFY_TOKEN` en Forja.
+- [ ] **Aviso de versión nueva en el teléfono** (`docs/publicacion.md` §2.5): con pruebas abierto, al publicarse un
+      commit nuevo debe salir "Hay una versión nueva de Checador" al volver a la pestaña (o en 5 minutos como máximo).
 - [ ] **Avisos en iPhone**: probar con Checador agregado a la pantalla de inicio (Android ya probado el 2026-11-20).
       El resultado decide si la fase 3 (app en tiendas) es urgente.
 - [ ] **Número real de WhatsApp**: cuando exista, ponerlo en `docs/manual/fuente/hojas/whatsapp.html` y en el manual.
