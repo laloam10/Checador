@@ -10,7 +10,7 @@ Jemba, WhatsApp, avisos ni el manual 1.2. Detalle técnico: `docs/estado-supabas
       2026-11-16, probablemente pausado por inactividad. Mientras tanto nadie puede entrar ni checar en
       `checador.jemba.mx` y la verificación de cada lunes falla. En el plan gratuito, a los 90 días ya no se reactiva
       desde el panel.
-- [ ] **Paso a producción** (lo hace Claude una vez reactivada): migraciones 18 a 24, código de `pruebas` a `main`,
+- [ ] **Paso a producción** (lo hace Claude una vez reactivada): migraciones 18 a 25, código de `pruebas` a `main`,
       manual 1.2 con sus cuatro hojas y verificación de producción (`verificar-produccion.yml`). El usuario pone en
       producción los secretos y variables de WhatsApp (§1.9) y avisos (§1.10); producción no necesita el bypass de
       Vercel.
@@ -45,6 +45,11 @@ Jemba, WhatsApp, avisos ni el manual 1.2. Detalle técnico: `docs/estado-supabas
 - [ ] Revocar en Supabase el token viejo `checador-configuracion-2` y borrar su entrada "Supabase
       checador-configuracion-2" en los secretos de red del entorno de Claude (el vigente es `checador-migraciones`).
 - [ ] Regenerar la licencia de Forja (quedó escrita en una conversación).
+
+## Documentación
+
+- [ ] **Manual: sección de horarios** (Configuración → Horarios, campo Horario en la ficha, señales en la semana,
+      "Frente al horario de hoy" en el tablero y "Tu horario de hoy" en la app), con capturas nuevas.
 
 ## Decisiones abiertas
 

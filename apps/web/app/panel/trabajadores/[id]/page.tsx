@@ -4,16 +4,17 @@ import { aHoraLocal } from "@checador/jornada";
 import { FormAccion } from "@/components/panel/FormAccion";
 import { CamposTrabajador } from "@/components/panel/CamposTrabajador";
 import { SeccionAcuerdo } from "@/components/panel/SeccionAcuerdo";
+import { horariosDeEmpresa } from "@/lib/horariosDatos";
 import { esGestor, requierePanel } from "@/lib/panel";
 import { asignarPin, darDeBaja, generarCodigoWhatsApp, guardarTrabajador, revertirBaja } from "../../acciones";
 
 export default async function FichaTrabajador({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const ctx = await requierePanel();
-  const [{ data: t }, { data: centros }, { data: conPin }, { data: historial }] = await Promise.all([
+  const [{ data: t }, { data: centros }, { data: conPin }, { data: historial }, { horarios, predeterminado }] = await Promise.all([
     ctx.supabase
       .from("trabajadores")
-      .select("id, nombre, numero_empleado, email, telefono, telefono_verificado_en, curp, user_id, centro_trabajo_id, fecha_ingreso, fecha_baja, dia_descanso, dias_descanso_adicionales, jornada_pactada_min")
+      .select("id, nombre, numero_empleado, email, telefono, telefono_verificado_en, curp, user_id, horario_id, sin_horario_fijo, centro_trabajo_id, fecha_ingreso, fecha_baja, dia_descanso, dias_descanso_adicionales, jornada_pactada_min")
       .eq("id", id)
       .eq("empresa_id", ctx.empresa.id)
       .maybeSingle(),
@@ -24,6 +25,7 @@ export default async function FichaTrabajador({ params }: { params: Promise<{ id
       .select("id, accion, fecha_baja, motivo, creado_en")
       .eq("trabajador_id", id)
       .order("id"),
+    horariosDeEmpresa(ctx.supabase, ctx.empresa.id),
   ]);
   if (!t) notFound();
   const gestor = esGestor(ctx.rol);
@@ -89,7 +91,7 @@ export default async function FichaTrabajador({ params }: { params: Promise<{ id
         <>
           <h2>Datos</h2>
           <FormAccion accion={guardarTrabajador} boton="Guardar cambios">
-            <CamposTrabajador centros={centros ?? []} t={{ ...t, jornada_pactada_min: t.jornada_pactada_min as Record<string, number> | null }} />
+            <CamposTrabajador centros={centros ?? []} horarios={horarios} predeterminado={predeterminado} t={{ ...t, jornada_pactada_min: t.jornada_pactada_min as Record<string, number> | null }} />
           </FormAccion>
 
           <h2>PIN para el kiosco</h2>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { FormAccion } from "@/components/panel/FormAccion";
 import { CamposTrabajador } from "@/components/panel/CamposTrabajador";
 import { estadoAcuerdo, estadosAcuerdosEmpresa, type ClaveEstado } from "@/lib/acuerdosDatos";
+import { horariosDeEmpresa } from "@/lib/horariosDatos";
 import { esGestor, requierePanel } from "@/lib/panel";
 import { generarAcuerdosPendientes, guardarTrabajador, importarTrabajadores } from "../acciones";
 
@@ -37,11 +38,12 @@ export default async function Trabajadores({
     .eq("empresa_id", ctx.empresa.id)
     .order("nombre");
   if (!bajas) consulta = consulta.is("fecha_baja", null);
-  const [{ data: trabajadores }, { data: centros }, { data: conPin }, estados] = await Promise.all([
+  const [{ data: trabajadores }, { data: centros }, { data: conPin }, estados, { horarios, predeterminado }] = await Promise.all([
     consulta,
     ctx.supabase.from("centros_trabajo").select("id, nombre").eq("empresa_id", ctx.empresa.id).order("nombre"),
     ctx.supabase.rpc("trabajadores_con_pin", { p_empresa: ctx.empresa.id }),
     estadosAcuerdosEmpresa(ctx.supabase, ctx.empresa.id),
+    horariosDeEmpresa(ctx.supabase, ctx.empresa.id),
   ]);
   const pines = new Set((conPin ?? []) as string[]);
   const acuerdoDe = new Map(estados.map((e) => [e.trabajadorId, e.clave]));
@@ -164,7 +166,7 @@ export default async function Trabajadores({
           ) : (
             <>
               <FormAccion accion={guardarTrabajador} boton="Dar de alta">
-                <CamposTrabajador centros={centros ?? []} />
+                <CamposTrabajador centros={centros ?? []} horarios={horarios} predeterminado={predeterminado} />
               </FormAccion>
               <details className="alta-masiva" id="alta-masiva">
                 <summary>Dar de alta a varias personas desde Excel</summary>

@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { aHoraLocal } from "@checador/jornada";
+import { aHoraLocal, senalesHorario, type SenalHorario } from "@checador/jornada";
 import { FormAccion } from "@/components/panel/FormAccion";
 import { hm, TablaSemana } from "@/components/TablaSemana";
 import { lunesDe, semanaDeTrabajador, sumarDias, trabajadorPorId, type FilaEvento } from "@/lib/datos";
+import { aHorario, horarioEfectivo, resumenHorario } from "@/lib/horarios";
+import { horariosDeEmpresa } from "@/lib/horariosDatos";
 import { requierePanel } from "@/lib/panel";
 import { agregarChecada, anularChecada, corregirChecada } from "../../../acciones";
 
@@ -72,7 +74,7 @@ export default async function SemanaPanel({
   const lunes = param && /^\d{4}-\d{2}-\d{2}$/.test(param) ? lunesDe(param) : lunesDe(ahoraLocal.slice(0, 10));
   const domingo = sumarDias(lunes, 6);
 
-  const [{ semana, reconstruccion, filas }, { data: conformidades }] = await Promise.all([
+  const [{ semana, reconstruccion, filas }, { data: conformidades }, { horarios, predeterminado }, { data: asignado }] = await Promise.all([
     semanaDeTrabajador(ctx.supabase, trabajador, lunes),
     ctx.supabase
       .from("conformidades")
@@ -80,7 +82,15 @@ export default async function SemanaPanel({
       .eq("trabajador_id", trabajador.id)
       .eq("periodo_inicio", lunes)
       .order("respondido_en", { ascending: false }),
+    horariosDeEmpresa(ctx.supabase, ctx.empresa.id),
+    ctx.supabase.from("trabajadores").select("horario_id, sin_horario_fijo").eq("id", trabajador.id).single(),
   ]);
+  // Señales de horario: informativas (no cambian cálculos ni van en exportaciones).
+  const horario = asignado ? horarioEfectivo(asignado, horarios, predeterminado) : null;
+  const senalesPorDia = new Map<string, SenalHorario[]>();
+  if (horario) {
+    for (const x of senalesHorario(reconstruccion.turnos, aHorario(horario))) senalesPorDia.set(x.fecha, [...(senalesPorDia.get(x.fecha) ?? []), x]);
+  }
   const capturas = agrupar(filas).filter((c) => {
     const f = aHoraLocal(c.vigente, zona).slice(0, 10);
     return f >= lunes && f <= domingo;
@@ -115,6 +125,9 @@ export default async function SemanaPanel({
           <p className="ayuda">
             Semana {nombreSemana(lunes)} · {trabajador.centro}{" "}
             <span className={`insignia-estado ${estado.clase}`}>{estado.texto}</span>
+          </p>
+          <p className="ayuda">
+            {horario ? <>Horario <strong>{horario.nombre}</strong>: {resumenHorario(horario.dias)} · tolerancia {horario.tolerancia_min} min</> : "Sin horario asignado."}
           </p>
         </div>
         <nav className="semana-botones" aria-label="Cambiar de semana">
@@ -166,6 +179,18 @@ export default async function SemanaPanel({
           {[...porDia.entries()].map(([dia, lista]) => (
             <section key={dia} className="bitacora-dia">
               <h3>{nombreDia(dia)}</h3>
+              {senalesPorDia.get(dia) && (
+                <div className="senales" aria-label="Frente a su horario">
+                  {senalesPorDia.get(dia)!.map((x) => (
+                    <span key={x.codigo} className={`senal ${x.codigo === "FUERA_DE_HORARIO" ? "senal-neutra" : ""}`} title={x.mensaje}>
+                      {x.codigo === "RETARDO" ? `${x.minutos} min tarde`
+                        : x.codigo === "SALIDA_ANTICIPADA" ? `salió ${x.minutos} min antes`
+                        : x.codigo === "FUERA_DE_HORARIO" ? `${x.minutos} min fuera de horario`
+                        : "día no programado"}
+                    </span>
+                  ))}
+                </div>
+              )}
               <ul className="bitacora">
                 {lista.map((c) => (
                   <li key={c.id}>

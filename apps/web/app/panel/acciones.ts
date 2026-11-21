@@ -8,6 +8,7 @@ import { aHoraLocal, localAInstante } from "@checador/jornada";
 import { generarTextoAcuerdo } from "@/lib/acuerdo";
 import { datosActuales, estadosAcuerdosEmpresa } from "@/lib/acuerdosDatos";
 import { trabajadorPorId } from "@/lib/datos";
+import { horarioDesdeFormulario } from "@/lib/horarios";
 import { decodificar, MAX_BYTES, validarImportacion } from "@/lib/importacion";
 import { esGestor, requierePanel, ZONAS_MX } from "@/lib/panel";
 import { crearClienteServidor, usuarioActual } from "@/lib/supabase/server";
@@ -116,6 +117,61 @@ export async function cambiarRecordatorios(activar: boolean): Promise<Estado> {
   return ok(activar ? "Recordatorios activados." : "Recordatorios desactivados.");
 }
 
+// --- Horarios ------------------------------------------------------------------
+
+/** Personas activas a las que les aplica un horario (el suyo o, si no tienen, el de la empresa). */
+async function personasConHorario(ctx: Awaited<ReturnType<typeof requierePanel>>, horarioId: string): Promise<number> {
+  const { data: empresa } = await ctx.supabase.from("empresas").select("horario_predeterminado").eq("id", ctx.empresa.id).maybeSingle();
+  let q = ctx.supabase.from("trabajadores").select("id", { count: "exact", head: true }).eq("empresa_id", ctx.empresa.id)
+    .is("fecha_baja", null).eq("sin_horario_fijo", false);
+  q = empresa?.horario_predeterminado === horarioId ? q.or(`horario_id.eq.${horarioId},horario_id.is.null`) : q.eq("horario_id", horarioId);
+  const { count } = await q;
+  return count ?? 0;
+}
+
+export async function guardarHorario(_: Estado, fd: FormData): Promise<Estado> {
+  const ctx = await requierePanel();
+  if (!esGestor(ctx.rol)) return fallo("Solo el propietario o un administrador pueden cambiar los horarios.");
+  const r = horarioDesdeFormulario((k) => texto(fd, k));
+  if (!r.ok) return fallo(r.error);
+  const id = texto(fd, "id");
+  const fila = { nombre: r.nombre, dias: r.dias, tolerancia_min: r.tolerancia };
+  const { error } = id
+    ? await ctx.supabase.from("horarios").update(fila).eq("id", id).eq("empresa_id", ctx.empresa.id)
+    : await ctx.supabase.from("horarios").insert({ ...fila, empresa_id: ctx.empresa.id });
+  if (error) return fallo(error.code === "23505" ? "Ya existe un horario con ese nombre." : traducir(error));
+  refrescar();
+  if (!id) return ok(`Horario «${r.nombre}» creado.`);
+  const n = await personasConHorario(ctx, id);
+  return ok(
+    n
+      ? `Horario actualizado. La jornada pactada de ${n === 1 ? "1 persona" : `${n} personas`} se recalculó: revisa sus acuerdos en Trabajadores (si cambió, quedan desactualizados).`
+      : "Horario actualizado.",
+  );
+}
+
+export async function eliminarHorario(_: Estado, fd: FormData): Promise<Estado> {
+  const ctx = await requierePanel();
+  if (!esGestor(ctx.rol)) return fallo("Solo el propietario o un administrador pueden cambiar los horarios.");
+  if (texto(fd, "confirmar") !== "BORRAR") return fallo("Escribe BORRAR para confirmar.");
+  const { data, error } = await ctx.supabase.from("horarios").delete().eq("id", texto(fd, "id")).eq("empresa_id", ctx.empresa.id).select("nombre");
+  if (error) return fallo(traducir(error));
+  if (!data?.length) return fallo("Ese horario ya no existe.");
+  refrescar();
+  return ok(`Horario «${data[0]!.nombre}» borrado. Quien lo tenía pasa al horario de la empresa.`);
+}
+
+export async function cambiarHorarioPredeterminado(_: Estado, fd: FormData): Promise<Estado> {
+  const ctx = await requierePanel();
+  if (!esGestor(ctx.rol)) return fallo("Solo el propietario o un administrador pueden cambiar los horarios.");
+  const id = texto(fd, "horario_predeterminado") || null;
+  const { data, error } = await ctx.supabase.from("empresas").update({ horario_predeterminado: id }).eq("id", ctx.empresa.id).select("id");
+  if (error) return fallo(traducir(error));
+  if (!data?.length) return fallo("No tienes permiso para hacer esto.");
+  refrescar();
+  return ok(id ? "Horario de la empresa guardado. Aplica a quien no tiene uno propio." : "La empresa ya no tiene horario por omisión.");
+}
+
 // --- Datos de la empresa -------------------------------------------------------
 
 export async function guardarEmpresa(_: Estado, fd: FormData): Promise<Estado> {
@@ -149,7 +205,12 @@ export async function guardarTrabajador(_: Estado, fd: FormData): Promise<Estado
     if (!Number.isFinite(min) || min < 0 || min > 12 * 60) return fallo("La jornada pactada por día debe estar entre 0 y 12 horas.");
     pactada[String(d)] = min;
   }
+  // Horario: "" = el de la empresa; "sin" = sin horario fijo; otro valor = un horario de la empresa.
+  const horario = texto(fd, "horario");
+  const conHorario = horario !== "sin" && (horario !== "" || texto(fd, "empresa_tiene_horario") === "si");
   const datos = {
+    horario_id: horario && horario !== "sin" ? horario : null,
+    sin_horario_fijo: horario === "sin",
     nombre: texto(fd, "nombre"),
     numero_empleado: texto(fd, "numero_empleado") || null,
     email: texto(fd, "email").toLowerCase() || null,
@@ -161,7 +222,8 @@ export async function guardarTrabajador(_: Estado, fd: FormData): Promise<Estado
     dias_descanso_adicionales: [...new Set(fd.getAll("descanso_adicional").map(Number))]
       .filter((d) => Number.isInteger(d) && d >= 0 && d <= 6)
       .sort(),
-    jornada_pactada_min: Object.keys(pactada).length ? pactada : null,
+    // Con horario, la jornada pactada la calcula la base a partir de él (trigger).
+    ...(conHorario ? {} : { jornada_pactada_min: Object.keys(pactada).length ? pactada : null }),
   };
   if (!datos.nombre) return fallo("Escribe el nombre del trabajador.");
   // El descanso obligatorio no se repite como adicional (art. 69: uno por cada seis días de trabajo).

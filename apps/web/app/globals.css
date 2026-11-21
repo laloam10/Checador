@@ -540,3 +540,28 @@ body:has(main.kiosco) { background: var(--noche); color: var(--noche-tinta); }
   .nav-app { column-gap: 0.1rem; }
   .nav-app a:not(.marca-enlace) { padding: 0.35rem 0.5rem; font-size: 0.88rem; }
 }
+
+/* ---- Horarios (Configuración) ---- */
+.horarios { list-style: none; padding: 0; margin: 0.5rem 0; display: grid; gap: 0.5rem; }
+.horarios li > details { border: 1px solid var(--borde); border-radius: var(--radio-chico); padding: 0.6rem 0.8rem; background: var(--superficie); }
+.horarios summary { display: flex; flex-wrap: wrap; gap: 0.35rem 0.6rem; align-items: baseline; color: var(--tinta); }
+.horarios summary .ayuda { flex-basis: 100%; }
+.form-horario .tabla-horario { margin-top: 0.25rem; box-shadow: none; }
+.tabla-horario td { vertical-align: middle; padding: 0.35rem 0.5rem; }
+.tabla-horario input[type="time"] { padding: 0.4rem 0.5rem; min-width: 6.5rem; }
+.tabla-horario .casilla-linea { white-space: nowrap; font-weight: 600; }
+.nuevo-horario { margin-top: 1rem; }
+.nuevo-horario h3 { margin: 0 0 0.25rem; font-size: 1rem; }
+@media (max-width: 40rem) {
+  .tabla-horario { display: block; overflow-x: auto; }
+}
+/* Señales de horario (semana del panel y tablero): informativas. */
+.senales { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0.15rem 0 0.35rem; }
+.senal { font-size: 0.76rem; padding: 0.08rem 0.5rem; border-radius: 999px; background: var(--ambar-claro); color: var(--ambar); font-weight: 600; }
+.senal-neutra { background: var(--superficie-2); color: var(--gris); }
+/* Ficha: la jornada se captura a mano solo sin horario (la elección del select decide qué se ve). */
+.jornada-manual { display: none; }
+form:has(select[name="horario"] option[data-manual]:checked) .jornada-manual { display: block; }
+form:has(select[name="horario"] option[data-manual]:checked) .jornada-horario { display: none; }
+.jornada-manual.siempre { display: block; }
+.horario-trabajador { text-align: center; margin: 0.25rem 0 0; }

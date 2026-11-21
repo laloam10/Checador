@@ -1,5 +1,8 @@
 import Link from "next/link";
-import { guardarEmpresa } from "@/app/panel/acciones";
+import { cambiarHorarioPredeterminado, eliminarHorario, guardarEmpresa } from "@/app/panel/acciones";
+import { FormHorario } from "@/components/panel/FormHorario";
+import { resumenHorario } from "@/lib/horarios";
+import { horariosDeEmpresa } from "@/lib/horariosDatos";
 import { FormAccion } from "@/components/panel/FormAccion";
 import { InterruptorRecordatorios } from "@/components/panel/InterruptorRecordatorios";
 import { esGestor, requierePanel, ZONAS_MX } from "@/lib/panel";
@@ -13,6 +16,13 @@ export default async function Configuracion() {
     .eq("id", ctx.empresa.id)
     .single();
   const recordatorios = empresa?.recordatorios_conformidad ?? true;
+  const [{ horarios, predeterminado }, { data: personal }] = await Promise.all([
+    horariosDeEmpresa(ctx.supabase, ctx.empresa.id),
+    ctx.supabase.from("trabajadores").select("horario_id, sin_horario_fijo").eq("empresa_id", ctx.empresa.id).is("fecha_baja", null),
+  ]);
+  // Cuántas personas activas usa cada horario (las que no tienen uno propio usan el de la empresa).
+  const usan = (id: string) =>
+    (personal ?? []).filter((t) => !t.sin_horario_fijo && (t.horario_id ?? predeterminado) === id).length;
   const zona = ZONAS_MX.find((z) => z.zona === empresa?.zona_horaria)?.etiqueta ?? empresa?.zona_horaria;
 
   return (
@@ -40,6 +50,67 @@ export default async function Configuracion() {
           <Link href="/panel/objeciones#recordatorios">Objeciones</Link>. Este interruptor también controla el aviso en el
           teléfono de «semana por revisar», para quien activó los avisos en su app.
         </p>
+      </section>
+
+      <section className="ajuste-seccion" id="horarios">
+        <h2>Horarios</h2>
+        <p className="ayuda">
+          Define el horario normal de trabajo para ver quién llega tarde, sale antes o trabaja fuera de horario. Es
+          informativo: no impide checar ni descuenta nada, y el tiempo extra se sigue calculando por horas trabajadas, no por
+          la hora del reloj. Si una persona tiene horario, su <strong>jornada pactada por día</strong> sale de él (sin la
+          comida, si en su centro de trabajo se puede salir a comer).
+        </p>
+        {horarios.length > 0 && (
+          <ul className="horarios">
+            {horarios.map((h) => (
+              <li key={h.id}>
+                <details>
+                  <summary>
+                    <strong>{h.nombre}</strong>
+                    {h.id === predeterminado && <span className="insignia-estado insignia-ok">De la empresa</span>}{" "}
+                    <span className="ayuda">
+                      {resumenHorario(h.dias)} · tolerancia {h.tolerancia_min} min · {usan(h.id) === 1 ? "1 persona" : `${usan(h.id)} personas`}
+                    </span>
+                  </summary>
+                  {gestor && (
+                    <>
+                      <FormHorario h={h} />
+                      {usan(h.id) > 0 && (
+                        <p className="mensaje mensaje-aviso">
+                          Al cambiar las horas de este horario se recalcula la jornada pactada de {usan(h.id) === 1 ? "1 persona" : `${usan(h.id)} personas`};
+                          si cambia, sus acuerdos de registro quedan <strong>desactualizados</strong> y habrá que firmar una versión nueva.
+                        </p>
+                      )}
+                      <FormAccion accion={eliminarHorario} boton="Borrar horario" peligro className="form-panel form-linea">
+                        <input type="hidden" name="id" value={h.id} />
+                        <label>Escribe BORRAR para confirmar<input name="confirmar" autoComplete="off" /></label>
+                      </FormAccion>
+                    </>
+                  )}
+                </details>
+              </li>
+            ))}
+          </ul>
+        )}
+        {gestor && horarios.length > 0 && (
+          <FormAccion accion={cambiarHorarioPredeterminado} boton="Guardar" className="form-panel form-linea">
+            <label>
+              Horario de la empresa (para quien no tiene uno propio)
+              <select name="horario_predeterminado" defaultValue={predeterminado ?? ""}>
+                <option value="">Ninguno</option>
+                {horarios.map((h) => <option key={h.id} value={h.id}>{h.nombre}</option>)}
+              </select>
+            </label>
+          </FormAccion>
+        )}
+        {/* Siempre visible (no dentro de un <details>): así el aviso de "creado" no se oculta al recargar la sección. */}
+        {gestor && (
+          <div className="nuevo-horario">
+            <h3>Nuevo horario</h3>
+            <FormHorario />
+          </div>
+        )}
+        {!gestor && horarios.length === 0 && <p className="vacio">Tu empresa aún no tiene horarios.</p>}
       </section>
 
       <section className="ajuste-seccion">

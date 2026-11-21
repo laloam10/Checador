@@ -3,3 +3,4 @@ export * from "./limites";
 export { calcularSemana, clasificarJornada, minutosEfectivos, pagoTiempoExtraCentavos } from "./calculo";
 export { minutosNocturnos } from "./tiempo";
 export * from "./reconstruccion";
+export * from "./horario";

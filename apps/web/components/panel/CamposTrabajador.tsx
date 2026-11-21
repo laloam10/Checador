@@ -1,3 +1,5 @@
+import type { HorarioFila } from "@/lib/horarios";
+
 const DIAS = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
 export interface DatosTrabajador {
@@ -12,9 +14,22 @@ export interface DatosTrabajador {
   dia_descanso?: number;
   dias_descanso_adicionales?: number[] | null;
   jornada_pactada_min?: Record<string, number> | null;
+  horario_id?: string | null;
+  sin_horario_fijo?: boolean;
 }
 
-export function CamposTrabajador({ t, centros }: { t?: DatosTrabajador; centros: { id: string; nombre: string }[] }) {
+export function CamposTrabajador({
+  t,
+  centros,
+  horarios = [],
+  predeterminado = null,
+}: {
+  t?: DatosTrabajador;
+  centros: { id: string; nombre: string }[];
+  horarios?: HorarioFila[];
+  predeterminado?: string | null;
+}) {
+  const deEmpresa = horarios.find((h) => h.id === predeterminado);
   return (
     <>
       {t?.id && <input type="hidden" name="id" value={t.id} />}
@@ -50,6 +65,24 @@ export function CamposTrabajador({ t, centros }: { t?: DatosTrabajador; centros:
           </select>
         </label>
         <label>Fecha de ingreso<input name="fecha_ingreso" type="date" required defaultValue={t?.fecha_ingreso ?? ""} /></label>
+        <input type="hidden" name="empresa_tiene_horario" value={deEmpresa ? "si" : "no"} />
+        {horarios.length > 0 ? (
+          <label>
+            Horario
+            <select name="horario" defaultValue={t?.sin_horario_fijo ? "sin" : (t?.horario_id ?? "")}>
+              {deEmpresa ? (
+                <option value="">El de la empresa ({deEmpresa.nombre})</option>
+              ) : (
+                <option value="" data-manual="">Sin horario (la empresa no tiene uno por omisión)</option>
+              )}
+              {horarios.map((h) => <option key={h.id} value={h.id}>{h.nombre}</option>)}
+              <option value="sin" data-manual="">Sin horario fijo (turnos que cambian)</option>
+            </select>
+            <span className="ayuda">Para ver retardos y trabajo fuera de horario. Los horarios se crean en Configuración.</span>
+          </label>
+        ) : (
+          <input type="hidden" name="horario" value="" />
+        )}
         <label>
           Descanso semanal obligatorio
           <select name="dia_descanso" defaultValue={String(t?.dia_descanso ?? 0)}>
@@ -75,6 +108,7 @@ export function CamposTrabajador({ t, centros }: { t?: DatosTrabajador; centros:
           el descanso obligatorio, se ignora.
         </span>
       </fieldset>
+      <div className={`jornada-manual ${horarios.length ? "" : "siempre"}`}>
       <details>
         <summary>Jornada pactada por día (opcional, art. 58 LFT)</summary>
         <p className="ayuda">
@@ -91,6 +125,13 @@ export function CamposTrabajador({ t, centros }: { t?: DatosTrabajador; centros:
           ))}
         </div>
       </details>
+      </div>
+      {horarios.length > 0 && (
+        <p className="ayuda jornada-horario">
+          La jornada pactada por día (art. 58) se calcula del horario: de la entrada a la salida, sin la comida si en su centro
+          de trabajo se puede salir a comer. No hace falta capturarla.
+        </p>
+      )}
     </>
   );
 }

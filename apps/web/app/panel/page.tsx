@@ -4,7 +4,7 @@ import { FormAccion } from "@/components/panel/FormAccion";
 import { calcularAlta, PrimerosPasos } from "@/components/panel/PrimerosPasos";
 import { estadosAcuerdosEmpresa } from "@/lib/acuerdosDatos";
 import { lunesDe, sumarDias } from "@/lib/datos";
-import { objecionesPendientes, presentesAhora, requierePanel, type ContextoPanel } from "@/lib/panel";
+import { horarioDeHoy, objecionesPendientes, presentesAhora, requierePanel, type ContextoPanel } from "@/lib/panel";
 import { verificarIntegridad } from "./acciones";
 
 interface SemanaPasada {
@@ -44,11 +44,12 @@ export default async function Tablero() {
   const ahora = aHoraLocal(new Date(), zona);
   const hoy = ahora.slice(0, 10);
   const lunesPasado = sumarDias(lunesDe(hoy), -7);
-  const [presentes, objeciones, estados, semana] = await Promise.all([
+  const [presentes, objeciones, estados, semana, hoyHorario] = await Promise.all([
     presentesAhora(ctx),
     objecionesPendientes(ctx),
     estadosAcuerdosEmpresa(ctx.supabase, ctx.empresa.id),
     semanaPasada(ctx, lunesPasado),
+    horarioDeHoy(ctx),
   ]);
   const alta = await calcularAlta(ctx, estados);
 
@@ -182,6 +183,45 @@ export default async function Tablero() {
             </li>
           ))}
         </ul>
+      )}
+
+      {hoyHorario.conHorario > 0 && (
+        <>
+          <div className="seccion-cabecera">
+            <h2>Frente al horario de hoy</h2>
+            <Link href="/panel/configuracion#horarios">Horarios</Link>
+          </div>
+          {hoyHorario.tarde.length === 0 && hoyHorario.sinEntrada.length === 0 ? (
+            <p className="vacio">Nadie ha llegado tarde y todos los turnos que ya empezaron tienen entrada.</p>
+          ) : (
+            <ul className="en-turno horario-hoy">
+              {hoyHorario.sinEntrada.map((p) => (
+                <li key={`s-${p.trabajadorId}`}>
+                  <span className="punto pausa" aria-hidden />
+                  <div>
+                    <Link href={`/panel/trabajadores/${p.trabajadorId}/semana`}>{p.nombre}</Link>{" "}
+                    <span className="insignia-estado insignia-aviso">Sin checar entrada</span>
+                  </div>
+                  <div className="tiempo">entra a las {p.programada}</div>
+                </li>
+              ))}
+              {hoyHorario.tarde.map((p) => (
+                <li key={`t-${p.trabajadorId}`}>
+                  <span className="punto pausa" aria-hidden />
+                  <div>
+                    <Link href={`/panel/trabajadores/${p.trabajadorId}/semana`}>{p.nombre}</Link>{" "}
+                    <span className="insignia-estado insignia-neutra">{p.minutos} min tarde</span>
+                  </div>
+                  <div className="tiempo">entró a las {p.entrada}</div>
+                </li>
+              ))}
+            </ul>
+          )}
+          <p className="ayuda">
+            Es informativo: una entrada sin checar puede ser una falta, un permiso o una checada olvidada. Revísalo con la
+            persona antes de actuar; Checador no descuenta nada.
+          </p>
+        </>
       )}
 
       <section className="form-panel integridad">
