@@ -1,8 +1,23 @@
+import { execFileSync } from "node:child_process";
 import type { NextConfig } from "next";
+
+// Identifica el código de este despliegue (ver lib/despliegue.ts). Se usa el commit y no la
+// hora de compilación: next.config se evalúa más de una vez al compilar y el valor debe ser
+// el mismo en el navegador y en el servidor.
+function despliegue(): string {
+  const commit = process.env.VERCEL_GIT_COMMIT_SHA;
+  if (commit) return commit.slice(0, 12);
+  try {
+    return execFileSync("git", ["rev-parse", "--short=12", "HEAD"], { encoding: "utf8" }).trim();
+  } catch {
+    return "desarrollo";
+  }
+}
 
 const nextConfig: NextConfig = {
   transpilePackages: ["@checador/jornada"],
   poweredByHeader: false,
+  env: { NEXT_PUBLIC_CHECADOR_DESPLIEGUE: despliegue() },
   async headers() {
     return [
       {

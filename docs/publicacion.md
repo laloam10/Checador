@@ -328,6 +328,37 @@ Solo dos, y ninguna es secreta:
 2. HTTPS se configura solo.
 3. La app envía `Strict-Transport-Security` con `includeSubDomains; preload`. Antes de enviar tu dominio a la lista *preload* de los navegadores, asegúrate de que **todos** tus subdominios funcionen con HTTPS. Si no estás seguro, no lo envíes: la cabecera funciona igual sin estar en esa lista.
 
+### 2.5 Versiones durante una publicación (Skew Protection)
+
+Cuando se publica una versión, quien ya tenía Checador abierto sigue con la anterior en su navegador. Dos piezas cubren
+ese desfase:
+
+1. **Skew Protection de Vercel** (planes Pro y Enterprise). Los proyectos creados después del 19 de noviembre de 2024
+   la traen activa; el de Checador sí (las páginas de `checador.jemba.mx` llevan `data-dpl-id` en `<html>`, revisado
+   el 2026-11-21). Con Next.js 14.1.4 o posterior no lleva configuración: no pongas `deploymentId` en `next.config.ts`
+   (en Vercel un identificador propio que se repita hace fallar el despliegue). Para revisarla: **Project Settings →
+   Advanced → Skew Protection** (requiere *Automatically expose System Environment Variables* activo en
+   **Environment Variables**). Si alguna vez se apaga o se cambia, vuelve a desplegar la última versión de producción.
+   - Fija al despliegue que sirvió la página los archivos de JavaScript y CSS, las navegaciones dentro de la app, los
+     *prefetch* y las Server Actions del panel, durante su **edad máxima** (12 horas por omisión en Pro).
+   - **No fija las llamadas propias con `fetch()`**: las checadas de la PWA (`/api/eventos`), del kiosco
+     (`/api/kiosco/checar`), la conformidad y la app instalada llegan siempre a la versión más reciente. Por eso esas
+     rutas deben aceptar lo que mandaba la versión anterior: un cambio de formato se hace en dos publicaciones (primero
+     el servidor acepta ambos formatos; después el cliente cambia).
+   - Una recarga completa siempre trae la versión vigente.
+2. **Aviso de versión nueva** (`lib/despliegue.ts`, ruta `/api/despliegue`). Cada página consulta la versión vigente
+   al abrir, cada 5 minutos, al volver a la pestaña y al recuperar la conexión. La versión es el commit de Git
+   (`VERCEL_GIT_COMMIT_SHA`): volver a desplegar el mismo commit no genera aviso.
+   - Panel y pantallas de la persona trabajadora: franja "Hay una versión nueva de Checador" con botón **Actualizar**.
+     No se recarga sola porque puede haber un formulario a medio llenar.
+   - Kiosco: se recarga solo, pero solo en reposo (pantalla del número de empleado, vacía, sin nada enviándose), tras
+     10 segundos y como máximo una vez cada 10 minutos. Antes termina de enviar su cola; lo que quede sin enviar sigue
+     guardado en el dispositivo y se envía después sin duplicarse.
+   - Prueba: `apps/web/e2e/actualizacion.e2e.mjs`.
+
+Si un despliegue tiene un error grave y las páginas abiertas no deben seguir usándolo, en la lista de despliegues
+abre el menú del despliegue que lo corrige → **Skew Protection Threshold** → **Set**.
+
 ---
 
 ## 3. Seguridad que ya trae la aplicación

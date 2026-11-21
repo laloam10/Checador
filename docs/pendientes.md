@@ -1,6 +1,6 @@
 # Pendientes
 
-Actualizado el 2026-11-20. Lo hecho está en la rama `pruebas`; producción (`main`) no tiene todavía el diseño de
+Actualizado el 2026-11-21. Lo hecho está en la rama `pruebas`; producción (`main`) no tiene todavía el diseño de
 Jemba, WhatsApp, avisos ni el manual 1.2. Detalle técnico: `docs/estado-supabase.md`, `docs/plan-app-movil.md` y
 `docs/publicacion.md`.
 
@@ -10,7 +10,7 @@ Jemba, WhatsApp, avisos ni el manual 1.2. Detalle técnico: `docs/estado-supabas
       2026-11-16, probablemente pausado por inactividad. Mientras tanto nadie puede entrar ni checar en
       `checador.jemba.mx` y la verificación de cada lunes falla. En el plan gratuito, a los 90 días ya no se reactiva
       desde el panel.
-- [ ] **Paso a producción** (lo hace Claude una vez reactivada): migraciones 18 a 25, código de `pruebas` a `main`,
+- [ ] **Paso a producción** (lo hace Claude una vez reactivada): migraciones 18 a 25 (incluye horarios), código de `pruebas` a `main`,
       manual 1.2 con sus cuatro hojas y verificación de producción (`verificar-produccion.yml`). El usuario pone en
       producción los secretos y variables de WhatsApp (§1.9) y avisos (§1.10); producción no necesita el bypass de
       Vercel.
@@ -47,6 +47,9 @@ Jemba, WhatsApp, avisos ni el manual 1.2. Detalle técnico: `docs/estado-supabas
 - [ ] Regenerar la licencia de Forja (quedó escrita en una conversación).
 
 ## Decisiones abiertas
+
+- [ ] **"Novedades" para el empleador** (pospuesto el 2026-11-21): qué cambió en cada versión, visible en el panel.
+      El aviso de versión nueva y Skew Protection ya están (`docs/publicacion.md` §2.5).
 
 - [ ] Cuentas de Apple y Google Play: a nombre de una organización (Jemba) o personal (`docs/plan-app-movil.md`).
 - [ ] Aviso de "turno abierto": requiere antes una forma de que la persona pida una corrección.

@@ -2,6 +2,7 @@
 
 import { Isotipo } from "@/components/Marca";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useVersionNueva } from "@/lib/useVersionNueva";
 import { aHoraLocal } from "@checador/jornada";
 import { ahoraServidor, registrarHoraServidor, sincronizarReloj, type TipoCaptura } from "@/lib/cola";
 import {
@@ -67,6 +68,11 @@ interface AcuerdoPendiente {
 const INACTIVIDAD_MS = 20_000;
 const LECTURA_MS = 4 * 60_000; // acuerdo o semana: tiempo para leer con calma
 const CONFIRMACION_MS = 4_000;
+// Con versión nueva, el kiosco se recarga tras este tiempo en reposo.
+const REPOSO_ACTUALIZAR_MS = 10_000;
+// Freno contra un ciclo de recargas si tras recargar siguiera viendo otra versión.
+const ENTRE_RECARGAS_MS = 10 * 60_000;
+const CLAVE_RECARGA = "checador:kiosco:recarga";
 
 export function Kiosco({ empresa, centro, zonaHoraria }: { empresa: string; centro: string | null; zonaHoraria: string }) {
   const [paso, setPaso] = useState<Paso>({ tipo: "numero" });
@@ -127,6 +133,34 @@ export function Kiosco({ empresa, centro, zonaHoraria }: { empresa: string; cent
       void bloqueo?.release();
     };
   }, [sincronizar, zonaHoraria]);
+
+  // Versión nueva: el kiosco no tiene quien pulse "Actualizar", así que se recarga solo, pero
+  // únicamente en reposo (pantalla del número, vacía, sin nada enviándose). Antes de recargar
+  // termina de enviar la cola; lo que quede pendiente sigue guardado en este dispositivo
+  // (IndexedDB) y se envía después de recargar sin duplicarse (identificador único por checada).
+  const versionNueva = useVersionNueva();
+  const enReposo = paso.tipo === "numero" && !numero && !enviando;
+  const reposo = useRef(enReposo);
+  useEffect(() => {
+    reposo.current = enReposo;
+  });
+  useEffect(() => {
+    if (!versionNueva || !enReposo) return;
+    let cancelado = false;
+    const t = setTimeout(async () => {
+      if (!navigator.onLine) return;
+      await sincronizarColaKiosco().catch(() => 0);
+      if (cancelado || !reposo.current) return;
+      const ultima = Number(sessionStorage.getItem(CLAVE_RECARGA) ?? 0);
+      if (Date.now() - ultima < ENTRE_RECARGAS_MS) return;
+      sessionStorage.setItem(CLAVE_RECARGA, String(Date.now()));
+      window.location.reload();
+    }, REPOSO_ACTUALIZAR_MS);
+    return () => {
+      cancelado = true;
+      clearTimeout(t);
+    };
+  }, [versionNueva, enReposo]);
 
   // Vuelve al inicio por inactividad (nadie debe ver el paso de otra persona).
   useEffect(() => {

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import { connection } from "next/server";
+import { AvisoActualizacion } from "@/components/AvisoActualizacion";
 import { RegistrarServiceWorker } from "@/components/RegistrarServiceWorker";
 import "./globals.css";
 
@@ -30,6 +31,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="es-MX" className={`${texto.variable} ${titulos.variable} ${mono.variable}`}>
       <body>
+        <AvisoActualizacion />
         {children}
         <RegistrarServiceWorker />
       </body>
