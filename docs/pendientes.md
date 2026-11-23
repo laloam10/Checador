@@ -1,6 +1,6 @@
 # Pendientes
 
-Actualizado el 2026-11-21. Lo hecho está en la rama `pruebas`; producción (`main`) no tiene todavía el diseño de
+Actualizado el 2026-11-23. Lo hecho está en la rama `pruebas`; producción (`main`) no tiene todavía el diseño de
 Jemba, WhatsApp, avisos ni el manual 1.2. Detalle técnico: `docs/estado-supabase.md`, `docs/plan-app-movil.md` y
 `docs/publicacion.md`.
 
@@ -10,7 +10,7 @@ Jemba, WhatsApp, avisos ni el manual 1.2. Detalle técnico: `docs/estado-supabas
       2026-11-16, probablemente pausado por inactividad. Mientras tanto nadie puede entrar ni checar en
       `checador.jemba.mx` y la verificación de cada lunes falla. En el plan gratuito, a los 90 días ya no se reactiva
       desde el panel.
-- [ ] **Paso a producción** (lo hace Claude una vez reactivada): migraciones 18 a 25 (incluye horarios), código de `pruebas` a `main`,
+- [ ] **Paso a producción** (lo hace Claude una vez reactivada): migraciones 18 a 26 (incluye horarios y Salir con PIN), código de `pruebas` a `main`,
       manual 1.2 con sus cuatro hojas y verificación de producción (`verificar-produccion.yml`). El usuario pone en
       producción los secretos y variables de WhatsApp (§1.9) y avisos (§1.10); producción no necesita el bypass de
       Vercel.
@@ -33,6 +33,7 @@ Jemba, WhatsApp, avisos ni el manual 1.2. Detalle técnico: `docs/estado-supabas
 ## Revisión legal (antes del primer cliente)
 
 - [ ] Plantilla del acuerdo de registro (`apps/web/lib/acuerdo.ts`).
+- [ ] Interpretación 11 (volver a entrar con PIN sin cambiar el acuerdo).
 - [ ] Interpretaciones 8 y 9 de `packages/jornada/README.md` (checada y conformidad por WhatsApp). Si cambian, ajustar
       el manual (3.17 y capítulo 6) y la hoja de WhatsApp.
 - [ ] Redacción del método "aplicación" en el acuerdo antes de publicar una app en tiendas (hoy dice "Aplicación

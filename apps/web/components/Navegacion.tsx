@@ -20,8 +20,9 @@ export function Navegacion({ panel = false }: { panel?: boolean }) {
     if ("caches" in window) {
       for (const k of await caches.keys()) await caches.delete(k);
     }
-    await fetch("/api/salir", { method: "POST" });
-    window.location.href = "/entrar";
+    // Si la persona eligió volver a entrar con su PIN, Salir solo bloquea este teléfono.
+    const r = await fetch("/api/salir", { method: "POST" }).then((x) => x.json()).catch(() => ({}));
+    window.location.href = (r as { bloqueada?: boolean }).bloqueada ? "/desbloquear" : "/entrar";
   }
 
   return (
@@ -35,8 +36,8 @@ export function Navegacion({ panel = false }: { panel?: boolean }) {
       <Link href="/registros" className={ruta.startsWith("/registros") ? "activo" : ""}>
         Mis registros
       </Link>
-      <Link href="/pin" className={ruta.startsWith("/pin") ? "activo" : ""}>
-        PIN
+      <Link href="/acceso" className={ruta.startsWith("/acceso") ? "activo" : ""}>
+        Acceso
       </Link>
       <Link href="/acuerdo" className={ruta.startsWith("/acuerdo") ? "activo" : ""}>
         Acuerdo

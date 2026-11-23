@@ -12,7 +12,7 @@ const RUTAS = {
     "/panel/trabajadores/aaaaaaaa-0000-0000-0000-000000000003/semana", "/panel/objeciones",
     "/panel/exportar", "/panel/centros", "/panel/accesos", "/panel/configuracion",
   ],
-  "ana@ejemplo.mx": ["/", "/registros?semana=2026-10-26", "/pin", "/acuerdo"],
+  "ana@ejemplo.mx": ["/", "/registros?semana=2026-10-26", "/acceso", "/acuerdo"],
   "kiosco.centro@ejemplo.mx": ["/kiosco"],
 };
 

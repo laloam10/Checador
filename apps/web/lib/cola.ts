@@ -79,6 +79,7 @@ export type ResultadoEnvio =
   | { tipo: "ok" }
   | { tipo: "sin-red" }
   | { tipo: "sesion" }
+  | { tipo: "bloqueada" }
   | { tipo: "rechazado"; mensaje: string };
 
 export async function enviar(
@@ -100,6 +101,8 @@ export async function enviar(
   if (cuerpo.horaServidor) registrarHoraServidor(cuerpo.horaServidor, inicio, Date.now());
   if (r.ok) return { tipo: "ok" };
   if (r.status === 401) return { tipo: "sesion" };
+  // Sesión bloqueada (lib/acceso.ts): la checada se conserva y se envía al desbloquear.
+  if (r.status === 423) return { tipo: "bloqueada" };
   if (r.status >= 500) return { tipo: "sin-red" };
   return { tipo: "rechazado", mensaje: cuerpo.error ?? `Error ${r.status}` };
 }
@@ -125,7 +128,7 @@ export function sincronizarCola(): Promise<number> {
         else if (res.tipo === "rechazado") restantes.push({ ...p, rechazo: res.mensaje });
         else {
           restantes.push(p);
-          detener = true; // sin red o sin sesión: reintentar después, en orden
+          detener = true; // sin red, sin sesión o bloqueada: reintentar después, en orden
         }
       }
       // Pudo haberse encolado algo mientras se enviaba.

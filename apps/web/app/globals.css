@@ -572,3 +572,22 @@ form:has(select[name="horario"] option[data-manual]:checked) .jornada-horario { 
 .aviso-actualizacion { display: flex; align-items: center; justify-content: center; gap: 0.75rem; flex-wrap: wrap; padding: 0.5rem 1rem; background: var(--noche); color: #fff; font-size: 0.92rem; }
 .aviso-actualizacion .secundario { width: auto; padding: 0.3rem 0.9rem; font-size: 0.9rem; background: var(--lima); color: var(--noche); border-color: var(--lima); }
 .aviso-actualizacion .secundario:hover { background: #d8f240; }
+
+/* Acceso: qué pasa al salir y pantalla de desbloqueo con PIN. */
+.opciones-acceso { border: none; padding: 0; margin: 1rem 0 0; display: grid; gap: 0.6rem; }
+.opciones-acceso legend { font-weight: 700; margin-bottom: 0.4rem; }
+.opcion-acceso { display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.8rem 0.9rem; border: 1px solid var(--borde); border-radius: var(--radio); cursor: pointer; background: var(--superficie); }
+.opcion-acceso.elegida { border-color: var(--marca); background: var(--marca-claro); }
+.opcion-acceso input { width: auto; margin-top: 0.25rem; accent-color: var(--marca); }
+.opcion-acceso span { display: grid; gap: 0.15rem; }
+.opcion-acceso small { color: var(--gris); font-size: 0.86rem; }
+.opcion-acceso:has(input:disabled) { opacity: 0.65; cursor: not-allowed; }
+.desbloquear { max-width: 22rem; text-align: center; padding-top: 2.5rem; }
+.desbloquear-marca { display: flex; justify-content: center; margin-bottom: 0.5rem; }
+.desbloquear h1 { margin-bottom: 0.2rem; }
+.pin-puntos { display: flex; justify-content: center; gap: 0.7rem; margin: 1.2rem 0 1.4rem; }
+.pin-puntos span { width: 0.85rem; height: 0.85rem; border-radius: 50%; border: 2px solid var(--marca); }
+.pin-puntos span.lleno { background: var(--marca); }
+.desbloquear-salida { margin-top: 1.5rem; font-size: 0.88rem; }
+.sugerencia-acceso { display: flex; justify-content: space-between; gap: 0.75rem; align-items: flex-start; background: var(--marca-claro); color: var(--marca-oscuro); border-color: rgb(47 110 16 / 0.18); font-size: 0.92rem; }
+.sugerencia-acceso button { color: inherit; padding: 0 0.25rem; }

@@ -121,6 +121,9 @@ export function Checador({ trabajador, eventos }: { trabajador: TrabajadorClient
       } else if (r.tipo === "sesion") {
         await encolar({ ...datos, horaDispositivo: hora });
         router.push("/entrar");
+      } else if (r.tipo === "bloqueada") {
+        // No se guarda: se intentó con el teléfono bloqueado, quizá por otra persona.
+        window.location.href = "/desbloquear";
       } else {
         setMensaje({ tipo: "error", texto: r.mensaje });
       }

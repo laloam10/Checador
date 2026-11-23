@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { COOKIE_BLOQUEO, permitidaConBloqueo } from "@/lib/acceso";
 import { cabecerasCors, origenAppPermitido, rutaDeApp } from "@/lib/appMovil";
 
 /**
@@ -8,7 +9,9 @@ import { cabecerasCors, origenAppPermitido, rutaDeApp } from "@/lib/appMovil";
  *     con ese nonce; solo se conecta al propio dominio y a Supabase).
  *  2. Refresca la sesión de Supabase.
  *  3. Redirige a /entrar si no hay sesión (las rutas /api responden 401 por sí mismas).
- *  4. CORS solo para la app instalada desde las tiendas (orígenes de Capacitor) y solo en las
+ *  4. Con la sesión bloqueada (lib/acceso.ts), manda a /desbloquear; las rutas /api responden
+ *     423. La base impide checar de todos modos; esto evita mostrar pantallas a medias.
+ *  5. CORS solo para la app instalada desde las tiendas (orígenes de Capacitor) y solo en las
  *     rutas que usa (lib/appMovil.ts). La app manda su token en Authorization, sin cookies.
  */
 export async function proxy(request: NextRequest) {
@@ -58,6 +61,24 @@ export async function proxy(request: NextRequest) {
     redireccion.headers.set("Content-Security-Policy", csp);
     return redireccion;
   }
+  const sesion = (data?.claims as { session_id?: string } | undefined)?.session_id;
+  if (sesion && request.cookies.get(COOKIE_BLOQUEO)?.value === sesion && !permitidaConBloqueo(ruta)) {
+    let bloqueo: NextResponse;
+    if (ruta.startsWith("/api/")) {
+      bloqueo = NextResponse.json({ ok: false, error: "Checador está bloqueado en este teléfono. Desbloquéalo con tu PIN." }, { status: 423 });
+    } else {
+      const url = request.nextUrl.clone();
+      url.pathname = "/desbloquear";
+      url.search = ruta === "/" ? "" : `?siguiente=${encodeURIComponent(ruta + request.nextUrl.search)}`;
+      bloqueo = NextResponse.redirect(url);
+    }
+    // Conserva la sesión refrescada (los refresh tokens rotan: perderla cerraría la sesión).
+    for (const c of response.cookies.getAll()) bloqueo.cookies.set(c);
+    bloqueo.headers.set("Content-Security-Policy", csp);
+    if (cors) for (const [k, v] of Object.entries(cors)) bloqueo.headers.set(k, v);
+    return bloqueo;
+  }
+
   response.headers.set("Content-Security-Policy", csp);
   if (cors) for (const [k, v] of Object.entries(cors)) response.headers.set(k, v);
   return response;

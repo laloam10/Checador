@@ -1,9 +1,11 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { crearClienteNavegador } from "@/lib/supabase/client";
 
 export function FormPin({ trabajadorId }: { trabajadorId: string }) {
+  const router = useRouter();
   const [pin, setPin] = useState("");
   const [confirmacion, setConfirmacion] = useState("");
   const [estado, setEstado] = useState<{ tipo: "ok" | "error"; texto: string } | null>(null);
@@ -24,6 +26,7 @@ export function FormPin({ trabajadorId }: { trabajadorId: string }) {
       setEstado({ tipo: "ok", texto: "PIN guardado." });
       setPin("");
       setConfirmacion("");
+      router.refresh(); // habilita "Volver a entrar con mi PIN"
     }
   }
 

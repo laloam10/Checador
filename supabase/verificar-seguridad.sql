@@ -95,6 +95,7 @@ select 'ALTO', 'Función privilegiada ejecutable por authenticated sin estar en 
      'whatsapp_estado', 'whatsapp_vincular', 'whatsapp_checar', 'generar_codigo_whatsapp',
      'whatsapp_semana', 'whatsapp_esperar_objecion', 'whatsapp_conformidad', 'whatsapp_permitir_reenvio',
      'avisos_por_enviar', 'avisos_registrar_envio', 'registrar_suscripcion_push', 'quitar_suscripcion_push',
+     'elegir_acceso_al_salir', 'bloquear_mi_sesion', 'desbloquear_con_pin', 'olvidar_bloqueo_de_mi_sesion', 'mi_acceso',
      'trabajadores_con_pin', 'mi_rol', 'es_gestor', 'puede_consultar', 'soy_trabajador', 'trabajo_en')
 union all
 -- 11. Solo vincular_mi_cuenta() liga una ficha de trabajador a una cuenta (si no, el empleador

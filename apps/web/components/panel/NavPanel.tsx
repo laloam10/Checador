@@ -17,8 +17,8 @@ const ENLACES = [
 
 async function salir() {
   if ("caches" in window) for (const k of await caches.keys()) await caches.delete(k);
-  await fetch("/api/salir", { method: "POST" });
-  window.location.href = "/entrar";
+  const r = await fetch("/api/salir", { method: "POST" }).then((x) => x.json()).catch(() => ({}));
+  window.location.href = (r as { bloqueada?: boolean }).bloqueada ? "/desbloquear" : "/entrar";
 }
 
 export function CabeceraPanel({ empresa, rol }: { empresa: string; rol: string }) {

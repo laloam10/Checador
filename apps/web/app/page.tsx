@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Checador } from "@/components/Checador";
 import { Navegacion } from "@/components/Navegacion";
 import { SinVinculo } from "@/components/SinVinculo";
+import { SugerenciaAcceso } from "@/components/SugerenciaAcceso";
 import { aHoraLocal } from "@checador/jornada";
 import { cargarEventos, misTrabajadores } from "@/lib/datos";
 import { horarioEfectivo } from "@/lib/horarios";
@@ -25,11 +26,12 @@ export default async function Inicio() {
     return <SinVinculo />;
   }
 
-  const [esEmpleador, { data: pendiente }, { horarios, predeterminado }, { data: asignado }] = await Promise.all([
+  const [esEmpleador, { data: pendiente }, { horarios, predeterminado }, { data: asignado }, { data: acceso }] = await Promise.all([
     membresiaPanel(supabase, userId).then(Boolean),
     supabase.rpc("acuerdo_pendiente", { p_trabajador: trabajador.id }).maybeSingle<{ version: number }>(),
     horariosDeEmpresa(supabase, trabajador.empresaId),
     supabase.from("trabajadores").select("horario_id, sin_horario_fijo").eq("id", trabajador.id).single(),
+    supabase.rpc("mi_acceso"),
   ]);
   // Su horario de hoy, para que sepa qué espera su empresa (transparencia; no impide checar).
   const horario = asignado ? horarioEfectivo(asignado, horarios, predeterminado) : null;
@@ -59,6 +61,7 @@ export default async function Inicio() {
             : "Hoy no tienes turno en tu horario."}
         </p>
       )}
+      {(acceso as { al_salir?: string } | null)?.al_salir === "codigo" && <SugerenciaAcceso />}
       <Checador
         trabajador={{
           id: trabajador.id,
