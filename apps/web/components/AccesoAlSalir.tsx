@@ -4,10 +4,10 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { crearClienteNavegador } from "@/lib/supabase/client";
 
-type Modo = "codigo" | "pin";
+type Modo = "codigo" | "pin" | "passkey";
 
 /** La persona elige qué pasa al tocar "Salir" (migración 20261127000001_acceso_bloqueo.sql). */
-export function AccesoAlSalir({ modo, tienePin }: { modo: Modo; tienePin: boolean }) {
+export function AccesoAlSalir({ modo, tienePin, tienePasskey }: { modo: Modo; tienePin: boolean; tienePasskey: boolean }) {
   const router = useRouter();
   const [actual, setActual] = useState<Modo>(modo);
   const [estado, setEstado] = useState<{ tipo: "ok" | "error"; texto: string } | null>(null);
@@ -28,7 +28,12 @@ export function AccesoAlSalir({ modo, tienePin }: { modo: Modo; tienePin: boolea
     }
     setEstado({
       tipo: "ok",
-      texto: nuevo === "pin" ? "Listo: al salir, volverás a entrar con tu PIN." : "Listo: al salir, te pediremos el código de tu correo.",
+      texto:
+        nuevo === "pin"
+          ? "Listo: al salir, volverás a entrar con tu PIN."
+          : nuevo === "passkey"
+            ? "Listo: al salir, volverás a entrar con tu huella o rostro."
+            : "Listo: al salir, te pediremos el código de tu correo.",
     });
     router.refresh();
   }
@@ -36,6 +41,13 @@ export function AccesoAlSalir({ modo, tienePin }: { modo: Modo; tienePin: boolea
   return (
     <fieldset className="opciones-acceso" disabled={guardando}>
       <legend>Al salir de Checador en este teléfono</legend>
+      <label className={`opcion-acceso ${actual === "passkey" ? "elegida" : ""}`}>
+        <input type="radio" name="al-salir" checked={actual === "passkey"} disabled={!tienePasskey} onChange={() => elegir("passkey")} />
+        <span>
+          <strong>Volver a entrar con mi huella o rostro</strong>
+          <small>{tienePasskey ? "Lo más rápido. Si falla, puedes usar tu PIN." : "Primero registra tu huella o rostro abajo."}</small>
+        </span>
+      </label>
       <label className={`opcion-acceso ${actual === "pin" ? "elegida" : ""}`}>
         <input type="radio" name="al-salir" checked={actual === "pin"} disabled={!tienePin} onChange={() => elegir("pin")} />
         <span>

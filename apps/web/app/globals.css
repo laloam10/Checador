@@ -588,6 +588,14 @@ form:has(select[name="horario"] option[data-manual]:checked) .jornada-horario { 
 .pin-puntos { display: flex; justify-content: center; gap: 0.7rem; margin: 1.2rem 0 1.4rem; }
 .pin-puntos span { width: 0.85rem; height: 0.85rem; border-radius: 50%; border: 2px solid var(--marca); }
 .pin-puntos span.lleno { background: var(--marca); }
-.desbloquear-salida { margin-top: 1.5rem; font-size: 0.88rem; }
+.desbloquear-salida { margin-top: 1.5rem; font-size: 0.88rem; display: grid; gap: 0.2rem; justify-items: center; }
+.desbloquear-salida p { margin: 0; }
 .sugerencia-acceso { display: flex; justify-content: space-between; gap: 0.75rem; align-items: flex-start; background: var(--marca-claro); color: var(--marca-oscuro); border-color: rgb(47 110 16 / 0.18); font-size: 0.92rem; }
 .sugerencia-acceso button { color: inherit; padding: 0 0.25rem; }
+.huella-acceso { display: grid; gap: 0.8rem; }
+.huella-acceso p { margin: 0; }
+.lista-passkeys { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+.lista-passkeys li { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; padding: 0.7rem 0.9rem; border: 1px solid var(--borde); border-radius: var(--radio); background: var(--superficie); }
+.lista-passkeys li span { display: grid; gap: 0.1rem; }
+.lista-passkeys small { color: var(--gris); font-size: 0.84rem; }
+.boton-huella { margin: 1.2rem 0 0.4rem; }

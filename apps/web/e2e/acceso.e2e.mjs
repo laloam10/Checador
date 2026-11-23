@@ -65,7 +65,8 @@ try {
   await page.getByLabel("Confirma el PIN").fill(PIN);
   await page.getByRole("button", { name: "Guardar PIN" }).click();
   await page.getByText("PIN guardado.").waitFor();
-  await page.waitForFunction(() => !document.querySelector('input[name="al-salir"]:disabled'));
+  await page.waitForFunction(() =>
+    [...document.querySelectorAll('input[name="al-salir"]')].some((r) => r.closest("label")?.textContent?.includes("con mi PIN") && !r.disabled));
   await conPin.check();
   await page.getByText("Listo: al salir, volverás a entrar con tu PIN.").waitFor();
   await capturar(page, "acceso");

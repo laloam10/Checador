@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@checador/jornada": "0.1.0",
+    "@simplewebauthn/browser": "^14.0.0",
+    "@simplewebauthn/server": "^14.1.0",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.119.0",
     "idb-keyval": "^6.3.0",

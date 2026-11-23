@@ -16,5 +16,14 @@ export default async function PaginaDesbloquear({ searchParams }: { searchParams
   // El nombre se puede leer con la sesión bloqueada (no así los registros).
   const { data } = await supabase.from("trabajadores").select("nombre").eq("user_id", userId).is("fecha_baja", null).limit(1).maybeSingle();
   const nombre = (data?.nombre as string | undefined)?.split(" ")[0] ?? null;
-  return <Desbloquear nombre={nombre} siguiente={siguiente} />;
+  const { data: acceso } = await supabase.rpc("mi_acceso");
+  const a = (acceso ?? {}) as { al_salir?: string; tiene_pin?: boolean; tiene_passkey?: boolean };
+  return (
+    <Desbloquear
+      nombre={nombre}
+      siguiente={siguiente}
+      conPasskey={Boolean(a.tiene_passkey)}
+      conPin={Boolean(a.tiene_pin)}
+    />
+  );
 }

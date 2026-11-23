@@ -29,7 +29,7 @@ select tests.afirmar((select al_salir = 'pin' from public.preferencias_acceso wh
   'la persona eligió volver a entrar con su PIN');
 
 \echo '--- Bloquear'
-select tests.afirmar(public.mi_acceso() = '{"al_salir": "pin", "tiene_pin": true, "bloqueada": false}'::jsonb, 'la pantalla Acceso sabe qué eligió y que tiene PIN');
+select tests.afirmar(public.mi_acceso() @> '{"al_salir": "pin", "tiene_pin": true, "bloqueada": false}'::jsonb, 'la pantalla Acceso sabe qué eligió y que tiene PIN');
 select tests.afirmar(public.bloquear_mi_sesion(), 'Salir bloquea la sesión');
 select tests.afirmar((public.mi_acceso() ->> 'bloqueada')::boolean, 'la sesión aparece bloqueada');
 select tests.debe_fallar(format($$insert into public.eventos (empresa_id, trabajador_id, tipo, origen, id_cliente)

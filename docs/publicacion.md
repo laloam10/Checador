@@ -289,6 +289,32 @@ Antes de ofrecerlo a clientes: el aviso de privacidad debe mencionar que, si la 
 identificador de su navegador y que el aviso pasa por el servicio de notificaciones de Google, Apple, Mozilla o
 Microsoft (el contenido va cifrado y no lleva horas ni datos de su jornada).
 
+### 1.12 Volver a entrar con PIN, huella o rostro
+
+En **Acceso**, la persona trabajadora elige qué pasa al tocar **Salir**: pedir el código del correo (como siempre),
+volver a entrar con su PIN o con la huella o el rostro de su teléfono (passkeys). Con PIN o huella, Salir solo bloquea
+la sesión de ese teléfono; la base de datos impide checar mientras está bloqueada. El primer acceso en cada teléfono
+siempre es con el código del correo (interpretación 11 de `packages/jornada/README.md`). Migraciones 26 y 27.
+
+- **PIN:** no necesita configuración.
+- **Huella o rostro:** necesita un secreto de servicio (otro distinto a los de WhatsApp y avisos), porque la firma de la
+  passkey la verifica el servidor de la app y la base solo acepta el desbloqueo si viene de ahí.
+  1. Genera el secreto en Supabase → SQL Editor (funciona igual en Windows, Mac o Linux):
+     `select encode(extensions.gen_random_bytes(32), 'hex');`
+  2. Guárdalo en la base, en el mismo SQL Editor: `select public.configurar_secreto_servicio('acceso', '<secreto>');`
+     (solo se guarda su huella SHA-256).
+  3. Vercel → **Settings → Environment Variables** → `ACCESO_SECRETO_SERVICIO` con el mismo secreto (en pruebas:
+     entorno Preview, rama `pruebas`). Sin prefijo `NEXT_PUBLIC_`. Vuelve a desplegar.
+  4. No lo pegues en chats ni lo subas al repositorio. Para cambiarlo, repite 1 a 3.
+
+  Sin el secreto, el botón de huella responde "no están disponibles por ahora" y el PIN sigue funcionando.
+
+  Una passkey queda ligada al dominio donde se registró: una de `checador-pruebas.vercel.app` no sirve en
+  `checador.jemba.mx`. Si producción cambia de dominio, cada persona debe registrarla de nuevo.
+
+Antes de ofrecerlo a clientes: el aviso de privacidad debe decir que, si la persona registra su huella o rostro, se
+guarda una llave pública y el tipo de dispositivo, y que la huella o el rostro nunca salen de su teléfono.
+
 ### 1.11 App instalada desde las tiendas (preparación)
 
 Las rutas del trabajador ya aceptan el token de sesión de una app con Capacitor (ver `docs/plan-app-movil.md`, fase
