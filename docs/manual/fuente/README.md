@@ -28,7 +28,7 @@ Hazlo cuando cambien pantallas o textos de la app. `capturas.cjs` recorre la app
 Requisitos (los mismos que las pruebas de punta a punta, ver `apps/web/README.md`):
 
 1. Supabase local con las migraciones (`npx supabase start`), incluido Mailpit en el puerto 54324 para leer los códigos.
-2. La app en `http://127.0.0.1:3000` con el `.env.local` de Supabase local y, para las capturas de WhatsApp y Avisos, con `WHATSAPP_NUMERO=5215500000000` (número de ejemplo; el QR se difumina) y `VAPID_PUBLICA=<cualquier llave pública VAPID>` en el entorno:
+2. La app en `http://localhost:3000` (no `127.0.0.1`: la huella no acepta direcciones IP) con el `.env.local` de Supabase local y, para las capturas de WhatsApp, Avisos y Acceso, con `WHATSAPP_NUMERO=5215500000000` (número de ejemplo; el QR se difumina), `VAPID_PUBLICA=<cualquier llave pública VAPID>` y `ACCESO_SECRETO_SERVICIO=<cualquier texto de 32 caracteres o más>` en el entorno:
 
    ```bash
    npm run build -w @checador/web && npm run start -w @checador/web
@@ -39,11 +39,12 @@ Requisitos (los mismos que las pruebas de punta a punta, ver `apps/web/README.md
 Después:
 
 ```bash
-LUNES_PASADO=2026-10-26 node docs/manual/fuente/capturas.cjs
+LUNES_PASADO=2026-10-26 ACCESO_SECRETO_SERVICIO=<el mismo> node docs/manual/fuente/capturas.cjs
 node docs/manual/fuente/generar.cjs
 ```
 
 - `LUNES_PASADO` es el lunes de la semana de ejemplo. Tiene que ser una semana **ya terminada** (si no, no aparece el botón de conformidad). El jueves de esa semana José trabaja 11 horas con 3 de extra; el manual lo describe así.
 - Cada corrida crea una empresa nueva con correos distintos, así que se puede repetir sin limpiar la base.
+- La huella se simula con el sensor virtual de Chromium; el script guarda el mismo `ACCESO_SECRETO_SERVICIO` en la base local.
 - Tamaños: escritorio 1180×860, celular 390×844 y tableta 820×1100, todos a escala 2.
 - Si cambias el texto de un botón o una etiqueta, el script falla en el paso que lo busca: actualízalo ahí y en el HTML del manual.

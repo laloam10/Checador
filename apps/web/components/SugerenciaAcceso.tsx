@@ -13,7 +13,7 @@ export function SugerenciaAcceso() {
   return (
     <p className="mensaje sugerencia-acceso">
       <span>
-        ¿No quieres esperar el código del correo cada vez que sales? <Link href="/acceso">Vuelve a entrar con tu PIN</Link>.
+        ¿No quieres esperar el código del correo cada vez que sales? <Link href="/acceso">Vuelve a entrar con tu huella o tu PIN</Link>.
       </span>
       <button type="button" className="enlace" aria-label="No volver a mostrar"
         onClick={() => { localStorage.setItem(CLAVE, "1"); setVisible(false); }}>

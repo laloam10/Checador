@@ -86,7 +86,7 @@
       conforme al artículo 132, fracción XXXIV, de la Ley Federal del Trabajo<br><br>
       <b>Aplicación:</b> https://checador.jemba.mx
     </div>
-    <div class="version">Versión 1.2 · noviembre de 2026</div>
+    <div class="version">Versión 1.3 · noviembre de 2026</div>
   </div>
 </section>
 
@@ -107,7 +107,7 @@
     </ol>
   </li>
   <li><a href="#trabajador">4. Guía del trabajador (app en el celular)</a>
-    <ol><li>4.1 Firmar tu acuerdo · 4.2 Checar · 4.3 Revisar tus registros · 4.4 Tu PIN · 4.5 Avisos en tu teléfono</li></ol>
+    <ol><li>4.1 Firmar tu acuerdo · 4.2 Checar · 4.3 Revisar tus registros · 4.4 Acceso: PIN, huella o rostro · 4.5 Avisos en tu teléfono</li></ol>
   </li>
   <li><a href="#kiosco">5. Guía del kiosco</a></li>
   <li><a href="#whatsapp">6. Checar por WhatsApp (trabajador)</a></li>
@@ -150,6 +150,7 @@
   <li>Escribe el código de 6 dígitos y presiona <span class="boton">Entrar</span>.</li>
 </ol>
 <div class="nota"><b>Ten en cuenta</b>El código vence en <b>15 minutos</b> y sirve una sola vez. Si no llega en un par de minutos, revisa la carpeta de <b>spam</b> o "promociones". Si pides demasiados códigos seguidos, el sistema te pedirá esperar unos minutos.</div>
+<div class="consejo"><b>Solo la primera vez</b>El código se pide la primera vez en cada teléfono o computadora, y otra vez cuando tocas <b>Salir</b>. Si eres trabajador, en la sección <b>Acceso</b> puedes elegir volver a entrar con tu <b>huella, tu rostro o tu PIN</b> en lugar del código (sección 4.4).</div>
 
 <h2>Instalar la app en el celular</h2>
 <p>Checador funciona desde el navegador, pero conviene agregarlo a la pantalla de inicio para abrirlo como una app:</p>
@@ -215,7 +216,7 @@
 <ul>
   <li>No se aceptan PIN obvios como <code>0000</code> o <code>1234</code>.</li>
   <li>Nadie puede ver un PIN después de asignarlo, ni siquiera el propietario. Si se olvida, asigna uno nuevo.</li>
-  <li>El trabajador que usa la app puede elegir su propio PIN desde la sección <b>PIN</b> de su celular.</li>
+  <li>El trabajador que usa la app puede elegir su propio PIN desde la sección <b>Acceso</b> de su celular. Ese mismo PIN le sirve para volver a entrar a la app sin código (sección 4.4).</li>
 </ul>
 
 <h2>3.5 Acuerdos de registro</h2>
@@ -468,9 +469,36 @@
 <p>Al responder recibes un <b>comprobante</b> con un número de registro. Guárdalo: sirve para demostrar qué semana confirmaste.</p>
 <p>Si tienes semanas sin revisar, o tu empleador corrigió una semana que objetaste, los lunes te llega un correo de <b>Reloj Checador</b> con un enlace a cada una.</p>
 
-<h2>4.4 Elegir tu PIN para el kiosco</h2>
-<figure class="celular"><img src="img/15-app-pin.png"><figcaption>Sección PIN.</figcaption></figure>
-<p>Si en tu centro hay kiosco, en la sección <b>PIN</b> puedes elegir tu propio PIN de 4 a 6 dígitos. <b>No lo compartas</b>: quien lo conozca puede checar por ti.</p>
+<h2>4.4 Acceso: volver a entrar sin código</h2>
+<div class="fila">
+  <figure class="celular"><img src="img/15-app-acceso.png"><figcaption>Sección Acceso.</figcaption></figure>
+  <div style="flex:1.3; font-size:10pt">
+    <p>La primera vez que entras en un teléfono siempre se pide el código de tu correo (sección 2). Después, en la sección <b>Acceso</b> eliges qué pasa cuando tocas <b>Salir</b>:</p>
+    <ul>
+      <li><b>Volver a entrar con mi huella o rostro</b>: usas el desbloqueo que ya tiene tu teléfono. Antes, en <b>Huella o rostro</b>, toca <span class="boton">Agregar la huella o el rostro de este teléfono</span> y acepta lo que te pida el teléfono.</li>
+      <li><b>Volver a entrar con mi PIN</b>: el mismo PIN del kiosco. Antes, créalo en <b>Mi PIN</b>, más abajo en la misma sección.</li>
+      <li><b>Pedir el código de mi correo</b>: cierra la sesión por completo, como siempre. Elígelo si compartes el teléfono.</li>
+    </ul>
+    <p>Tu PIN es de 4 a 6 dígitos y no puede ser obvio (como <code>0000</code> o <code>1234</code>). <b>No lo compartas</b>: quien lo conozca puede checar por ti.</p>
+    <p>Mientras uses el código del correo, en <b>Checar</b> verás una sugerencia para elegir otra forma de volver a entrar. Si no la quieres, ciérrala con <b>✕</b>.</p>
+  </div>
+</div>
+<div class="fila">
+  <figure style="flex:0.8"><img src="img/15c-app-huella.png"><figcaption>Teléfonos registrados.</figcaption></figure>
+  <div style="flex:1.2; font-size:10pt">
+    <div class="consejo"><b>Tu huella no sale de tu teléfono</b>Checador no recibe ni guarda tu huella ni tu rostro: el teléfono los revisa y solo le confirma a Checador que eres tú. En <b>Huella o rostro</b> ves los teléfonos registrados y puedes quitarlos. Si tu cuenta de Google o de Apple sincroniza tus llaves de acceso, también podrás entrar con ellas desde tus otros dispositivos con esa misma cuenta.</div>
+  </div>
+</div>
+<div class="fila">
+  <figure class="celular"><img src="img/15b-app-desbloquear.png"><figcaption>Checador bloqueado.</figcaption></figure>
+  <div style="flex:1.3; font-size:10pt">
+    <p>Con huella, rostro o PIN, <b>Salir</b> no cierra tu sesión: <b>bloquea Checador en ese teléfono</b>. Mientras está bloqueado nadie puede checar, ver tus horas, dar tu conformidad ni firmar por ti.</p>
+    <p>Para volver a entrar, toca <span class="boton">Entrar con huella o rostro</span> o escribe tu PIN. No te llega ningún correo.</p>
+    <p>Si olvidaste tu PIN o alguien más va a usar el teléfono, toca <b>Cerrar sesión</b>. La próxima vez entrarás con el código de tu correo.</p>
+    <div class="nota"><b>PIN bloqueado</b>Después de <b>5 intentos equivocados</b>, el PIN se bloquea <b>15 minutos</b>, aquí y en el kiosco. Si no puedes esperar, usa <b>Cerrar sesión</b> y entra con el código de tu correo.</div>
+  </div>
+</div>
+
 
 <h2>4.5 Avisos en tu teléfono</h2>
 <div class="fila">
@@ -517,7 +545,7 @@
     <p>Tu respuesta queda firmada con tu PIN y recibes un número de registro. Si tienes varias semanas, pasa sola a la siguiente. Tienes 4 minutos por semana; con <b>Ahora no</b> lo dejas para otro día. Responder es voluntario.</p>
   </div>
 </div>
-<div class="nota"><b>PIN incorrecto o bloqueado</b>Después de <b>5 intentos fallidos</b> el PIN se bloquea <b>15 minutos</b>. Si lo olvidaste, pide a tu empleador que te asigne uno nuevo.</div>
+<div class="nota"><b>PIN incorrecto o bloqueado</b>Después de <b>5 intentos fallidos</b> el PIN se bloquea <b>15 minutos</b>, en el kiosco y en la app. Si lo olvidaste, pide a tu empleador que te asigne uno nuevo o cámbialo tú en la sección <b>Acceso</b> de tu app.</div>
 <div class="nota"><b>Sin internet</b>El kiosco guarda la checada y verifica tu PIN cuando vuelve la conexión. Si el PIN era incorrecto, la checada se rechaza y aparece abajo en la pantalla para que el supervisor la capture con su motivo.</div>
 
 <!-- ======================= 6. FAQ ======================= -->
@@ -569,7 +597,9 @@ Tortillería Doña Lupita · registro n.º 41<div class="btns"><span>Iniciar pau
   <tr><td>Di de baja a alguien por error</td><td>En su ficha, <b>¿La baja fue un error?</b> → escribe el motivo → <span class="boton">Deshacer la baja</span>. Queda en el historial.</td></tr>
   <tr><td>Mis horas de la semana no son correctas</td><td>En <b>Mis registros</b>, al terminar la semana, presiona <b>Algo no es correcto</b> y explica qué está mal.</td></tr>
   <tr><td>¿Se puede borrar un registro?</td><td>No. Para que el registro sea válido como prueba, nada se borra: se corrige o se anula con motivo y el original queda visible.</td></tr>
-  <tr><td>Cambié de celular</td><td>Abre Checador en el nuevo y entra con tu correo. Tus registros están en el servidor, no en el teléfono.</td></tr>
+  <tr><td>Cambié de celular</td><td>Abre Checador en el nuevo y entra con tu correo. Tus registros están en el servidor, no en el teléfono. Si usabas la huella, regístrala de nuevo en <b>Acceso</b> y quita el teléfono anterior de la lista.</td></tr>
+  <tr><td>Me pide el código del correo cada vez que salgo</td><td>En <b>Acceso</b>, elige volver a entrar con tu huella, tu rostro o tu PIN (sección 4.4).</td></tr>
+  <tr><td>Olvidé el PIN con el que desbloqueo la app</td><td>En la pantalla de desbloqueo toca <b>Cerrar sesión</b> y entra con el código de tu correo. Después elige un PIN nuevo en <b>Acceso</b>.</td></tr>
   <tr><td>Un trabajador no quiere firmar el acuerdo</td><td>No se le puede obligar. Sus registros siguen siendo prueba, aunque no prueba plena. Conviene aclarar sus dudas sobre el texto.</td></tr>
   <tr><td>Cambié la jornada o los días de descanso de alguien</td><td>Su acuerdo queda <b>desactualizado</b>: firma la nueva versión y pídele que la firme. La anterior sigue vigente mientras tanto.</td></tr>
   <tr><td>El kiosco dice "Este dispositivo no está configurado"</td><td>La cuenta con la que se entró en la tableta no tiene el rol de kiosco. Invítala desde <b>Accesos</b> y vuelve a cargar la página.</td></tr>
@@ -596,6 +626,8 @@ Tortillería Doña Lupita · registro n.º 41<div class="btns"><span>Iniciar pau
   <tr><td>Sin conexión (diferida)</td><td>Checada hecha sin internet y enviada después. Se guardan la hora del dispositivo y la hora en que llegó.</td></tr>
   <tr><td>Descanso semanal obligatorio / adicional</td><td>El obligatorio es el día que exige la ley por cada seis de trabajo (art. 69); trabajarlo se paga doble (art. 73). Los adicionales son días extra que pactas, como el sábado en una semana de 5 días.</td></tr>
   <tr><td>Kiosco</td><td>Tableta compartida donde se checa con número de empleado y PIN.</td></tr>
+  <tr><td>Bloquear / desbloquear</td><td>Al tocar <b>Salir</b>, si la persona eligió huella, rostro o PIN, Checador queda bloqueado en ese teléfono en lugar de cerrar la sesión. Se desbloquea con la huella, el rostro o el PIN, sin código por correo.</td></tr>
+  <tr><td>Llave de acceso (passkey)</td><td>Forma de entrar con la huella, el rostro o el bloqueo de pantalla del teléfono. Checador solo guarda una llave pública para reconocer el teléfono; nunca la huella ni el rostro.</td></tr>
   <tr><td>Horario</td><td>Hora de entrada, salida y comida que la empresa espera de una persona cada día. Define su jornada pactada y sirve para marcar retardos y trabajo fuera de horario, de forma informativa.</td></tr>
   <tr><td>Tolerancia</td><td>Minutos de gracia de un horario antes de marcar un retardo o una salida anticipada.</td></tr>
   <tr><td>Código de activación</td><td>Código de 6 dígitos que genera el empleador para que una persona active su checada por WhatsApp. Sirve una vez y vence en 24 horas.</td></tr>

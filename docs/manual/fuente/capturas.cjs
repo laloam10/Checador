@@ -6,9 +6,13 @@ const path = require("path");
 const os = require("os");
 
 const OUT = path.join(__dirname, "img");
-const APP = "http://127.0.0.1:3000";
+// localhost y no 127.0.0.1: la huella (WebAuthn) no acepta direcciones IP.
+const APP = "http://localhost:3000";
 const MAILPIT = "http://127.0.0.1:54324";
 const DB = "postgresql://postgres:postgres@127.0.0.1:54322/postgres";
+// El mismo secreto con que corre la app (ACCESO_SECRETO_SERVICIO), para la captura de la huella.
+const SECRETO_ACCESO = process.env.ACCESO_SECRETO_SERVICIO;
+if (!SECRETO_ACCESO) throw new Error("Falta ACCESO_SECRETO_SERVICIO (el mismo con que corre la app).");
 // Lunes de la semana de ejemplo (debe ser una semana ya terminada para poder dar conformidad).
 const LUNES = process.env.LUNES_PASADO || "2026-10-26";
 const masDias = (f, n) => new Date(Date.parse(`${f}T12:00:00Z`) + n * 864e5).toISOString().slice(0, 10);
@@ -68,7 +72,9 @@ const estado = (p, t) => p.getByRole("status").filter({ hasText: t }).first().wa
 (async () => {
   const b = await chromium.launch();
   const escritorio = await b.newContext({ viewport: { width: 1180, height: 860 }, deviceScaleFactor: 2, locale: "es-MX" });
-  const celular = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, locale: "es-MX" });
+  // Agente de Android: el nombre del teléfono en Acceso → Huella o rostro sale de aquí.
+  const celular = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, locale: "es-MX",
+    userAgent: "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36" });
   const tableta = await b.newContext({ viewport: { width: 820, height: 1100 }, deviceScaleFactor: 2, locale: "es-MX" });
   const d = await escritorio.newPage();
   const m = await celular.newPage();
@@ -178,9 +184,34 @@ const estado = (p, t) => p.getByRole("status").filter({ hasText: t }).first().wa
   await shotEl(m.locator(".tarjeta").filter({ hasText: "¿Qué no es correcto?" }), "14b-app-objetar");
   await m.getByRole("button", { name: "Enviar objeción" }).click();
   await m.getByText("Objetaste esta semana").waitFor();
-  await m.goto(`${APP}/pin`);
-  await m.getByRole("heading", { name: "Mi PIN para el kiosco" }).waitFor();
-  await shot(m, "15-app-pin");
+  // Acceso: PIN, huella (sensor virtual de Chromium) y Salir con bloqueo.
+  sql(`select public.configurar_secreto_servicio('acceso', '${SECRETO_ACCESO}')`);
+  const cdp = await celular.newCDPSession(m);
+  await cdp.send("WebAuthn.enable");
+  await cdp.send("WebAuthn.addVirtualAuthenticator", {
+    options: { protocol: "ctap2", transport: "internal", hasResidentKey: true, hasUserVerification: true, isUserVerified: true, automaticPresenceSimulation: true },
+  });
+  await m.goto(`${APP}/acceso`);
+  await m.getByLabel("Nuevo PIN (4 a 6 dígitos)").fill("4826");
+  await m.getByLabel("Confirma el PIN").fill("4826");
+  await m.getByRole("button", { name: "Guardar PIN" }).click();
+  await m.getByText("PIN guardado.").waitFor();
+  await m.getByRole("button", { name: "Agregar la huella o el rostro de este teléfono" }).click();
+  await m.getByText("Listo: ya puedes elegir volver a entrar con tu huella o rostro.").waitFor();
+  await m.getByRole("radio", { name: /Volver a entrar con mi huella o rostro/ }).check();
+  await m.getByText("Listo: al salir, volverás a entrar con tu huella o rostro.").waitFor();
+  await m.reload();
+  await m.getByText("Teléfono Android").waitFor();
+  await m.evaluate(() => scrollTo(0, 0)); // al recargar, el navegador conserva la posición
+  await shot(m, "15-app-acceso");
+  await shotEl(m.locator("section.tarjeta").filter({ has: m.getByRole("heading", { name: "Huella o rostro" }) }), "15c-app-huella");
+  await m.goto(APP);
+  await m.getByRole("button", { name: "Salir" }).click();
+  await m.waitForURL(`${APP}/desbloquear`);
+  await m.getByRole("button", { name: "Entrar con huella o rostro" }).waitFor();
+  await shot(m, "15b-app-desbloquear");
+  await m.getByRole("button", { name: "Entrar con huella o rostro" }).click();
+  await m.waitForURL(`${APP}/`);
   log("trabajadora");
 
   // ---------- Kiosco (tableta) ----------

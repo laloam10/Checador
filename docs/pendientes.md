@@ -1,7 +1,7 @@
 # Pendientes
 
 Actualizado el 2026-11-25. Lo hecho está en la rama `pruebas`; producción (`main`) no tiene todavía el diseño de
-Jemba, WhatsApp, avisos ni el manual 1.2. Detalle técnico: `docs/estado-supabase.md`, `docs/plan-app-movil.md` y
+Jemba, WhatsApp, avisos, horarios, Salir con PIN o huella ni el manual 1.3. Detalle técnico: `docs/estado-supabase.md`, `docs/plan-app-movil.md` y
 `docs/publicacion.md`.
 
 ## Bloquea producción
@@ -11,7 +11,7 @@ Jemba, WhatsApp, avisos ni el manual 1.2. Detalle técnico: `docs/estado-supabas
       `checador.jemba.mx` y la verificación de cada lunes falla. En el plan gratuito, a los 90 días ya no se reactiva
       desde el panel.
 - [ ] **Paso a producción** (lo hace Claude una vez reactivada): migraciones 18 a 27 (incluye horarios y Salir con PIN o huella), código de `pruebas` a `main`,
-      manual 1.2 con sus cuatro hojas y verificación de producción (`verificar-produccion.yml`). El usuario pone en
+      manual 1.3 con sus cuatro hojas y verificación de producción (`verificar-produccion.yml`). El usuario pone en
       producción los secretos y variables de WhatsApp (§1.9) y avisos (§1.10); producción no necesita el bypass de
       Vercel.
 
