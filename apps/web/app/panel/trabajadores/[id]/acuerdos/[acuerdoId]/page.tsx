@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { aHoraLocal } from "@checador/jornada";
 import { BotonImprimir } from "@/components/panel/BotonImprimir";
 import { folio } from "@/lib/acuerdo";
 import { acuerdosDe, firmaDe, MODALIDAD } from "@/lib/acuerdosDatos";
 import { requierePanel } from "@/lib/panel";
+import { fechaHora } from "@/lib/formato";
 
 export default async function VerAcuerdo({ params }: { params: Promise<{ id: string; acuerdoId: string }> }) {
   const { id, acuerdoId } = await params;
@@ -38,7 +38,7 @@ export default async function VerAcuerdo({ params }: { params: Promise<{ id: str
               {f && (
                 <p className="ayuda">
                   {quien === "empleador" && correoDe.get(f.user_id) && <>Firmó: {correoDe.get(f.user_id)} · </>}
-                  {MODALIDAD[f.modalidad]} · {aHoraLocal(f.firmado_en, zona).replace("T", " ")}
+                  {MODALIDAD[f.modalidad]} · {fechaHora(f.firmado_en, zona, true)}
                   {f.modalidad === "autografa" && ` · resguardo: ${String(f.evidencia.resguardo ?? "")}`}
                 </p>
               )}

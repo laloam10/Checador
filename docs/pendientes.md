@@ -20,7 +20,7 @@ Jemba, WhatsApp, avisos, horarios, Salir con PIN o huella, ubicación al checar 
 - [ ] **Actualizar el manual y las hojas** cuando el usuario dé por terminado el pulido de la app (decisión del
       2026-11-25: no antes). Falta: ubicación al checar (Centros, aviso en Checar y kiosco, bitácora del panel, Mis
       registros, ver en mapa), nuevo acomodo de la ficha del trabajador (Datos, Kiosco y WhatsApp, Baja; capturas 05, 06,
-      31 y 32) y lo que se pula después. Regenerar con `docs/manual/fuente/capturas.cjs` y `generar.cjs`.
+      31 y 32), cabecera de la ficha con indicadores y acuerdo plegado, app del trabajador (barra inferior, tarjeta del reloj, pendientes), fechas legibles en toda la app, y lo que se pula después. Regenerar con `docs/manual/fuente/capturas.cjs` y `generar.cjs`.
 
 ## Del usuario (en pruebas)
 

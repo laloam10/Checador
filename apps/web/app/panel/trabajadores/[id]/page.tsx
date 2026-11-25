@@ -3,7 +3,10 @@ import { notFound } from "next/navigation";
 import { aHoraLocal } from "@checador/jornada";
 import { FormAccion } from "@/components/panel/FormAccion";
 import { CamposTrabajador } from "@/components/panel/CamposTrabajador";
+import { CabeceraTrabajador, type ResumenAcuerdo } from "@/components/panel/CabeceraTrabajador";
 import { SeccionAcuerdo } from "@/components/panel/SeccionAcuerdo";
+import { estadoAcuerdo } from "@/lib/acuerdosDatos";
+import { fecha, fechaHora } from "@/lib/formato";
 import { horariosDeEmpresa } from "@/lib/horariosDatos";
 import { esGestor, requierePanel } from "@/lib/panel";
 import { asignarPin, darDeBaja, generarCodigoWhatsApp, guardarTrabajador, revertirBaja } from "../../acciones";
@@ -31,24 +34,31 @@ export default async function FichaTrabajador({ params }: { params: Promise<{ id
   const gestor = esGestor(ctx.rol);
   const tienePin = ((conPin ?? []) as string[]).includes(t.id);
 
+  // Estado del acuerdo: una sola consulta para la cabecera y la sección.
+  const acuerdo = t.fecha_baja ? null : await estadoAcuerdo(ctx.supabase, t.id);
+  const resumen: ResumenAcuerdo | null = acuerdo && {
+    clave: !acuerdo.vigente && !acuerdo.pendiente ? "sin_acuerdo" : acuerdo.desactualizado ? "desactualizado" : acuerdo.pendiente ? "pendiente" : "vigente",
+    version: (acuerdo.pendiente ?? acuerdo.vigente)?.version ?? null,
+  };
+  const horarioId = t.horario_id ?? predeterminado;
+  const horario = t.sin_horario_fijo
+    ? "Sin horario fijo"
+    : horarios.find((h) => h.id === horarioId)?.nombre ? `Horario ${horarios.find((h) => h.id === horarioId)!.nombre}` : "Sin horario";
+
   return (
     <>
-      <p><Link href="/panel/trabajadores">← Trabajadores</Link></p>
-      <h1>{t.nombre}{t.fecha_baja && <small className="ayuda"> · baja el {t.fecha_baja}</small>}</h1>
-      <p>
-        <Link href={`/panel/trabajadores/${t.id}/semana`}>Ver registros y corregir checadas →</Link>
-        {" · "}
-        <Link href={`/panel/exportar?trabajador=${t.id}`}>Exportar para inspección →</Link>
-      </p>
-      <p className="ayuda">
-        App del celular: {t.user_id ? "vinculada" : t.email ? `pendiente (entrará con ${t.email})` : "sin correo"} ·
-        PIN de kiosco: {tienePin ? "asignado" : "sin asignar"} ·
-        WhatsApp: {!t.telefono ? "sin celular" : t.telefono_verificado_en ? "activado" : "pendiente de activar"}
-      </p>
+      <p className="migas"><Link href="/panel/trabajadores">← Trabajadores</Link></p>
+      <CabeceraTrabajador
+        t={t}
+        centro={(centros ?? []).find((c) => c.id === t.centro_trabajo_id)?.nombre ?? ""}
+        horario={horario}
+        tienePin={tienePin}
+        acuerdo={resumen}
+      />
 
       {t.fecha_baja && (
         <p className="mensaje mensaje-aviso">
-          Dado de baja el {t.fecha_baja}. Ya no puede checar; sus registros se conservan como exige el art. 804 de la LFT.
+          Dado de baja el {fecha(t.fecha_baja)}. Ya no puede checar; sus registros se conservan como exige el art. 804 de la LFT.
         </p>
       )}
 
@@ -76,8 +86,8 @@ export default async function FichaTrabajador({ params }: { params: Promise<{ id
           <ul className="bitacora">
             {(historial ?? []).map((h) => (
               <li key={h.id}>
-                <strong>{h.accion === "baja" ? `Baja con fecha ${h.fecha_baja}` : `Baja del ${h.fecha_baja} deshecha`}</strong>
-                <span className="ayuda"> · registrado el {aHoraLocal(h.creado_en, ctx.empresa.zonaHoraria).replace("T", " ")}</span>
+                <strong>{h.accion === "baja" ? `Baja con fecha ${fecha(h.fecha_baja)}` : `Baja del ${fecha(h.fecha_baja)} deshecha`}</strong>
+                <span className="ayuda"> · registrado el {fechaHora(h.creado_en, ctx.empresa.zonaHoraria, true)}</span>
                 {h.motivo && <span className="ajuste">Motivo: {h.motivo}</span>}
               </li>
             ))}
@@ -85,16 +95,16 @@ export default async function FichaTrabajador({ params }: { params: Promise<{ id
         </section>
       )}
 
-      {!t.fecha_baja && <SeccionAcuerdo ctx={ctx} trabajadorId={t.id} gestor={gestor} />}
+      {acuerdo && <SeccionAcuerdo ctx={ctx} trabajadorId={t.id} gestor={gestor} e={acuerdo} />}
 
       {gestor && !t.fecha_baja && (
         <>
-          <h2>Datos</h2>
+          <h2 id="datos">Datos</h2>
           <FormAccion accion={guardarTrabajador} boton="Guardar cambios">
             <CamposTrabajador centros={centros ?? []} horarios={horarios} predeterminado={predeterminado} t={{ ...t, jornada_pactada_min: t.jornada_pactada_min as Record<string, number> | null }} />
           </FormAccion>
 
-          <h2>Kiosco y WhatsApp</h2>
+          <h2 id="kiosco">Kiosco y WhatsApp</h2>
           <div className="form-panel panel-grupos">
             <section className="grupo-campos" aria-labelledby="titulo-pin">
               <div className="grupo-titulo">

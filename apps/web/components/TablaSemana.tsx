@@ -27,7 +27,7 @@ export function TablaSemana({
   }
   return (
     <>
-        <table className="tabla">
+        <table className="tabla tabla-semana">
           <thead>
             <tr>
               <th>Día</th>
@@ -81,7 +81,8 @@ export function TablaSemana({
         {vista === "trabajador" && <dl className="resumen">
           <dt>Jornada ordinaria</dt>
           <dd>
-            {hm(semana.totales.ordinariaMin)} de {hm(semana.jornadaSemanalMaxMin)} máximo legal
+            {hm(semana.totales.ordinariaMin)}
+            <small>de {hm(semana.jornadaSemanalMaxMin)} máximo legal</small>
           </dd>
           <dt>Extra pagada al doble</dt>
           <dd>{hm(semana.totales.extraDobleMin)}</dd>

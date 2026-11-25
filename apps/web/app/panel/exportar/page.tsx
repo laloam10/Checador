@@ -3,6 +3,7 @@ import { FormExportar } from "@/components/panel/FormExportar";
 import { VerificarArchivo } from "@/components/panel/VerificarArchivo";
 import { lunesDe, sumarDias } from "@/lib/fechas";
 import { requierePanel } from "@/lib/panel";
+import { fechaHora, rangoFechas } from "@/lib/formato";
 
 const FORMATO: Record<string, string> = { pdf: "PDF", csv_bitacora: "CSV bitácora", csv_resumen: "CSV resumen" };
 
@@ -53,9 +54,9 @@ export default async function Exportar({ searchParams }: { searchParams: Promise
           <tbody>
             {(exportaciones ?? []).map((x) => (
               <tr key={x.id}>
-                <td data-etiqueta="Emitida">{aHoraLocal(x.generado_en, ctx.empresa.zonaHoraria).replace("T", " ")}</td>
+                <td data-etiqueta="Emitida">{fechaHora(x.generado_en, ctx.empresa.zonaHoraria)}</td>
                 <td className="celda-titulo">{((Array.isArray(x.trabajadores) ? x.trabajadores[0] : x.trabajadores) as { nombre: string } | null)?.nombre ?? "Todos"}</td>
-                <td data-etiqueta="Periodo">{x.desde} al {x.hasta}</td>
+                <td data-etiqueta="Periodo">{rangoFechas(x.desde, x.hasta)}</td>
                 <td data-etiqueta="Formato">{FORMATO[x.formato]}{x.cadena_integra ? "" : " ⚠"}</td>
                 <td data-etiqueta="Huella" className="comprobante">{String(x.hash_archivo).replace(/^\\x/, "").slice(0, 16)}…</td>
               </tr>

@@ -6,6 +6,7 @@ import { estadosAcuerdosEmpresa } from "@/lib/acuerdosDatos";
 import { lunesDe, sumarDias } from "@/lib/datos";
 import { horarioDeHoy, objecionesPendientes, presentesAhora, requierePanel, type ContextoPanel } from "@/lib/panel";
 import { verificarIntegridad } from "./acciones";
+import { fechaConDia } from "@/lib/formato";
 
 interface SemanaPasada {
   lunes: string;
@@ -173,7 +174,7 @@ export default async function Tablero() {
               <div className="tiempo">
                 {p.desde ? (
                   <>
-                    desde {p.desde.startsWith(hoy) ? p.desde.slice(11) : p.desde.replace("T", " ")}
+                    desde {p.desde.startsWith(hoy) ? p.desde.slice(11) : `${fechaConDia(p.desde.slice(0, 10)).slice(0, -5)}, ${p.desde.slice(11)}`}
                     <small>{duracion(p.desde, ahora)} en turno</small>
                   </>
                 ) : (

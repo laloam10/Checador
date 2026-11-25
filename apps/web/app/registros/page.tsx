@@ -9,6 +9,7 @@ import { SinVinculo } from "@/components/SinVinculo";
 import { lunesDe, misTrabajadores, semanaDeTrabajador, sumarDias } from "@/lib/datos";
 import { crearClienteServidor, usuarioActual } from "@/lib/supabase/server";
 import { llaveMapa, ubicacionesDe } from "@/lib/ubicacionesDatos";
+import { fechaHora, rangoFechas } from "@/lib/formato";
 
 const ETIQUETA: Record<string, string> = { entrada: "Entrada", salida: "Salida", inicio_pausa: "Inicio de pausa", fin_pausa: "Fin de pausa" };
 const DIAS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
@@ -54,7 +55,7 @@ export default async function Registros({ searchParams }: { searchParams: Promis
         <div className="semana-nav">
           <Link href={`/registros?semana=${sumarDias(lunes, -7)}`}>← Anterior</Link>
           <strong>
-            {lunes} al {domingo}
+            {rangoFechas(lunes, domingo)}
           </strong>
           {lunes < lunesDe(hoy) ? <Link href={`/registros?semana=${sumarDias(lunes, 7)}`}>Siguiente →</Link> : <span />}
         </div>
@@ -90,7 +91,7 @@ export default async function Registros({ searchParams }: { searchParams: Promis
           <div className={`mensaje ${conformidad.respuesta === "conforme" ? "mensaje-ok" : "mensaje-aviso"}`}>
             <p>
               {conformidad.respuesta === "conforme" ? "Diste tu conformidad" : "Objetaste esta semana"} el{" "}
-              {aHoraLocal(conformidad.respondido_en, trabajador.zonaHoraria).replace("T", " a las ")}.
+              {fechaHora(conformidad.respondido_en, trabajador.zonaHoraria)}.
             </p>
             {conformidad.comentario && <p>“{conformidad.comentario}”</p>}
             <p className="comprobante">

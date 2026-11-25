@@ -84,7 +84,7 @@ try {
   await dueno.getByLabel("Celular para WhatsApp (opcional)").fill(`55 ${String(Date.now()).slice(-8)}`);
   await dueno.getByRole("button", { name: "Dar de alta" }).click();
   await dueno.getByRole("heading", { name: "Carla Ruiz" }).waitFor();
-  await dueno.getByText("WhatsApp: pendiente de activar").waitFor();
+  await dueno.locator(".estado-tile", { hasText: "WhatsApp" }).getByText("Pendiente de activar").waitFor();
   await dueno.getByRole("button", { name: "Generar código de activación" }).click();
   await mensaje(dueno, /Código de activación: \d{3} \d{3}\. Sirve una sola vez/);
   if (process.env.WHATSAPP_NUMERO) {
@@ -192,7 +192,7 @@ try {
   await dueno.getByRole("heading", { name: "Baja" }).waitFor();
   await dueno.getByLabel("Escribe BAJA para confirmar").fill("BAJA");
   await dueno.getByRole("button", { name: "Registrar baja" }).click();
-  await dueno.getByText(/Dado de baja el \d{4}-\d{2}-\d{2}/).waitFor();
+  await dueno.getByText(/Dado de baja el \d{1,2} [a-z]{3} \d{4}/).waitFor();
   await dueno.getByRole("link", { name: "← Trabajadores" }).click();
   await dueno.getByText("Aún no hay trabajadores.").waitFor();
   paso("baja registrada; los registros se conservan");
@@ -203,7 +203,7 @@ try {
   await dueno.getByRole("heading", { name: "¿La baja fue un error?" }).waitFor();
   await dueno.getByLabel("Motivo").fill("Se registró la baja de la persona equivocada");
   await dueno.getByRole("button", { name: "Deshacer la baja" }).click();
-  await dueno.getByText(/Baja del \d{4}-\d{2}-\d{2} deshecha/).waitFor();
+  await dueno.getByText(/Baja del \d{1,2} [a-z]{3} \d{4} deshecha/).waitFor();
   await dueno.getByText("Motivo: Se registró la baja de la persona equivocada").waitFor();
   if (await dueno.getByText(/Dado de baja el/).count()) throw new Error("La persona debía quedar activa");
   await dueno.goto(`${APP}/panel/trabajadores`);

@@ -5,8 +5,18 @@ import { usePathname } from "next/navigation";
 import { Isotipo } from "@/components/Marca";
 import { leerPendientes } from "@/lib/cola";
 
+// Secciones de la persona trabajadora. Íconos de trazo (24×24), como en el panel.
+const SECCIONES = [
+  { href: "/", etiqueta: "Checar", corta: "Checar", exacto: true, icono: "M12 7v5l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" },
+  { href: "/registros", etiqueta: "Mis registros", corta: "Registros", icono: "M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" },
+  { href: "/acuerdo", etiqueta: "Acuerdo", corta: "Acuerdo", icono: "M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8zM14 3v5h5M9 13h6M9 17h4" },
+  { href: "/acceso", etiqueta: "Acceso", corta: "Acceso", icono: "M7 11V7a5 5 0 0 1 10 0v4M5 11h14v10H5zM12 15v2" },
+  { href: "/avisos", etiqueta: "Avisos", corta: "Avisos", icono: "M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0" },
+];
+
 export function Navegacion({ panel = false }: { panel?: boolean }) {
   const ruta = usePathname();
+  const activo = (s: (typeof SECCIONES)[number]) => (s.exacto ? ruta === s.href : ruta.startsWith(s.href));
 
   async function salir() {
     const pendientes = await leerPendientes();
@@ -20,35 +30,45 @@ export function Navegacion({ panel = false }: { panel?: boolean }) {
     if ("caches" in window) {
       for (const k of await caches.keys()) await caches.delete(k);
     }
-    // Si la persona eligió volver a entrar con su PIN, Salir solo bloquea este teléfono.
+    // Si la persona eligió volver a entrar con su PIN o su huella, Salir solo bloquea este teléfono.
     const r = await fetch("/api/salir", { method: "POST" }).then((x) => x.json()).catch(() => ({}));
     window.location.href = (r as { bloqueada?: boolean }).bloqueada ? "/desbloquear" : "/entrar";
   }
 
   return (
-    <nav className="nav nav-app">
-      <Link href="/" className="marca-enlace" aria-label="Checador: inicio">
-        <Isotipo tamano={28} />
-      </Link>
-      <Link href="/" className={ruta === "/" ? "activo" : ""}>
-        Checar
-      </Link>
-      <Link href="/registros" className={ruta.startsWith("/registros") ? "activo" : ""}>
-        Mis registros
-      </Link>
-      <Link href="/acceso" className={ruta.startsWith("/acceso") ? "activo" : ""}>
-        Acceso
-      </Link>
-      <Link href="/acuerdo" className={ruta.startsWith("/acuerdo") ? "activo" : ""}>
-        Acuerdo
-      </Link>
-      <Link href="/avisos" className={ruta.startsWith("/avisos") ? "activo" : ""}>
-        Avisos
-      </Link>
-      {panel && <Link href="/panel">Panel</Link>}
-      <button className="enlace" onClick={salir}>
-        Salir
-      </button>
-    </nav>
+    <>
+      <header className="app-cabecera">
+        <Link href="/" className="marca-enlace app-marca" aria-label="Checador: inicio">
+          <Isotipo tamano={30} />
+          <span>checador</span>
+        </Link>
+        <nav className="app-secciones" aria-label="Secciones">
+          {SECCIONES.map((s) => (
+            <Link key={s.href} href={s.href} className={activo(s) ? "activo" : ""} aria-current={activo(s) ? "page" : undefined}>
+              {s.etiqueta}
+            </Link>
+          ))}
+        </nav>
+        <div className="app-cabecera-acciones">
+          {panel && <Link href="/panel" className="chip-panel">Panel</Link>}
+          <button className="enlace" onClick={salir}>Salir</button>
+        </div>
+      </header>
+
+      {/* En el celular: abajo, al alcance del pulgar. */}
+      <nav className="barra-inferior barra-trabajador" aria-label="Secciones">
+        {SECCIONES.map((s) => (
+          <Link key={s.href} href={s.href} className={activo(s) ? "activo" : ""} aria-current={activo(s) ? "page" : undefined}>
+            <span className="barra-icono">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                strokeLinecap="round" strokeLinejoin="round" aria-hidden focusable="false">
+                <path d={s.icono} />
+              </svg>
+            </span>
+            {s.corta}
+          </Link>
+        ))}
+      </nav>
+    </>
   );
 }

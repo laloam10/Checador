@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import { aHoraLocal } from "@checador/jornada";
 import { FormFirmaAcuerdo } from "@/components/FormFirmaAcuerdo";
 import { Navegacion } from "@/components/Navegacion";
 import { SinVinculo } from "@/components/SinVinculo";
@@ -7,6 +6,7 @@ import { folio } from "@/lib/acuerdo";
 import { acuerdosDe, firmaDe, MODALIDAD } from "@/lib/acuerdosDatos";
 import { misTrabajadores } from "@/lib/datos";
 import { crearClienteServidor, usuarioActual } from "@/lib/supabase/server";
+import { fechaHora } from "@/lib/formato";
 
 export default async function MiAcuerdo() {
   const supabase = await crearClienteServidor();
@@ -36,7 +36,7 @@ export default async function MiAcuerdo() {
           <p>Acuerdo vigente: versión {vigente.version} · folio {folio(vigente.contenido_hash)}</p>
           <p className="ayuda">
             Tu firma: {MODALIDAD[firmaDe(vigente, "trabajador")!.modalidad]},{" "}
-            {aHoraLocal(firmaDe(vigente, "trabajador")!.firmado_en, zona).replace("T", " ")}
+            {fechaHora(firmaDe(vigente, "trabajador")!.firmado_en, zona, true)}
           </p>
         </div>
       )}

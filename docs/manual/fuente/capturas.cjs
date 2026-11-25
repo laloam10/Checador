@@ -309,7 +309,7 @@ const estado = (p, t) => p.getByRole("status").filter({ hasText: t }).first().wa
   await d.getByLabel("Celular para WhatsApp (opcional)").fill(`55${String(Date.now()).slice(-8)}`);
   await d.getByRole("button", { name: "Guardar cambios" }).click();
   await estado(d, "Datos actualizados");
-  await d.getByText("WhatsApp: pendiente de activar").waitFor();
+  await d.locator(".estado-tile", { hasText: "WhatsApp" }).getByText("Pendiente de activar").waitFor();
   await shotEl(d.getByLabel("Celular para WhatsApp (opcional)").locator("xpath=ancestor::label[1]"), "31-ficha-celular");
   await d.getByRole("button", { name: "Generar código de activación" }).click();
   await d.getByAltText("Código QR para activar WhatsApp").waitFor();

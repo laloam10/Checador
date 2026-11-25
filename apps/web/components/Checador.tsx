@@ -15,6 +15,7 @@ import {
   type TipoCaptura,
 } from "@/lib/cola";
 import { obtenerUbicacion } from "@/lib/ubicacionCliente";
+import { fechaHora } from "@/lib/formato";
 
 export interface TrabajadorCliente {
   id: string;
@@ -37,11 +38,17 @@ export function Checador({
   trabajador,
   eventos,
   pedirUbicacion = false,
+  horarioHoy,
+  pendientes: tarjetaPendientes,
 }: {
   trabajador: TrabajadorCliente;
   eventos: EventoBitacora[];
   /** El centro registra la ubicación al checar (nunca impide checar). */
   pedirUbicacion?: boolean;
+  /** "Tu horario de hoy…", dentro de la tarjeta del reloj. */
+  horarioHoy?: React.ReactNode;
+  /** Tarjeta de pendientes (acuerdo por firmar, sugerencias), debajo de los botones. */
+  pendientes?: React.ReactNode;
 }) {
   const router = useRouter();
   const [pendientes, setPendientes] = useState<Pendiente[]>([]);
@@ -163,6 +170,7 @@ export function Checador({
 
   return (
     <section className="checador">
+      <div className={`tarjeta-reloj reloj-${estado}`}>
       <p className="quien">
         {trabajador.nombre}
         <span>
@@ -179,6 +187,8 @@ export function Checador({
         {estado === "trabajando" && `Trabajando desde las ${enCurso?.inicio.slice(11)}`}
         {estado === "en_pausa" && "En pausa"}
       </p>
+      {horarioHoy}
+      </div>
 
       {!enLinea && <p className="aviso">Sin conexión: tus checadas se guardarán en este teléfono.</p>}
 
@@ -205,6 +215,10 @@ export function Checador({
         )}
       </div>
 
+      {mensaje && <p className={`mensaje mensaje-${mensaje.tipo}`}>{mensaje.texto}</p>}
+
+      {tarjetaPendientes}
+
       {pedirUbicacion && (
         <p className="ayuda nota-ubicacion">
           Tu empresa registra la ubicación de tu teléfono solo al momento de checar. Si no das permiso, tu checada se
@@ -212,15 +226,13 @@ export function Checador({
         </p>
       )}
 
-      {mensaje && <p className={`mensaje mensaje-${mensaje.tipo}`}>{mensaje.texto}</p>}
-
       {rechazados.length > 0 && (
         <div className="mensaje mensaje-error">
           <p>Algunas checadas guardadas sin conexión fueron rechazadas:</p>
           <ul>
             {rechazados.map((p) => (
               <li key={p.idCliente}>
-                {ETIQUETA[p.tipo]} {aHoraLocal(p.horaDispositivo, trabajador.zonaHoraria).replace("T", " ")}: {p.rechazo}
+                {ETIQUETA[p.tipo]} {fechaHora(p.horaDispositivo, trabajador.zonaHoraria)}: {p.rechazo}
               </li>
             ))}
           </ul>

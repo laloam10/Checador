@@ -19,6 +19,7 @@ import type { Reconstruccion, ResultadoSemana } from "@checador/jornada";
 import { sumarDias } from "@/lib/fechas";
 import { TablaSemana } from "./TablaSemana";
 import { Teclado } from "./Teclado";
+import { fechaHora } from "@/lib/formato";
 
 type Paso =
   | { tipo: "numero" }
@@ -548,7 +549,7 @@ export function Kiosco({
             <ul>
               {rechazados.map((p) => (
                 <li key={p.idCliente}>
-                  N.º {p.numero} · {ETIQUETA[p.tipo]} {aHoraLocal(p.horaDispositivo, zonaHoraria).replace("T", " ")}: {p.rechazo}
+                  N.º {p.numero} · {ETIQUETA[p.tipo]} {fechaHora(p.horaDispositivo, zonaHoraria)}: {p.rechazo}
                 </li>
               ))}
             </ul>

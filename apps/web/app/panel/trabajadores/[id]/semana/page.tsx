@@ -10,6 +10,7 @@ import { requierePanel } from "@/lib/panel";
 import { UbicacionChecada } from "@/components/UbicacionChecada";
 import { llaveMapa, ubicacionesDe } from "@/lib/ubicacionesDatos";
 import { agregarChecada, anularChecada, corregirChecada } from "../../../acciones";
+import { fechaHora } from "@/lib/formato";
 
 const ETIQUETA: Record<string, string> = {
   entrada: "Entrada",
@@ -101,7 +102,7 @@ export default async function SemanaPanel({
   const ubicaciones = await ubicacionesDe(ctx.supabase, capturas.map((c) => c.id));
   const mapa = llaveMapa();
   const ultima = conformidades?.[0];
-  const local = (iso: string) => aHoraLocal(iso, zona).replace("T", " ");
+  const local = (iso: string) => fechaHora(iso, zona);
   const hoy = ahoraLocal.slice(0, 10);
   const cerrada = domingo < hoy;
   const estado = ultima

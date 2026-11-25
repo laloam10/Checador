@@ -1,9 +1,8 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Checador } from "@/components/Checador";
 import { Navegacion } from "@/components/Navegacion";
 import { SinVinculo } from "@/components/SinVinculo";
-import { SugerenciaAcceso } from "@/components/SugerenciaAcceso";
+import { Pendientes } from "@/components/Pendientes";
 import { aHoraLocal } from "@checador/jornada";
 import { cargarEventos, misTrabajadores } from "@/lib/datos";
 import { horarioEfectivo } from "@/lib/horarios";
@@ -49,19 +48,6 @@ export default async function Inicio() {
   return (
     <main>
       <Navegacion panel={esEmpleador} />
-      {pendiente && (
-        <Link href="/acuerdo" className="mensaje mensaje-aviso aviso-acuerdo">
-          Tu empleador te envió el acuerdo de registro de jornada (versión {pendiente.version}). Léelo y fírmalo aquí →
-        </Link>
-      )}
-      {horario && (
-        <p className="ayuda horario-trabajador">
-          {tramoHoy
-            ? <>Tu horario de hoy: <strong>{tramoHoy.entrada} a {tramoHoy.salida}</strong>{tramoHoy.pausa_inicio && <> · comida {tramoHoy.pausa_inicio}–{tramoHoy.pausa_fin}</>}</>
-            : "Hoy no tienes turno en tu horario."}
-        </p>
-      )}
-      {(acceso as { al_salir?: string } | null)?.al_salir === "codigo" && <SugerenciaAcceso />}
       <Checador
         trabajador={{
           id: trabajador.id,
@@ -72,6 +58,19 @@ export default async function Inicio() {
         }}
         eventos={eventos}
         pedirUbicacion={trabajador.ubicacionCelular}
+        horarioHoy={horario && (
+          <p className="horario-trabajador">
+            {tramoHoy
+              ? <>Tu horario de hoy: <strong>{tramoHoy.entrada} a {tramoHoy.salida}</strong>{tramoHoy.pausa_inicio && <> · <span className="sin-corte">comida {tramoHoy.pausa_inicio}–{tramoHoy.pausa_fin}</span></>}</>
+              : "Hoy no tienes turno en tu horario."}
+          </p>
+        )}
+        pendientes={
+          <Pendientes
+            acuerdo={pendiente?.version ?? null}
+            sugerirAcceso={(acceso as { al_salir?: string } | null)?.al_salir === "codigo"}
+          />
+        }
       />
     </main>
   );

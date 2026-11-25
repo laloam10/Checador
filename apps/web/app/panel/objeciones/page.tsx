@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { aHoraLocal } from "@checador/jornada";
 import { esGestor, objecionesPendientes, requierePanel } from "@/lib/panel";
+import { fechaHora, rangoFechas } from "@/lib/formato";
+import { sumarDias } from "@/lib/fechas";
 
 interface EnvioDia {
   fecha: string;
@@ -57,9 +59,9 @@ export default async function Objeciones() {
             {objeciones.map((o) => (
               <tr key={`${o.trabajadorId}-${o.semana}`}>
                 <td className="celda-titulo"><Link href={`/panel/trabajadores/${o.trabajadorId}/semana?semana=${o.semana}`}>{o.nombre}</Link></td>
-                <td data-etiqueta="Semana">{o.semana}</td>
+                <td data-etiqueta="Semana">{rangoFechas(o.semana, sumarDias(o.semana, 6))}</td>
                 <td data-etiqueta="Comentario">“{o.comentario}”</td>
-                <td data-etiqueta="Fecha">{aHoraLocal(o.respondidoEn, ctx.empresa.zonaHoraria).replace("T", " ")}</td>
+                <td data-etiqueta="Fecha">{fechaHora(o.respondidoEn, ctx.empresa.zonaHoraria)}</td>
               </tr>
             ))}
           </tbody>
