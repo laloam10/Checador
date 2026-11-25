@@ -11,6 +11,7 @@ import {
 } from "@checador/jornada";
 import type { crearClienteServidor } from "./supabase/server";
 import { sumarDias } from "./fechas";
+import { incidenciasDeLaSemana } from "./incidencias";
 
 export { lunesDe, sumarDias } from "./fechas";
 
@@ -217,10 +218,11 @@ export function calcularSemanaDesdeFilas(
     return f >= lunes && f < domingoSiguiente;
   });
   const semana = calcularSemana(lunes, turnos, trabajador.config);
+  const incidencias = incidenciasDeLaSemana(reconstruccion.incidencias, filas, trabajador.zonaHoraria, lunes);
   return {
     filas,
     semana,
-    reconstruccion: { ...reconstruccion, turnos },
+    reconstruccion: { ...reconstruccion, turnos, incidencias },
     eventoIds: turnos.flatMap((t) => t.eventoIds),
   };
 }
