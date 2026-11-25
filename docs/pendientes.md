@@ -1,6 +1,6 @@
 # Pendientes
 
-Actualizado el 2026-11-23. Lo hecho está en la rama `pruebas`; producción (`main`) no tiene todavía el diseño de
+Actualizado el 2026-11-25. Lo hecho está en la rama `pruebas`; producción (`main`) no tiene todavía el diseño de
 Jemba, WhatsApp, avisos ni el manual 1.2. Detalle técnico: `docs/estado-supabase.md`, `docs/plan-app-movil.md` y
 `docs/publicacion.md`.
 
@@ -26,8 +26,9 @@ Jemba, WhatsApp, avisos ni el manual 1.2. Detalle técnico: `docs/estado-supabas
       verificar el reenvío. No registrar el webhook de Forja en Meta ni guardar `WHATSAPP_VERIFY_TOKEN` en Forja.
 - [ ] **Recarga del kiosco con versión nueva en una tableta real** (`docs/publicacion.md` §2.5). El aviso con
       **Actualizar** ya se probó en el teléfono el 2026-11-21; la recarga sola del kiosco solo está probada en e2e.
-- [ ] **Huella o rostro en pruebas** (`docs/publicacion.md` §1.12): secreto de servicio `acceso` en Supabase y
-      `ACCESO_SECRETO_SERVICIO` en Vercel; después probar en Android y en iPhone (pantalla de inicio).
+- [ ] **Huella o rostro en iPhone** (pantalla de inicio, Llavero de iCloud). En pruebas ya están el secreto `acceso` y
+      `ACCESO_SECRETO_SERVICIO`, y en Android funciona (probado el 2026-11-25). En producción falta repetir
+      `docs/publicacion.md` §1.12 con un secreto distinto.
 - [ ] **Avisos en iPhone**: probar con Checador agregado a la pantalla de inicio (Android ya probado el 2026-11-20).
       El resultado decide si la fase 3 (app en tiendas) es urgente.
 - [ ] **Número real de WhatsApp**: cuando exista, ponerlo en `docs/manual/fuente/hojas/whatsapp.html` y en el manual.
