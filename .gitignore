@@ -16,3 +16,6 @@ node_modules/
 .claude/settings.local.json
 # Instalación local de la plantilla de Forja (código con licencia de terceros; no se versiona)
 /forja-bot/
+
+# Salida del generador de la empresa de ejemplo (capturas, ids)
+/scripts/ejemplo/salida/
