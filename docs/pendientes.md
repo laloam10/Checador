@@ -15,6 +15,13 @@ Jemba, WhatsApp, avisos, horarios, Salir con PIN o huella, ubicación al checar 
       producción los secretos y variables de WhatsApp (§1.9) y avisos (§1.10); producción no necesita el bypass de
       Vercel.
 
+## Manual (al terminar de pulir la aplicación)
+
+- [ ] **Actualizar el manual y las hojas** cuando el usuario dé por terminado el pulido de la app (decisión del
+      2026-11-25: no antes). Falta: ubicación al checar (Centros, aviso en Checar y kiosco, bitácora del panel, Mis
+      registros, ver en mapa), nuevo acomodo de la ficha del trabajador (Datos, Kiosco y WhatsApp, Baja; capturas 05, 06,
+      31 y 32) y lo que se pula después. Regenerar con `docs/manual/fuente/capturas.cjs` y `generar.cjs`.
+
 ## Del usuario (en pruebas)
 
 - [ ] **WhatsApp con Meta** (`docs/publicacion.md` §1.9): app de Meta con número de prueba, secreto de servicio
