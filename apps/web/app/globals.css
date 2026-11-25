@@ -599,3 +599,11 @@ form:has(select[name="horario"] option[data-manual]:checked) .jornada-horario { 
 .lista-passkeys li span { display: grid; gap: 0.1rem; }
 .lista-passkeys small { color: var(--gris); font-size: 0.84rem; }
 .boton-huella { margin: 1.2rem 0 0.4rem; }
+.nota-ubicacion { font-size: 0.84rem; text-align: center; margin-top: 0.8rem; }
+.ubicacion-centro { border: 1px solid var(--borde); border-radius: var(--radio); padding: 0.8rem 1rem; margin: 1rem 0 0; display: grid; gap: 0.5rem; }
+.ubicacion-centro legend { font-weight: 700; padding: 0 0.3rem; }
+.ubicacion-centro p { margin: 0; }
+.ubicacion-centro-boton { display: grid; gap: 0.4rem; justify-items: start; }
+.etiqueta-ok { background: var(--marca-claro); color: var(--marca-oscuro); }
+.etiqueta-neutra { background: var(--fondo); color: var(--gris); border: 1px solid var(--borde); }
+.enlace-mapa { font-size: 0.75rem; margin-left: 0.4rem; color: var(--gris); }

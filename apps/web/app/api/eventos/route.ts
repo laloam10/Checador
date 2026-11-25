@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { clienteApp } from "@/lib/appMovil";
 import { clienteDeSolicitud, usuarioActual } from "@/lib/supabase/server";
 import { evidenciaDe } from "@/lib/evidencia";
+import { parametrosUbicacion, ubicacionDeCuerpo } from "@/lib/ubicacion";
 
 const TIPOS = new Set(["entrada", "salida", "inicio_pausa", "fin_pausa"]);
 const RE_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -12,6 +13,8 @@ interface Cuerpo {
   idCliente?: unknown;
   diferido?: unknown;
   horaDispositivo?: unknown;
+  /** Ubicación al checar, si el centro la activó (lib/ubicacion.ts). Opcional. */
+  ubicacion?: unknown;
 }
 
 /**
@@ -47,7 +50,7 @@ export async function POST(request: NextRequest) {
     .maybeSingle();
   if (!trabajador) return error(403, "No tienes un registro de trabajador activo.");
 
-  const { error: errInsert } = await supabase.from("eventos").insert({
+  const { data: insertado, error: errInsert } = await supabase.from("eventos").insert({
     empresa_id: trabajador.empresa_id,
     trabajador_id: trabajadorId,
     tipo,
@@ -59,7 +62,7 @@ export async function POST(request: NextRequest) {
     evidencia: token
       ? { ...evidenciaDe(request), ...clienteApp(request.headers.get("x-checador-plataforma"), request.headers.get("x-checador-version")) }
       : evidenciaDe(request),
-  });
+  }).select("id").single();
 
   if (errInsert) {
     // Reintento de un envío que ya se había guardado: no es un error.
@@ -70,6 +73,13 @@ export async function POST(request: NextRequest) {
     if (errInsert.code === "23514") return error(422, errInsert.message);
     console.error("Error al registrar evento", errInsert);
     return error(500, "No se pudo registrar. Intenta de nuevo.");
+  }
+
+  // La ubicación nunca hace fallar la checada: ya quedó registrada.
+  const ubicacion = ubicacionDeCuerpo(cuerpo.ubicacion);
+  if (ubicacion && insertado?.id) {
+    const { error: errUbicacion } = await supabase.rpc("registrar_ubicacion", parametrosUbicacion(insertado.id as number, ubicacion));
+    if (errUbicacion) console.error("Ubicación no registrada", errUbicacion.message);
   }
 
   return NextResponse.json({ ok: true, horaServidor: new Date().toISOString() });

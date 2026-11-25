@@ -2,6 +2,7 @@
 
 import { del, get, set } from "idb-keyval";
 import { registrarHoraServidor, type TipoCaptura } from "./cola";
+import type { UbicacionCaptura } from "./ubicacion";
 
 /**
  * Cola sin conexión del kiosco.
@@ -19,6 +20,8 @@ export interface PendienteKiosco {
   pin: string;
   tipo: TipoCaptura;
   horaDispositivo: string;
+  /** Ubicación del kiosco al checar, si su centro la pide. */
+  ubicacion?: UbicacionCaptura;
   rechazo?: string;
 }
 

@@ -14,6 +14,7 @@ import {
   type Pendiente,
   type TipoCaptura,
 } from "@/lib/cola";
+import { obtenerUbicacion } from "@/lib/ubicacionCliente";
 
 export interface TrabajadorCliente {
   id: string;
@@ -32,7 +33,16 @@ const ETIQUETA: Record<string, string> = {
   anulacion: "Anulación del empleador",
 };
 
-export function Checador({ trabajador, eventos }: { trabajador: TrabajadorCliente; eventos: EventoBitacora[] }) {
+export function Checador({
+  trabajador,
+  eventos,
+  pedirUbicacion = false,
+}: {
+  trabajador: TrabajadorCliente;
+  eventos: EventoBitacora[];
+  /** El centro registra la ubicación al checar (nunca impide checar). */
+  pedirUbicacion?: boolean;
+}) {
   const router = useRouter();
   const [pendientes, setPendientes] = useState<Pendiente[]>([]);
   const [enviando, setEnviando] = useState(false);
@@ -96,16 +106,29 @@ export function Checador({ trabajador, eventos }: { trabajador: TrabajadorClient
     [vigentes, trabajador.zonaHoraria],
   );
 
+  // Con permiso ya concedido, se toma una ubicación al abrir para que al checar sea inmediata.
+  // Sin permiso, el navegador lo pide al checar (en contexto), no al abrir la app.
+  useEffect(() => {
+    if (!pedirUbicacion || !navigator.permissions) return;
+    navigator.permissions
+      .query({ name: "geolocation" })
+      .then((p) => p.state === "granted" && void obtenerUbicacion(8000, 300_000))
+      .catch(() => {});
+  }, [pedirUbicacion]);
+
   async function checar(tipo: TipoCaptura) {
     if (enviando) return;
     setEnviando(true);
     setMensaje(null);
+    const hora = ahoraServidor().toISOString();
+    // La ubicación nunca impide checar: sin permiso o sin señal se envía el estado.
+    const ubicacion = pedirUbicacion ? await obtenerUbicacion() : undefined;
     const datos = {
       idCliente: crypto.randomUUID(),
       trabajadorId: trabajador.id,
       tipo,
+      ...(ubicacion ? { ubicacion } : {}),
     };
-    const hora = ahoraServidor().toISOString();
     try {
       const r = await enviar(datos);
       if (r.tipo === "ok") {
@@ -181,6 +204,13 @@ export function Checador({ trabajador, eventos }: { trabajador: TrabajadorClient
           </button>
         )}
       </div>
+
+      {pedirUbicacion && (
+        <p className="ayuda nota-ubicacion">
+          Tu empresa registra la ubicación de tu teléfono solo al momento de checar. Si no das permiso, tu checada se
+          registra igual.
+        </p>
+      )}
 
       {mensaje && <p className={`mensaje mensaje-${mensaje.tipo}`}>{mensaje.texto}</p>}
 

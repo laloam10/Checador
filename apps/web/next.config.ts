@@ -28,8 +28,9 @@ const nextConfig: NextConfig = {
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           // HTTPS obligatorio por dos años (solo tiene efecto cuando se sirve por HTTPS).
           { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
-          // La app no usa cámara, micrófono ni ubicación (coherente con el acuerdo: sin biometría ni geolocalización).
-          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()" },
+          // Sin cámara ni micrófono (no hay biometría). La ubicación solo la usa la propia app, al checar,
+          // en los centros que la activaron (migración 20261129000001_ubicacion.sql).
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(self), payment=(), usb=()" },
           { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
         ],
       },

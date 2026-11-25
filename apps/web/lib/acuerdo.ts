@@ -9,7 +9,8 @@
  * Decisiones de redacción:
  *  - No hay aceptación tácita: el silencio del trabajador NO implica conformidad
  *    (una cláusula así podría considerarse renuncia de derechos, arts. 5 y 33 LFT).
- *  - Se declara qué datos personales se recaban y que no hay biometría ni ubicación.
+ *  - Se declara qué datos personales se recaban. No hay biometría. La ubicación solo aparece
+ *    si el centro de trabajo la activó (y solo para los métodos que la usan).
  *  - El registro original nunca se modifica: las correcciones quedan visibles.
  */
 
@@ -21,7 +22,13 @@ export interface DatosAcuerdo {
   version: number;
   fecha: string; // YYYY-MM-DD, fecha de generación (hora local del centro)
   empresa: { razonSocial: string; rfc: string | null };
-  centro: { nombre: string; direccion: string | null; pausaPuedeSalir: boolean };
+  centro: {
+    nombre: string;
+    direccion: string | null;
+    pausaPuedeSalir: boolean;
+    /** Ubicación al checar; sin ella (o apagada), el texto es idéntico al de antes (no desactualiza acuerdos). */
+    ubicacion?: { celular: boolean; kiosco: boolean };
+  };
   trabajador: {
     nombre: string;
     numeroEmpleado: string | null;
@@ -42,6 +49,22 @@ function adicionales(dias: number[] | undefined) {
   const orden = [...dias].sort((a, b) => ((a + 6) % 7) - ((b + 6) % 7)).map((d) => `el ${DIAS[d]}`);
   const lista = orden.length === 1 ? orden[0] : `${orden.slice(0, -1).join(", ")} y ${orden.at(-1)}`;
   return `; además, la persona trabajadora descansará ${lista}, como descanso adicional pactado`;
+}
+
+/**
+ * Cláusula de ubicación (migración 20261129000001_ubicacion.sql; interpretación 12 de
+ * packages/jornada/README.md). Solo para los métodos que la persona usa: celular si tiene
+ * correo, kiosco si tiene número de empleado.
+ */
+function textoUbicacion(d: DatosAcuerdo): string | null {
+  const u = d.centro.ubicacion;
+  const celular = Boolean(u?.celular && d.trabajador.email);
+  const kiosco = Boolean(u?.kiosco && d.trabajador.numeroEmpleado);
+  if (!celular && !kiosco) return null;
+  const donde = celular && kiosco
+    ? "en los registros desde su teléfono celular y desde el kiosco"
+    : celular ? "en los registros desde su teléfono celular" : "en los registros desde el kiosco";
+  return `Además, ${donde} se registra la ubicación aproximada del dispositivo, únicamente al momento de hacer cada registro, para verificar si se realiza en el centro de trabajo. La ubicación no se usa para seguir a la persona trabajadora en ningún otro momento, no impide hacer el registro cuando no está disponible o cuando la persona no otorga el permiso, y se elimina a los 90 días. No se recaban datos biométricos.`;
 }
 
 function horas(min: number) {
@@ -117,7 +140,7 @@ SÉPTIMA. Consulta y conformidad. La persona trabajadora puede consultar sus reg
 
 OCTAVA. Integridad y conservación. Los registros se almacenan de forma que cualquier alteración posterior sea detectable. Se conservarán al menos durante la relación de trabajo y un año después de su terminación, conforme al artículo 804 de la Ley Federal del Trabajo, y se proporcionarán a la autoridad cuando lo requiera.
 
-NOVENA. Datos personales. Para este registro se tratan: nombre, número de empleado, correo electrónico, ${t.telefono ? "número de teléfono celular, " : ""}horarios registrados y, por cada registro, la dirección IP y el tipo de dispositivo${t.telefono ? " o, en los registros por WhatsApp, el número de teléfono y el identificador del mensaje. Los mensajes de WhatsApp se transmiten por medio de ese servicio, operado por un tercero (Meta Platforms)" : ""}. No se recaban datos biométricos ni de ubicación. La finalidad es cumplir las obligaciones laborales de la persona empleadora. El tratamiento se rige por el aviso de privacidad de la persona empleadora.
+NOVENA. Datos personales. Para este registro se tratan: nombre, número de empleado, correo electrónico, ${t.telefono ? "número de teléfono celular, " : ""}horarios registrados y, por cada registro, la dirección IP y el tipo de dispositivo${t.telefono ? " o, en los registros por WhatsApp, el número de teléfono y el identificador del mensaje. Los mensajes de WhatsApp se transmiten por medio de ese servicio, operado por un tercero (Meta Platforms)" : ""}. ${textoUbicacion(d) ?? "No se recaban datos biométricos ni de ubicación."} La finalidad es cumplir las obligaciones laborales de la persona empleadora. El tratamiento se rige por el aviso de privacidad de la persona empleadora.
 
 DÉCIMA. Derechos irrenunciables. Nada de lo previsto en este acuerdo implica renuncia de derechos de la persona trabajadora, en términos de los artículos 5 y 33 de la Ley Federal del Trabajo, ni limita las pruebas que pueda ofrecer.
 

@@ -9,21 +9,32 @@ export interface KioscoConfig {
   empresa: string;
   centro: string | null;
   zonaHoraria: string;
+  /** Su centro registra la ubicación del kiosco al checar (migración 20261129000001_ubicacion.sql). */
+  ubicacion: boolean;
 }
 
 /** Configuración del kiosco si el usuario actual es una cuenta de kiosco; si no, null. */
 export async function miKiosco(supabase: Cliente, userId: string): Promise<KioscoConfig | null> {
   const { data, error } = await supabase
     .from("miembros")
-    .select("empresas(razon_social, zona_horaria), centros_trabajo(nombre, zona_horaria)")
+    .select("empresa_id, empresas(razon_social, zona_horaria), centros_trabajo(nombre, zona_horaria, ubicacion_kiosco)")
     .eq("user_id", userId)
     .eq("rol", "kiosco")
     .maybeSingle();
   if (error) throw error;
   if (!data) return null;
   const empresa = uno(data.empresas) as { razon_social: string; zona_horaria: string } | null;
-  const centro = uno(data.centros_trabajo) as { nombre: string; zona_horaria: string } | null;
+  const centro = uno(data.centros_trabajo) as { nombre: string; zona_horaria: string; ubicacion_kiosco: boolean } | null;
+  // Un kiosco sin centro fijo atiende a toda la empresa: pide la ubicación si algún centro la activó
+  // (la base solo la guarda si el centro de la persona la tiene activada).
+  let ubicacion = centro?.ubicacion_kiosco ?? false;
+  if (!centro) {
+    const { count } = await supabase.from("centros_trabajo").select("id", { count: "exact", head: true })
+      .eq("empresa_id", data.empresa_id).eq("ubicacion_kiosco", true);
+    ubicacion = (count ?? 0) > 0;
+  }
   return {
+    ubicacion,
     empresa: empresa?.razon_social ?? "",
     centro: centro?.nombre ?? null,
     zonaHoraria: centro?.zona_horaria ?? empresa?.zona_horaria ?? "America/Mexico_City",
@@ -56,6 +67,8 @@ export interface RespuestaKiosco {
   nombre?: string;
   duplicado?: boolean;
   hora_efectiva?: string;
+  /** Checada recién registrada (para asociarle la ubicación del kiosco). */
+  evento_id?: number;
   eventos?: {
     id: number;
     tipo: "entrada" | "salida" | "inicio_pausa" | "fin_pausa" | "correccion" | "anulacion";

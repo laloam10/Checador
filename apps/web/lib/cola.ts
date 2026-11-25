@@ -1,6 +1,7 @@
 "use client";
 
 import { del, get, set } from "idb-keyval";
+import type { UbicacionCaptura } from "./ubicacion";
 
 /**
  * Cola de checadas sin conexión (IndexedDB) y desfase del reloj del dispositivo.
@@ -17,6 +18,8 @@ export interface Pendiente {
   trabajadorId: string;
   tipo: TipoCaptura;
   horaDispositivo: string;
+  /** Ubicación tomada al checar, si el centro la pide (sin conexión también funciona el GPS). */
+  ubicacion?: UbicacionCaptura;
   /** Mensaje del servidor si la rechazó de forma definitiva. */
   rechazo?: string;
 }

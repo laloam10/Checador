@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { crearClienteServidor, usuarioActual } from "@/lib/supabase/server";
 import { evidenciaDe } from "@/lib/evidencia";
 import { estadoHttp, validarCredenciales, type RespuestaKiosco } from "@/lib/kiosco";
+import { parametrosUbicacion, ubicacionDeCuerpo } from "@/lib/ubicacion";
 
 const TIPOS = new Set(["entrada", "salida", "inicio_pausa", "fin_pausa"]);
 const RE_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -44,6 +45,12 @@ export async function POST(request: NextRequest) {
   const horaServidor = new Date().toISOString();
   if (!r.ok) {
     return NextResponse.json({ ok: false, codigo: r.codigo, error: r.error, horaServidor }, { status: estadoHttp(r) });
+  }
+  // Ubicación del kiosco, si su centro la activó. Nunca hace fallar la checada.
+  const ubicacion = ubicacionDeCuerpo(cuerpo.ubicacion);
+  if (ubicacion && r.evento_id) {
+    const { error: errUbicacion } = await supabase.rpc("registrar_ubicacion", parametrosUbicacion(r.evento_id, ubicacion));
+    if (errUbicacion) console.error("Ubicación del kiosco no registrada", errUbicacion.message);
   }
   return NextResponse.json({
     ok: true,

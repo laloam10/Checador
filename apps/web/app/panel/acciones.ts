@@ -82,22 +82,54 @@ export async function crearEmpresa(_: Estado, fd: FormData): Promise<Estado> {
 
 // --- Centros de trabajo -----------------------------------------------------------
 
+/** Número del formulario, o null si está vacío; NaN si no es número. */
+function numeroDe(fd: FormData, campo: string): number | null {
+  const v = texto(fd, campo).replace(",", ".");
+  return v ? Number(v) : null;
+}
+
 export async function guardarCentro(_: Estado, fd: FormData): Promise<Estado> {
   const ctx = await requierePanel();
   const id = texto(fd, "id");
+  const latitud = numeroDe(fd, "latitud");
+  const longitud = numeroDe(fd, "longitud");
+  const radio = numeroDe(fd, "radio_m") ?? 150;
   const datos = {
     nombre: texto(fd, "nombre"),
     direccion: texto(fd, "direccion") || null,
     zona_horaria: texto(fd, "zona_horaria") || ctx.empresa.zonaHoraria,
     pausa_puede_salir: fd.get("pausa_puede_salir") === "on",
+    // Ubicación al checar (migración 20261129000001_ubicacion.sql): opcional, por centro.
+    ubicacion_celular: fd.get("ubicacion_celular") === "on",
+    ubicacion_kiosco: fd.get("ubicacion_kiosco") === "on",
+    latitud,
+    longitud,
+    radio_m: Math.round(radio),
   };
   if (!datos.nombre) return fallo("El centro necesita un nombre.");
+  if ((latitud === null) !== (longitud === null)) return fallo("Captura la latitud y la longitud del centro, o deja las dos vacías.");
+  if (latitud !== null && (Number.isNaN(latitud) || latitud < -90 || latitud > 90)) return fallo("La latitud debe estar entre -90 y 90.");
+  if (longitud !== null && (Number.isNaN(longitud) || longitud < -180 || longitud > 180)) return fallo("La longitud debe estar entre -180 y 180.");
+  if (Number.isNaN(radio) || radio < 25 || radio > 5000) return fallo("El radio del centro debe ser de 25 a 5,000 metros.");
+  if ((datos.ubicacion_celular || datos.ubicacion_kiosco) && latitud === null) {
+    return fallo("Para registrar la ubicación al checar, captura las coordenadas del centro (o usa «Usar mi ubicación actual» estando en el lugar).");
+  }
+
+  let cambioUbicacion = datos.ubicacion_celular || datos.ubicacion_kiosco;
+  if (id) {
+    const { data: antes } = await ctx.supabase.from("centros_trabajo").select("ubicacion_celular, ubicacion_kiosco")
+      .eq("id", id).eq("empresa_id", ctx.empresa.id).maybeSingle();
+    cambioUbicacion = Boolean(antes) && (antes!.ubicacion_celular !== datos.ubicacion_celular || antes!.ubicacion_kiosco !== datos.ubicacion_kiosco);
+  }
   const { error } = id
     ? await ctx.supabase.from("centros_trabajo").update(datos).eq("id", id).eq("empresa_id", ctx.empresa.id)
     : await ctx.supabase.from("centros_trabajo").insert({ ...datos, empresa_id: ctx.empresa.id });
   if (error) return fallo(traducir(error));
   refrescar();
-  return ok(id ? "Centro actualizado." : "Centro creado.");
+  const base = id ? "Centro actualizado." : "Centro creado.";
+  return ok(cambioUbicacion && id
+    ? `${base} Cambió el registro de ubicación: las personas de este centro deben firmar una versión nueva del acuerdo.`
+    : base);
 }
 
 // --- Recordatorios de conformidad -------------------------------------------------

@@ -119,6 +119,7 @@ El motor de cálculo debe tener la tabla de transición por año (transitorios s
 ### 5.5 Datos personales
 
 Recabar geolocalización, fotografía o biometría trae obligaciones de la ley de datos personales: aviso de privacidad, consentimiento expreso para datos sensibles, finalidad y proporcionalidad. Nada de esto lo exige la LFT, así que es riesgo sin beneficio legal. `[INTERPRETACIÓN]`
+Actualización (2026-11-25): la **ubicación al checar** se agregó como opción por centro de trabajo, apagada por omisión, a petición de clientes que quieren verificar que se checa en el lugar. Las condiciones para mantenerla proporcional están en la interpretación 12 de `packages/jornada/README.md`. Fotografía y biometría siguen fuera.
 
 ## 6. Preguntas abiertas para el abogado
 

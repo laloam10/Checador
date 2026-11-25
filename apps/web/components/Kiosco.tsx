@@ -3,6 +3,8 @@
 import { Isotipo } from "@/components/Marca";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useVersionNueva } from "@/lib/useVersionNueva";
+import { obtenerUbicacion } from "@/lib/ubicacionCliente";
+import type { UbicacionCaptura } from "@/lib/ubicacion";
 import { aHoraLocal } from "@checador/jornada";
 import { ahoraServidor, registrarHoraServidor, sincronizarReloj, type TipoCaptura } from "@/lib/cola";
 import {
@@ -74,7 +76,22 @@ const REPOSO_ACTUALIZAR_MS = 10_000;
 const ENTRE_RECARGAS_MS = 10 * 60_000;
 const CLAVE_RECARGA = "checador:kiosco:recarga";
 
-export function Kiosco({ empresa, centro, zonaHoraria }: { empresa: string; centro: string | null; zonaHoraria: string }) {
+// El kiosco no se mueve: su ubicación se refresca cada 5 minutos y se usa la más reciente al checar.
+const UBICACION_CADA_MS = 5 * 60_000;
+const UBICACION_VIGENTE_MS = 15 * 60_000;
+
+export function Kiosco({
+  empresa,
+  centro,
+  zonaHoraria,
+  ubicacion = false,
+}: {
+  empresa: string;
+  centro: string | null;
+  zonaHoraria: string;
+  /** Su centro registra la ubicación del kiosco al checar (nunca impide checar). */
+  ubicacion?: boolean;
+}) {
   const [paso, setPaso] = useState<Paso>({ tipo: "numero" });
   const [numero, setNumero] = useState("");
   const [pin, setPin] = useState("");
@@ -85,6 +102,23 @@ export function Kiosco({ empresa, centro, zonaHoraria }: { empresa: string; cent
   const [enviando, setEnviando] = useState(false);
   const [comentario, setComentario] = useState("");
   const temporizador = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const ultimaUbicacion = useRef<{ u: UbicacionCaptura; en: number } | null>(null);
+
+  useEffect(() => {
+    if (!ubicacion) return;
+    const tomar = () => obtenerUbicacion(10_000, 60_000).then((u) => (ultimaUbicacion.current = { u, en: Date.now() }));
+    void tomar();
+    const cada = setInterval(tomar, UBICACION_CADA_MS);
+    return () => clearInterval(cada);
+  }, [ubicacion]);
+
+  /** La ubicación reciente del kiosco; si no hay, la pide sin hacer esperar más de 2 s. */
+  async function ubicacionActual(): Promise<UbicacionCaptura | undefined> {
+    if (!ubicacion) return undefined;
+    const u = ultimaUbicacion.current;
+    if (u && u.u.estado === "ok" && Date.now() - u.en < UBICACION_VIGENTE_MS) return u.u;
+    return obtenerUbicacion(2000, UBICACION_VIGENTE_MS);
+  }
 
   const reiniciar = useCallback(() => {
     setPaso({ tipo: "numero" });
@@ -290,8 +324,9 @@ export function Kiosco({ empresa, centro, zonaHoraria }: { empresa: string; cent
   async function checar(tipo: TipoCaptura) {
     if (enviando) return;
     setEnviando(true);
-    const datos = { idCliente: crypto.randomUUID(), numero, pin, tipo };
     const hora = ahoraServidor();
+    const u = await ubicacionActual();
+    const datos = { idCliente: crypto.randomUUID(), numero, pin, tipo, ...(u ? { ubicacion: u } : {}) };
     const r = await enviarKiosco(datos);
     if (r.tipo === "ok") {
       const h = r.horaEfectiva ? aHoraLocal(r.horaEfectiva, zonaHoraria).slice(11) : aHoraLocal(hora, zonaHoraria).slice(11);
@@ -505,6 +540,7 @@ export function Kiosco({ empresa, centro, zonaHoraria }: { empresa: string; cent
       )}
 
       <footer className="kiosco-pie">
+        {ubicacion && <span>Este kiosco registra su ubicación al checar.</span>}
         {porEnviar > 0 && <span>{porEnviar} checada(s) pendientes de enviar</span>}
         {rechazados.length > 0 && (
           <details>
