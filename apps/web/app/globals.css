@@ -843,3 +843,18 @@ h2[id] { scroll-margin-top: 1rem; }
   .filtros > a { padding-top: 0; grid-column: 1 / -1; justify-self: end; }
 }
 .texto-acuerdo.texto-completo { max-height: none; }
+
+/* Objeciones y Exportar: estados claros y compactos. */
+.estado-vacio { display: flex; gap: 0.9rem; align-items: center; background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--radio); box-shadow: var(--sombra); padding: 1rem 1.1rem; margin: 1rem 0; }
+.estado-vacio-icono { flex: none; width: 2.4rem; height: 2.4rem; border-radius: 50%; display: grid; place-items: center; background: var(--marca-claro); color: var(--marca-oscuro); font-weight: 700; }
+.estado-vacio p { margin: 0.15rem 0 0; color: var(--gris); font-size: 0.88rem; }
+.linea-estado { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.8rem; margin: 0.4rem 0 0.8rem; }
+.linea-estado .ayuda { margin: 0; }
+.descarga { display: flex; flex-wrap: wrap; gap: 0.8rem; align-items: center; border: 1px solid rgb(47 110 16 / 0.2); background: var(--marca-claro); border-radius: var(--radio-chico); padding: 0.8rem 0.9rem; }
+.descarga-icono { flex: none; width: 2rem; height: 2rem; border-radius: 50%; display: grid; place-items: center; background: var(--marca); color: white; font-weight: 700; }
+.descarga-texto { display: grid; gap: 0.1rem; flex: 1; min-width: 12rem; }
+.descarga-texto strong { color: var(--marca-oscuro); }
+.descarga-archivo { font-family: var(--mono); font-size: 0.78rem; color: var(--tinta); overflow-wrap: anywhere; }
+.descarga-huella { font-size: 0.8rem; color: var(--gris); }
+.descarga-huella code { font-family: var(--mono); color: var(--tinta); }
+.boton-copiar { padding: 0.45rem 0.8rem; font-size: 0.85rem; }

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { aHoraLocal } from "@checador/jornada";
 import { esGestor, objecionesPendientes, requierePanel } from "@/lib/panel";
-import { fechaHora, rangoFechas } from "@/lib/formato";
+import { fechaConDia, fechaHora, rangoFechas } from "@/lib/formato";
 import { sumarDias } from "@/lib/fechas";
 
 interface EnvioDia {
@@ -51,7 +51,13 @@ export default async function Objeciones() {
         corrige con motivo y pídele que confirme de nuevo desde su app.
       </p>
       {objeciones.length === 0 ? (
-        <p className="vacio">No hay objeciones pendientes.</p>
+        <div className="estado-vacio">
+          <span className="estado-vacio-icono" aria-hidden>✓</span>
+          <div>
+            <strong>No hay objeciones pendientes.</strong>
+            <p>Cuando alguien indique que su semana no es correcta, aparecerá aquí para que la revises.</p>
+          </div>
+        </div>
       ) : (
         <table className="tabla tabla-tarjetas">
           <thead><tr><th>Trabajador</th><th>Semana</th><th>Comentario</th><th>Fecha</th></tr></thead>
@@ -69,16 +75,11 @@ export default async function Objeciones() {
       )}
 
       <h2 id="recordatorios">Recordatorios por correo</h2>
-      <p className="ayuda">
-        Cada lunes a las 10:00 (hora del centro de México) Checador envía un correo a quien tenga semanas terminadas sin
-        revisar, o semanas que objetó y que ya corregiste. Revisa las últimas 8 semanas y envía como máximo un correo por
-        persona a la semana. Solo lo recibe quien tiene correo registrado; quien checa únicamente en el kiosco ve sus semanas pendientes ahí, al identificarse con su PIN.
-        Responder sigue siendo voluntario; el correo lo dice así.
-      </p>
-      <p>
-        Los recordatorios están <strong>{activos ? "activados" : "desactivados"}</strong>.{" "}
-        {esGestor(ctx.rol) && <Link href="/panel/configuracion">Cambiar en Configuración</Link>}
-      </p>
+      <div className="linea-estado">
+        <span className={`insignia-estado ${activos ? "insignia-ok" : "insignia-neutra"}`}>{activos ? "Activados" : "Desactivados"}</span>
+        <span className="ayuda">Cada lunes a las 10:00 (centro de México), a quien tenga semanas por revisar.</span>
+        {esGestor(ctx.rol) && <Link href="/panel/configuracion#recordatorios">Cambiar en Configuración</Link>}
+      </div>
       {dias.length === 0 ? (
         <p className="vacio">Todavía no se ha enviado ningún recordatorio.</p>
       ) : (
@@ -89,7 +90,7 @@ export default async function Objeciones() {
               const enProceso = d.total - d.enviados - d.fallidos;
               return (
                 <tr key={d.fecha}>
-                  <td className="celda-titulo">{d.fecha}</td>
+                  <td className="celda-titulo">{fechaConDia(d.fecha)}</td>
                   <td data-etiqueta="Personas">{d.total}</td>
                   <td data-etiqueta="Resultado">
                     {d.enviados > 0 && <>{d.enviados} entregado(s) al servicio de correo. </>}

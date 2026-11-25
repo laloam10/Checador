@@ -23,7 +23,18 @@ export function FormExportar({
   const router = useRouter();
   const [trabajador, setTrabajador] = useState(inicial);
   const [formato, setFormato] = useState("pdf");
-  const [estado, setEstado] = useState<{ ok: boolean; texto: string } | null>(null);
+  const [estado, setEstado] = useState<{ ok: boolean; texto: string; archivo?: string; huella?: string } | null>(null);
+  const [copiada, setCopiada] = useState(false);
+
+  async function copiarHuella(huella: string) {
+    try {
+      await navigator.clipboard.writeText(huella);
+      setCopiada(true);
+      setTimeout(() => setCopiada(false), 2500);
+    } catch {
+      window.prompt("Copia la huella SHA-256:", huella);
+    }
+  }
   const [generando, setGenerando] = useState(false);
 
   async function exportar(e: React.FormEvent<HTMLFormElement>) {
@@ -45,7 +56,8 @@ export function FormExportar({
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
-      setEstado({ ok: true, texto: `Descargado ${nombre}. Huella SHA-256: ${r.headers.get("X-Checador-Sha256")}` });
+      setEstado({ ok: true, texto: "Descargado", archivo: nombre, huella: r.headers.get("X-Checador-Sha256") ?? "" });
+      setCopiada(false);
       router.refresh();
     } catch {
       setEstado({ ok: false, texto: "Sin conexión." });
@@ -83,7 +95,26 @@ export function FormExportar({
       </div>
       <p className="ayuda">El periodo se ajusta a semanas completas (lunes a domingo), porque el tiempo extra se calcula por semana.</p>
       <button className="boton" disabled={generando}>{generando ? "Generando…" : "Exportar"}</button>
-      {estado && <p className={`mensaje ${estado.ok ? "mensaje-ok" : "mensaje-error"} comprobante`} role="status">{estado.texto}</p>}
+      {estado && !estado.ok && <p className="mensaje mensaje-error" role="status">{estado.texto}</p>}
+      {estado?.ok && (
+        <div className="descarga" role="status">
+          <span className="descarga-icono" aria-hidden>✓</span>
+          <div className="descarga-texto">
+            <strong>Descargado</strong>
+            <span className="descarga-archivo">{estado.archivo}</span>
+            {estado.huella && (
+              <span className="descarga-huella" title={estado.huella}>
+                Huella SHA-256: <code>{estado.huella.slice(0, 12)}…{estado.huella.slice(-8)}</code>
+              </span>
+            )}
+          </div>
+          {estado.huella && (
+            <button type="button" className="boton-secundario boton-copiar" onClick={() => copiarHuella(estado.huella!)}>
+              {copiada ? "Copiada ✓" : "Copiar huella"}
+            </button>
+          )}
+        </div>
+      )}
     </form>
   );
 }
