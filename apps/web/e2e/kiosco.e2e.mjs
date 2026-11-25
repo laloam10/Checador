@@ -122,6 +122,16 @@ try {
   if (pinGuardado?.some((p) => p)) throw new Error("El PIN de una checada rechazada sigue guardado en el dispositivo");
   paso("en la base: 2 eventos de kiosco, la salida diferida con evidencia; ningún PIN queda en el dispositivo");
 
+  // 6. Reposo: sin uso, reloj grande con el negocio; un toque vuelve al teclado sin marcar nada
+  const reposo = page.getByRole("button", { name: "Toca la pantalla para checar" });
+  await reposo.waitFor({ timeout: 60_000 });
+  await reposo.getByText(/\d{2}:\d{2}/).first().waitFor();
+  if (process.env.CAPTURA_REPOSO) await page.waitForTimeout(1000), await page.screenshot({ path: process.env.CAPTURA_REPOSO });
+  await reposo.click();
+  await reposo.waitFor({ state: "detached" });
+  if (await page.getByLabel("Número capturado").textContent().then((t) => t.trim())) throw new Error("El toque para despertar marcó un número");
+  paso("en reposo muestra el reloj y el negocio; un toque vuelve al teclado sin marcar nada");
+
   console.log("\nPrueba del kiosco: OK");
 } catch (e) {
   await page.screenshot({ path: "e2e-fallo.png", fullPage: true }).catch(() => {});

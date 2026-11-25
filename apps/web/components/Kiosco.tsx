@@ -19,7 +19,7 @@ import type { Reconstruccion, ResultadoSemana } from "@checador/jornada";
 import { sumarDias } from "@/lib/fechas";
 import { TablaSemana } from "./TablaSemana";
 import { Teclado } from "./Teclado";
-import { fechaHora } from "@/lib/formato";
+import { diaYFecha, fechaHora } from "@/lib/formato";
 import { TextoAcuerdo } from "@/components/TextoAcuerdo";
 
 type Paso =
@@ -74,6 +74,8 @@ const LECTURA_MS = 4 * 60_000; // acuerdo o semana: tiempo para leer con calma
 const CONFIRMACION_MS = 4_000;
 // Con versión nueva, el kiosco se recarga tras este tiempo en reposo.
 const REPOSO_ACTUALIZAR_MS = 10_000;
+// Sin nadie frente al kiosco, pasa a la pantalla de reposo (reloj grande y nombre del negocio).
+const PANTALLA_REPOSO_MS = 45_000;
 // Freno contra un ciclo de recargas si tras recargar siguiera viendo otra versión.
 const ENTRE_RECARGAS_MS = 10 * 60_000;
 const CLAVE_RECARGA = "checador:kiosco:recarga";
@@ -99,6 +101,8 @@ export function Kiosco({
   const [pin, setPin] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [reloj, setReloj] = useState("");
+  const [hoy, setHoy] = useState("");
+  const [dormido, setDormido] = useState(false);
   const [enLinea, setEnLinea] = useState(true);
   const [pendientes, setPendientes] = useState<PendienteKiosco[]>([]);
   const [enviando, setEnviando] = useState(false);
@@ -141,7 +145,11 @@ export function Kiosco({
   useEffect(() => {
     setEnLinea(navigator.onLine);
     void sincronizarReloj().then(sincronizar);
-    const actualizarReloj = () => setReloj(aHoraLocal(ahoraServidor(), zonaHoraria).slice(11));
+    const actualizarReloj = () => {
+      const local = aHoraLocal(ahoraServidor(), zonaHoraria);
+      setReloj(local.slice(11));
+      setHoy(local.slice(0, 10));
+    };
     actualizarReloj();
     const tick = setInterval(actualizarReloj, 1000);
     const periodico = setInterval(() => navigator.onLine && void sincronizar(), 60_000);
@@ -197,6 +205,31 @@ export function Kiosco({
       clearTimeout(t);
     };
   }, [versionNueva, enReposo]);
+
+  // Pantalla de reposo: tras un rato sin uso en la pantalla del número. Cualquier toque o
+  // tecla reinicia la espera; tocar la pantalla de reposo vuelve al teclado sin marcar nada.
+  useEffect(() => {
+    if (!enReposo || dormido) return;
+    let t = setTimeout(() => setDormido(true), PANTALLA_REPOSO_MS);
+    const actividad = () => {
+      clearTimeout(t);
+      t = setTimeout(() => setDormido(true), PANTALLA_REPOSO_MS);
+    };
+    window.addEventListener("pointerdown", actividad);
+    window.addEventListener("keydown", actividad);
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener("pointerdown", actividad);
+      window.removeEventListener("keydown", actividad);
+    };
+  }, [enReposo, dormido]);
+  useEffect(() => {
+    if (!dormido) return;
+    setError(null);
+    const despertar = () => setDormido(false);
+    window.addEventListener("keydown", despertar);
+    return () => window.removeEventListener("keydown", despertar);
+  }, [dormido]);
 
   // Vuelve al inicio por inactividad (nadie debe ver el paso de otra persona).
   useEffect(() => {
@@ -382,8 +415,32 @@ export function Kiosco({
   const rechazados = pendientes.filter((p) => p.rechazo);
   const porEnviar = pendientes.length - rechazados.length;
 
+  // Se mueve unos píxeles cada minuto para no marcar la pantalla de la tableta (siempre encendida).
+  const minuto = Number(reloj.slice(3, 5)) || 0;
+  const deriva = { x: ((minuto * 37) % 41) - 20, y: ((minuto * 53) % 41) - 20 };
+
   return (
     <main className="kiosco">
+      {dormido && (
+        <div className="kiosco-reposo" onClick={() => setDormido(false)} aria-label="Toca la pantalla para checar" role="button" tabIndex={-1}>
+          <div className="reposo-contenido" style={{ transform: `translate(${deriva.x}px, ${deriva.y}px)` }}>
+            <p className="reposo-empresa"><Isotipo tamano={30} />{empresa}</p>
+            {centro && <p className="reposo-centro">{centro}</p>}
+            <p className="reposo-reloj">{reloj.slice(0, 5) || "--:--"}</p>
+            {hoy && <p className="reposo-fecha">{diaYFecha(hoy)}</p>}
+            <p className="reposo-toca"><span className="reposo-punto" aria-hidden />Toca la pantalla para checar</p>
+          </div>
+          {(!enLinea || porEnviar > 0 || rechazados.length > 0) && (
+            <p className="reposo-estado">
+              {!enLinea
+                ? "Sin conexión: las checadas se guardan y se envían al volver la red"
+                : porEnviar > 0
+                  ? `${porEnviar} checada(s) por enviar`
+                  : `${rechazados.length} checada(s) sin conexión rechazadas: el supervisor debe revisarlas`}
+            </p>
+          )}
+        </div>
+      )}
       <header className="kiosco-cabecera">
         <Isotipo tamano={26} />
         <span>

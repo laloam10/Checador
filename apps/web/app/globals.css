@@ -997,3 +997,26 @@ main.esqueleto-kiosco { min-height: 100vh; }
   .grafica-ventana { width: 11rem; }
   .grafica-marca:nth-child(even) > span { display: none; }
 }
+
+/* =============================================================================
+   Kiosco en reposo: reloj grande y nombre del negocio cuando nadie lo usa.
+   Se mueve unos píxeles cada minuto (la tableta está siempre encendida).
+   ============================================================================= */
+.kiosco-reposo { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; cursor: pointer; overflow: hidden;
+  background: radial-gradient(60rem 40rem at 50% 115%, rgb(200 230 0 / 0.14), transparent 70%), var(--noche);
+  animation: reposo-entra 0.6s ease-out both; -webkit-tap-highlight-color: transparent; }
+.reposo-contenido { display: grid; justify-items: center; gap: 0.2rem; text-align: center; padding: 2rem; transition: transform 2s ease-in-out; }
+.reposo-empresa { display: inline-flex; align-items: center; gap: 0.7rem; margin: 0; font-family: var(--fuente-titulos, inherit), sans-serif; font-size: clamp(1.3rem, 3.6vw, 2.1rem); font-weight: 600; letter-spacing: -0.02em; color: var(--noche-tinta); }
+.reposo-centro { margin: 0; font-family: var(--mono); font-size: clamp(0.75rem, 1.6vw, 0.95rem); letter-spacing: 0.12em; text-transform: uppercase; color: var(--noche-sub); }
+.reposo-reloj { margin: 1.2rem 0 0; font-family: var(--fuente-titulos, inherit), sans-serif; font-weight: 500; font-size: clamp(5.5rem, 21vw, 13rem); line-height: 0.95; letter-spacing: -0.05em; font-variant-numeric: tabular-nums; color: var(--noche-tinta); }
+.reposo-fecha { margin: 0.6rem 0 0; font-size: clamp(1.05rem, 2.6vw, 1.45rem); color: var(--noche-sub); }
+.reposo-fecha::first-letter { text-transform: uppercase; }
+.reposo-toca { display: inline-flex; align-items: center; gap: 0.6rem; margin: 3rem 0 0; padding: 0.75rem 1.4rem; border: 1px solid var(--noche-linea); border-radius: 999px; background: rgb(255 255 255 / 0.03); color: var(--noche-tinta); font-weight: 600; font-size: 1.05rem; }
+.reposo-punto { width: 0.6rem; height: 0.6rem; border-radius: 50%; background: var(--lima); box-shadow: 0 0 0 0 rgb(200 230 0 / 0.6); animation: reposo-latido 2.4s ease-out infinite; }
+.reposo-estado { position: absolute; bottom: 1.25rem; left: 0; right: 0; margin: 0; text-align: center; font-size: 0.85rem; color: #f5c451; }
+@keyframes reposo-entra { from { opacity: 0; } to { opacity: 1; } }
+@keyframes reposo-latido { 0% { box-shadow: 0 0 0 0 rgb(200 230 0 / 0.55); } 70%, 100% { box-shadow: 0 0 0 0.9rem rgb(200 230 0 / 0); } }
+@media (prefers-reduced-motion: reduce) {
+  .kiosco-reposo, .reposo-punto { animation: none; }
+  .reposo-contenido { transition: none; }
+}

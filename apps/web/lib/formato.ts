@@ -61,6 +61,14 @@ export function fechaLarga(f: string): string {
   return `${d} de ${MESES_LARGOS[m - 1]} de ${a}`;
 }
 
+const DIAS_LARGOS = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+
+/** "miércoles 25 de noviembre" (pantalla de reposo del kiosco). */
+export function diaYFecha(f: string): string {
+  const { m, d } = partes(f);
+  return `${DIAS_LARGOS[new Date(`${f.slice(0, 10)}T12:00:00Z`).getUTCDay()]} ${d} de ${MESES_LARGOS[m - 1]}`;
+}
+
 /** "26/10/2026" (tablas de documentos; formato usual en México). */
 export function fechaNumerica(f: string): string {
   return `${f.slice(8, 10)}/${f.slice(5, 7)}/${f.slice(0, 4)}`;
