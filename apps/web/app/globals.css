@@ -904,3 +904,48 @@ main.alta-empresa { max-width: 52rem; }
 .alta-despues { margin-top: 0.8rem; }
 @media (min-width: 56rem) { .form-alta > .boton { margin-left: calc(14rem + 2rem); } }
 .opcion-acceso:has(input:checked) { border-color: var(--marca); background: var(--marca-claro); }
+
+/* =============================================================================
+   Pantallas de aviso (404, error) y esqueletos de carga.
+   ============================================================================= */
+main.pantalla-aviso { min-height: 80vh; display: grid; place-items: center; }
+.pantalla-aviso-tarjeta { text-align: center; background: var(--superficie); border: 1px solid var(--borde); border-radius: 1.2rem; box-shadow: var(--sombra); padding: 2.2rem 1.6rem; width: 100%; }
+.pantalla-aviso-marca { display: flex; justify-content: center; margin-bottom: 0.8rem; }
+.pantalla-aviso-codigo { font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.3em; color: var(--marca); margin: 0; }
+.pantalla-aviso h1 { margin: 0.3rem 0 0.6rem; color: var(--noche); }
+.pantalla-aviso p { color: var(--gris); }
+.pantalla-aviso-acciones { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; margin-top: 1.2rem; }
+.pantalla-aviso-acciones .boton, .pantalla-aviso-acciones .boton-secundario { text-decoration: none; justify-self: auto; }
+.pantalla-aviso-referencia { font-family: var(--mono); font-size: 0.75rem; margin-top: 1.2rem; }
+.pantalla-aviso-panel { margin-top: 1.5rem; }
+.pantalla-aviso-panel p { margin: 0.25rem 0 0; }
+
+.esqueleto { display: grid; gap: 0.9rem; padding-top: 0; }
+.esqueleto > div, .esqueleto-fila > div { border-radius: var(--radio); background: linear-gradient(90deg, rgb(19 40 10 / 0.05) 25%, rgb(19 40 10 / 0.1) 50%, rgb(19 40 10 / 0.05) 75%); background-size: 200% 100%; animation: brillo 1.2s ease-in-out infinite; }
+.esqueleto .esqueleto-oscuro { background: linear-gradient(90deg, #0a2103 25%, #173a0a 50%, #0a2103 75%); background-size: 200% 100%; }
+.esqueleto-barra { height: 3.6rem; margin: 0 -1rem; border-radius: 0 0 var(--radio) var(--radio) !important; }
+.esqueleto-bloque { height: 5rem; }
+.esqueleto-alto { height: 13rem; }
+.esqueleto-corto { height: 3rem; width: 60%; }
+.esqueleto-titulo { height: 2rem; width: 14rem; margin-top: 0.8rem; }
+.esqueleto-fila { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem; background: none !important; animation: none !important; }
+.esqueleto-panel { padding-top: 0.5rem; }
+@keyframes brillo { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+@media (prefers-reduced-motion: reduce) { .esqueleto > div, .esqueleto-fila > div { animation: none; } }
+@media (min-width: 34rem) { .esqueleto-barra { margin: 0; } }
+main.esqueleto-kiosco { min-height: 100vh; }
+
+/* Bitácora: corregir o anular en una ventana. */
+.acciones-checada { font-size: 0.85rem; margin-top: 0.3rem; }
+.mensaje-renglon { margin: 0.4rem 0 0; padding: 0.35rem 0.7rem; font-size: 0.85rem; }
+.ventana-accion { width: min(34rem, 94vw); padding: 0; border: 1px solid var(--borde); border-radius: var(--radio); box-shadow: var(--sombra-alta); }
+.ventana-accion::backdrop { background: rgb(10 33 3 / 0.55); }
+.ventana-accion-cabecera { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; padding: 0.9rem 1.1rem; border-bottom: 1px solid var(--borde); background: var(--superficie-2); }
+.ventana-accion-cabecera > div { display: grid; gap: 0.1rem; }
+.ventana-accion-cabecera span { color: var(--gris); font-size: 0.86rem; font-family: var(--mono); }
+.ventana-accion-cuerpo { padding: 1rem 1.1rem 1.1rem; display: grid; gap: 1rem; }
+.ventana-accion-cuerpo h3 { margin: 0 0 0.5rem; font-size: 0.98rem; }
+.ventana-accion-cuerpo .ayuda { margin: 0 0 0.5rem; }
+.ventana-accion-peligro { border-top: 1px solid var(--borde); padding-top: 0.9rem; }
+.ventana-accion-peligro h3 { color: #9b1c1c; }
+.ventana-accion-cuerpo > .ayuda { margin: 0; font-size: 0.82rem; }

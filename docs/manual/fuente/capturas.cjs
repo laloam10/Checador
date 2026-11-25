@@ -269,7 +269,6 @@ const estado = (p, t) => p.getByRole("status").filter({ hasText: t }).first().wa
   await reg.getByLabel("Motivo", { exact: true }).fill("Llegó una hora antes; el kiosco estaba sin conexión");
   await reg.getByRole("button", { name: "Corregir hora" }).click();
   await estado(d, "Corrección registrada");
-  await d.locator(".bitacora li").filter({ hasText: "Corregida a" }).first().locator("details").evaluate((x) => (x.open = false));
   await shotEl(d.locator(".bitacora"), "23-bitacora-correccion");
   await d.goto(`${APP}/panel/objeciones`);
   await d.getByRole("heading", { name: "Objeciones por atender" }).waitFor();

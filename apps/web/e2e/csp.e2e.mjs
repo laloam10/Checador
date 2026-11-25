@@ -42,8 +42,12 @@ try {
     await page.getByLabel("Código").fill(codigo);
     await page.getByRole("button", { name: "Entrar" }).click();
     await page.waitForURL((u) => !u.pathname.startsWith("/entrar"));
+    // Que termine la redirección de llegada (/ → /panel o /kiosco) antes de navegar: si no, la
+    // navegación siguiente compite con ella y Playwright devuelve una respuesta vacía.
+    await page.waitForLoadState("networkidle");
     for (const ruta of rutas) {
-      const r = await page.goto(`${APP}${ruta}`, { waitUntil: "networkidle" });
+      let r = await page.goto(`${APP}${ruta}`, { waitUntil: "networkidle" });
+      if (!r) r = await page.goto(`${APP}${ruta}`, { waitUntil: "networkidle" });
       if (!r || r.status() >= 400) throw new Error(`${ruta} respondió ${r?.status()}`);
       // La página debe estar hidratada: un script bloqueado dejaría los botones sin funcionar.
       await page.waitForFunction(() => document.querySelectorAll("script[nonce]").length > 0);

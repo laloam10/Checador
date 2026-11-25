@@ -17,6 +17,7 @@ export function FormAccion({
   className = "form-panel",
   peligro,
   limpiar,
+  alTerminar,
 }: {
   accion: (prev: Estado, fd: FormData) => Promise<Estado>;
   boton: string;
@@ -24,12 +25,17 @@ export function FormAccion({
   className?: string;
   peligro?: boolean;
   limpiar?: boolean;
+  /** Se llama con el mensaje cuando la acción termina bien (p. ej., para cerrar una ventana). */
+  alTerminar?: (mensaje: string) => void;
 }) {
   const [estado, enviar, pendiente] = useActionState(accion, null);
   const formulario = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     if (estado?.ok && limpiar) formulario.current?.reset();
+    if (estado?.ok) alTerminar?.(estado.mensaje);
+    // alTerminar se omite a propósito: solo importa cuando cambia el resultado.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [estado, limpiar]);
 
   return (

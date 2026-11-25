@@ -5,6 +5,16 @@
 const VERSION = "v3"; // súbela cuando cambien los íconos (se guardan con el mismo nombre)
 const CACHE = `checador-${VERSION}`;
 
+// Página cuando no hay red ni una copia guardada de la pantalla (estilos en línea: no hay CSS sin red).
+const SIN_CONEXION = `<!doctype html><html lang="es-MX"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Checador · Sin conexión</title></head>
+<body style="margin:0;min-height:100vh;display:grid;place-items:center;background:#f5f8ec;color:#13280a;font-family:system-ui,'Segoe UI',Helvetica,Arial,sans-serif">
+<div style="max-width:24rem;margin:1rem;padding:2rem 1.5rem;background:#fbfcf7;border:1px solid #dfe6cf;border-radius:1rem;text-align:center">
+<div style="width:44px;height:44px;margin:0 auto 1rem;border-radius:12px;background:#0a2103;display:grid;place-items:center"><span style="width:14px;height:14px;border-radius:4px;background:#c8e600"></span></div>
+<h1 style="font-size:1.35rem;margin:0 0 .5rem">Sin conexión</h1>
+<p style="color:#4b5a40;margin:0 0 1.2rem">Abre Checador cuando tengas internet al menos una vez. Después, si te quedas sin señal, tus checadas se guardan en el teléfono y se envían solas al volver la conexión.</p>
+<button onclick="location.reload()" style="background:#2f6e10;color:#fff;border:none;border-radius:10px;padding:.7rem 1.2rem;font-weight:600;font-size:1rem">Intentar de nuevo</button>
+</div></body></html>`;
+
 self.addEventListener("install", () => self.skipWaiting());
 
 self.addEventListener("activate", (event) => {
@@ -85,9 +95,7 @@ self.addEventListener("fetch", (event) => {
           caches.match(req).then((hit) => hit || caches.match("/")).then(
             (hit) =>
               hit ||
-              new Response("<h1>Sin conexión</h1><p>Abre Checador cuando tengas internet al menos una vez.</p>", {
-                headers: { "Content-Type": "text/html; charset=utf-8" },
-              }),
+              new Response(SIN_CONEXION, { headers: { "Content-Type": "text/html; charset=utf-8" } }),
           ),
         ),
     );

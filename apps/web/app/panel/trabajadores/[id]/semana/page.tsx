@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { aHoraLocal, senalesHorario, type SenalHorario } from "@checador/jornada";
+import { AccionesChecada } from "@/components/panel/AccionesChecada";
 import { FormAccion } from "@/components/panel/FormAccion";
 import { hm, TablaSemana } from "@/components/TablaSemana";
 import { lunesDe, semanaDeTrabajador, sumarDias, trabajadorPorId, type FilaEvento } from "@/lib/datos";
@@ -9,7 +10,7 @@ import { horariosDeEmpresa } from "@/lib/horariosDatos";
 import { requierePanel } from "@/lib/panel";
 import { UbicacionChecada } from "@/components/UbicacionChecada";
 import { llaveMapa, ubicacionesDe } from "@/lib/ubicacionesDatos";
-import { agregarChecada, anularChecada, corregirChecada } from "../../../acciones";
+import { agregarChecada } from "../../../acciones";
 import { fechaHora } from "@/lib/formato";
 
 const ETIQUETA: Record<string, string> = {
@@ -216,21 +217,13 @@ export default async function SemanaPanel({
                     ))}
                     {c.anulada && <span className="ajuste">Anulada el {local(c.anulada.hora_servidor)}: {c.anulada.motivo}</span>}
                     {!c.anulada && (
-                      <details>
-                        <summary>Corregir o anular</summary>
-                        <FormAccion accion={corregirChecada} boton="Corregir hora" className="form-panel form-linea">
-                          <input type="hidden" name="trabajador_id" value={trabajador.id} />
-                          <input type="hidden" name="evento_id" value={c.id} />
-                          <label>Hora correcta<input type="datetime-local" name="hora" required
-                            defaultValue={aHoraLocal(c.vigente, zona)} max={ahoraLocal} /></label>
-                          <label>Motivo<input name="motivo" required placeholder="Ej.: el trabajador olvidó checar a tiempo" /></label>
-                        </FormAccion>
-                        <FormAccion accion={anularChecada} boton="Anular checada" peligro className="form-panel form-linea">
-                          <input type="hidden" name="trabajador_id" value={trabajador.id} />
-                          <input type="hidden" name="evento_id" value={c.id} />
-                          <label>Motivo de la anulación<input name="motivo" required placeholder="Ej.: checada duplicada" /></label>
-                        </FormAccion>
-                      </details>
+                      <AccionesChecada
+                        trabajadorId={trabajador.id}
+                        eventoId={c.id}
+                        descripcion={`${ETIQUETA[c.tipo]} · ${local(c.vigente)}`}
+                        hora={aHoraLocal(c.vigente, zona)}
+                        maximo={ahoraLocal}
+                      />
                     )}
                   </li>
                 ))}
