@@ -1,4 +1,32 @@
-<h2>Tu código para entrar a Checador</h2>
-<p style="font-size:28px;font-weight:bold;letter-spacing:4px">{{ .Token }}</p>
-<p>Escríbelo en la app. Vence en 15 minutos.</p>
-<p>Si no lo pediste, ignora este correo: nadie podrá entrar sin el código.</p>
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width">
+<meta name="color-scheme" content="light">
+<title>Tu código para Checador</title>
+</head>
+<body style="margin:0;padding:0;background:#f5f8ec;font-family:Inter,'Segoe UI',Helvetica,Arial,sans-serif;color:#13280a">
+<!-- Plantilla del correo con el código de un solo uso (Supabase Auth). En Supabase local la toma
+     supabase/config.toml; en los proyectos de Supabase se pega en Authentication → Email Templates
+     (docs/publicacion.md §1.4). Mismo diseño que el recordatorio semanal (_correo_marco). -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f5f8ec;padding:24px 12px"><tr><td align="center">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border:1px solid #dfe6cf;border-radius:14px;overflow:hidden">
+    <tr><td style="background:#0a2103;padding:18px 24px">
+      <span style="display:inline-block;width:12px;height:12px;background:#c8e600;border-radius:3px;margin-right:8px;vertical-align:middle"></span>
+      <span style="color:#ffffff;font-size:18px;font-weight:700;letter-spacing:-0.3px;vertical-align:middle">checador</span>
+    </td></tr>
+    <tr><td style="padding:28px 24px 8px;font-size:15px;line-height:1.55;color:#13280a">
+      <p style="margin:0 0 6px;font-size:17px;font-weight:700">Tu código para entrar a Checador</p>
+      <p style="margin:0 0 18px;color:#4b5a40">Escríbelo en la app para entrar. Vence en 15 minutos y sirve una sola vez.</p>
+      <div style="font-family:'JetBrains Mono',Consolas,'Courier New',monospace;font-size:34px;font-weight:700;letter-spacing:10px;text-align:center;color:#0a2103;background:#f5f8ec;border:1px dashed #b9c99a;border-radius:12px;padding:16px 8px">{{ .Token }}</div>
+      <p style="margin:18px 0 0;color:#4b5a40">Si no lo pediste, ignora este correo: nadie puede entrar sin el código.</p>
+    </td></tr>
+    <tr><td style="padding:16px 24px 24px;color:#6b7563;font-size:12px;line-height:1.5;border-top:1px solid #eef2e3">
+      Checador registra la jornada laboral conforme al artículo 132, fracción XXXIV, de la Ley Federal del Trabajo. Nunca te pediremos tu código por teléfono ni por mensaje.
+    </td></tr>
+  </table>
+  <p style="margin:16px 0 0;color:#8a9480;font-size:11px">Checador · registro de jornada · por Jemba</p>
+</td></tr></table>
+</body>
+</html>

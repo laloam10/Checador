@@ -14,6 +14,7 @@ import { acuerdosDe, firmaDe, MODALIDAD } from "./acuerdosDatos";
 import { cargarFilasEventos, filaAEvento, trabajadorPorId, type FilaEvento, type Trabajador } from "./datos";
 import { sumarDias } from "./fechas";
 import type { crearClienteServidor } from "./supabase/server";
+import { fechaHoraNumerica } from "./formato";
 
 type Cliente = Awaited<ReturnType<typeof crearClienteServidor>>;
 
@@ -90,7 +91,7 @@ export async function datosTrabajador(
         folio: folio(a.contenido_hash),
         vigenteDesde,
         firmas: a.firmas.map(
-          (f) => `${f.firmante === "empleador" ? "Empresa" : "Trabajador(a)"}: ${MODALIDAD[f.modalidad]}, ${aHoraLocal(f.firmado_en, zona).replace("T", " ")}`,
+          (f) => `${f.firmante === "empleador" ? "Empresa" : "Persona trabajadora"}: ${MODALIDAD[f.modalidad]}, ${fechaHoraNumerica(f.firmado_en, zona)}`,
         ),
       };
     })

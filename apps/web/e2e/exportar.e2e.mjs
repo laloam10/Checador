@@ -63,8 +63,8 @@ try {
   afirmar(pdf.nombre === "checador_pdf_001_2026-10-26_2026-11-01.pdf", `Nombre inesperado: ${pdf.nombre}`);
   const texto = execFileSync("pdftotext", ["-layout", pdf.ruta, "-"], { encoding: "utf8" });
   for (const esperado of [
-    "REGISTRO ELECTRÓNICO DE LA JORNADA DE TRABAJO", "Ana Pérez", "2026-10-26 al 2026-11-01",
-    "ningún registro de la empresa ha sido alterado", "Acuerdo de registro electrónico", "Bitácora completa del periodo",
+    "REGISTRO ELECTRÓNICO DE LA JORNADA DE TRABAJO", "Ana Pérez", "26 de octubre de 2026", "1 de noviembre de 2026",
+    "Ningún registro de la empresa ha sido alterado", "Acuerdo de registro electrónico", "Bitácora completa del periodo",
     "Carga de prueba",
   ]) afirmar(texto.includes(esperado), `El PDF no contiene: ${esperado}`);
   afirmar(/Total del periodo: trabajado 50:00 · ordinaria 48:00 · extra al doble 2:00/.test(texto), "Totales del PDF incorrectos");

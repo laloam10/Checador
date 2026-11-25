@@ -52,3 +52,22 @@ export function iniciales(nombre: string): string {
   const p = nombre.trim().split(/\s+/).filter(Boolean);
   return ((p[0]?.[0] ?? "") + (p[1]?.[0] ?? "")).toUpperCase();
 }
+
+const MESES_LARGOS = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+
+/** "26 de octubre de 2026" (documentos formales). */
+export function fechaLarga(f: string): string {
+  const { a, m, d } = partes(f);
+  return `${d} de ${MESES_LARGOS[m - 1]} de ${a}`;
+}
+
+/** "26/10/2026" (tablas de documentos; formato usual en México). */
+export function fechaNumerica(f: string): string {
+  return `${f.slice(8, 10)}/${f.slice(5, 7)}/${f.slice(0, 4)}`;
+}
+
+/** "26/10/2026 08:00" en la hora local del centro. */
+export function fechaHoraNumerica(instante: string | Date, zona: string): string {
+  const local = aHoraLocal(instante, zona);
+  return `${fechaNumerica(local)} ${local.slice(11, 16)}`;
+}

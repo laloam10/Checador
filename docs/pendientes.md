@@ -10,7 +10,7 @@ Jemba, WhatsApp, avisos, horarios, Salir con PIN o huella, ubicación al checar 
       2026-11-16, probablemente pausado por inactividad. Mientras tanto nadie puede entrar ni checar en
       `checador.jemba.mx` y la verificación de cada lunes falla. En el plan gratuito, a los 90 días ya no se reactiva
       desde el panel.
-- [ ] **Paso a producción** (lo hace Claude una vez reactivada): migraciones 18 a 28 (incluye horarios, Salir con PIN o huella y ubicación al checar), código de `pruebas` a `main`,
+- [ ] **Paso a producción** (lo hace Claude una vez reactivada): migraciones 18 a 29 (incluye horarios, Salir con PIN o huella, ubicación al checar y diseño de correos), código de `pruebas` a `main`,
       manual 1.3 con sus cuatro hojas y verificación de producción (`verificar-produccion.yml`). El usuario pone en
       producción los secretos y variables de WhatsApp (§1.9) y avisos (§1.10); producción no necesita el bypass de
       Vercel.
@@ -20,7 +20,7 @@ Jemba, WhatsApp, avisos, horarios, Salir con PIN o huella, ubicación al checar 
 - [ ] **Actualizar el manual y las hojas** cuando el usuario dé por terminado el pulido de la app (decisión del
       2026-11-25: no antes). Falta: ubicación al checar (Centros, aviso en Checar y kiosco, bitácora del panel, Mis
       registros, ver en mapa), nuevo acomodo de la ficha del trabajador (Datos, Kiosco y WhatsApp, Baja; capturas 05, 06,
-      31 y 32), cabecera de la ficha con indicadores y acuerdo plegado, app del trabajador (barra inferior, tarjeta del reloj, pendientes), fechas legibles en toda la app, Configuración por tarjetas, texto del acuerdo como documento, Trabajadores en el celular, y lo que se pula después. Regenerar con `docs/manual/fuente/capturas.cjs` y `generar.cjs`.
+      31 y 32), cabecera de la ficha con indicadores y acuerdo plegado, app del trabajador (barra inferior, tarjeta del reloj, pendientes), fechas legibles en toda la app, Configuración por tarjetas, texto del acuerdo como documento, Trabajadores en el celular, Objeciones, Exportar, constancia PDF, correos, entrada y alta de la empresa, y lo que se pula después. Regenerar con `docs/manual/fuente/capturas.cjs` y `generar.cjs`.
 
 ## Del usuario (en pruebas)
 
@@ -36,6 +36,9 @@ Jemba, WhatsApp, avisos, horarios, Salir con PIN o huella, ubicación al checar 
 - [ ] **Huella o rostro en iPhone** (pantalla de inicio, Llavero de iCloud). En pruebas ya están el secreto `acceso` y
       `ACCESO_SECRETO_SERVICIO`, y en Android funciona (probado el 2026-11-25). En producción falta repetir
       `docs/publicacion.md` §1.12 con un secreto distinto.
+- [ ] **Plantilla nueva del correo con el código** en el Supabase de pruebas (y después en producción): pegar
+      `supabase/templates/codigo.html` en Authentication → Emails → Templates (Magic Link y Confirm signup), o
+      autorizar a Claude a correr `scripts/configurar-auth.py <ref>` (sin `--site-url`). `docs/publicacion.md` §1.4.
 - [ ] **Llave de Google para el mapa en ventana** (opcional, `docs/publicacion.md` §1.13): proyecto de Google Cloud con
       facturación, Maps Embed API y `GOOGLE_MAPS_EMBED_KEY` en Vercel. Sin ella, el mapa abre en otra pestaña.
 - [ ] **Ubicación al checar en teléfonos reales** (Android y iPhone con Checador en la pantalla de inicio): permiso,

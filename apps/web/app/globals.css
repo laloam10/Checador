@@ -858,3 +858,49 @@ h2[id] { scroll-margin-top: 1rem; }
 .descarga-huella { font-size: 0.8rem; color: var(--gris); }
 .descarga-huella code { font-family: var(--mono); color: var(--tinta); }
 .boton-copiar { padding: 0.45rem 0.8rem; font-size: 0.85rem; }
+
+/* =============================================================================
+   Entrada: panel de marca a la izquierda (escritorio) y formulario a la derecha.
+   ============================================================================= */
+main.entrar { max-width: none; padding: 0; min-height: 100vh; display: grid; grid-template-columns: minmax(0, 1fr); }
+.entrar-marca { display: none; }
+.entrar-formulario { width: 100%; max-width: 26rem; margin: 0 auto; padding: 2.5rem 1.25rem 2rem; }
+.entrar-marca-chica { margin-bottom: 1.6rem; }
+.entrar .entrar-titulo { font-size: 1.6rem; margin: 0 0 0.25rem; color: var(--noche); }
+.entrar .tarjeta { margin-top: 1.2rem; }
+.campo-codigo { font-family: var(--mono); font-size: 1.8rem; letter-spacing: 0.5em; text-align: center; padding: 0.7rem 0.5rem; }
+.campo-codigo::placeholder { color: var(--borde); }
+.entrar-acciones { display: flex; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap; }
+.entrar-acciones .enlace:disabled { color: var(--gris); text-decoration: none; cursor: default; opacity: 1; }
+.entrar .tarjeta .ayuda { margin: 0; font-size: 0.82rem; }
+.entrar-empresa { margin-top: 1.6rem; padding: 0.85rem 1rem; border-radius: var(--radio); background: var(--superficie); border: 1px dashed var(--borde); font-size: 0.9rem; }
+.entrar-empresa a { font-weight: 700; }
+@media (min-width: 56rem) {
+  main.entrar { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); }
+  .entrar-marca { display: flex; flex-direction: column; justify-content: space-between; padding: 3rem 3.5rem; color: var(--noche-tinta); background: radial-gradient(120% 80% at 0% 100%, rgb(200 230 0 / 0.16), transparent 55%), radial-gradient(110% 90% at 100% 0%, #1d4a0b 0%, var(--noche) 60%); }
+  .entrar-marca .marca-nombre { color: white; font-size: 1.7rem; }
+  .entrar-marca .marca-sub { color: var(--noche-sub); }
+  .entrar-lema h2 { font-size: 2.3rem; line-height: 1.12; color: white; margin: 0 0 1.4rem; max-width: 26rem; }
+  .entrar-lema ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.9rem; max-width: 28rem; }
+  .entrar-lema li { display: flex; gap: 0.75rem; align-items: flex-start; color: var(--noche-tinta); font-size: 1rem; line-height: 1.45; }
+  .entrar-lema li::before { content: ""; flex: none; width: 0.65rem; height: 0.65rem; margin-top: 0.4rem; border-radius: 3px; background: var(--lima); }
+  .entrar-pie { color: var(--noche-sub); font-size: 0.82rem; margin: 0; }
+  .entrar-formulario { align-self: center; padding: 3rem 2rem; }
+  .entrar-marca-chica { display: none; }
+}
+
+/* Alta de la empresa: bienvenida con pasos. */
+main.alta-empresa { max-width: 52rem; }
+.alta-cabecera { padding: 2rem 0 0.5rem; }
+.alta-cabecera h1 { font-size: 1.9rem; margin: 1.4rem 0 0.3rem; color: var(--noche); }
+.alta-cabecera p { color: var(--gris); margin: 0; }
+.pasos-alta { list-style: none; padding: 0; margin: 1.2rem 0 0.4rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.pasos-alta li { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0.9rem 0.35rem 0.4rem; border-radius: 999px; background: var(--superficie); border: 1px solid var(--borde); color: var(--gris); font-weight: 600; font-size: 0.88rem; }
+.pasos-alta li span { width: 1.6rem; height: 1.6rem; border-radius: 50%; display: grid; place-items: center; background: var(--fondo); font-size: 0.8rem; }
+.pasos-alta li.actual { border-color: var(--marca); color: var(--marca-oscuro); background: var(--marca-claro); }
+.pasos-alta li.actual span { background: var(--marca); color: white; }
+.form-alta { margin-top: 1.2rem; }
+.form-alta > .boton { margin: 0.4rem 0 0.6rem; }
+.alta-despues { margin-top: 0.8rem; }
+@media (min-width: 56rem) { .form-alta > .boton { margin-left: calc(14rem + 2rem); } }
+.opcion-acceso:has(input:checked) { border-color: var(--marca); background: var(--marca-claro); }

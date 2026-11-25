@@ -29,6 +29,7 @@ Bitácora de lo aplicado en los proyectos en la nube. No contiene secretos.
 | Migración 26: Salir con bloqueo y PIN (`20261127000001`) | ✅ aplicada por API (2026-11-23) | ⏳ pendiente (junto con la 18–25) |
 | Migración 27: huella o rostro, passkeys (`20261128000001`) | ✅ aplicada por API (2026-11-23) | ⏳ pendiente (junto con la 18–26) |
 | Migración 28: ubicación al checar (`20261129000001`) | ✅ aplicada por API (2026-11-25) | ⏳ pendiente (junto con la 18–27) |
+| Migración 29: diseño de los correos (`20261130000001`) | ✅ aplicada por API (2026-11-25) | ⏳ pendiente (junto con la 18–28) |
 | Avisos: secreto `avisos`, `checador_avisos_secreto` en Vault y `VAPID_*` en Vercel (guía, 1.10) | ✅ (2026-11-20), con `checador_vercel_bypass`; aviso real entregado en Android | ⏳ pendiente |
 | Secreto de servicio de WhatsApp (`configurar_secreto_servicio`) y variables `WHATSAPP_*` en Vercel | ⏳ pendiente | ⏳ pendiente |
 | `verificar-seguridad.sql` | ✅ 0 hallazgos | ✅ 0 hallazgos |
