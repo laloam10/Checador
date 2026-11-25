@@ -794,3 +794,52 @@ a.pendiente:hover, .pendiente a:hover { background: rgb(47 110 16 / 0.04); }
   .perfil-datos li + li::before { content: none; }
   .perfil-principal { align-items: start; }
 }
+
+/* =============================================================================
+   Configuración: tarjetas por tema con índice arriba.
+   ============================================================================= */
+.encabezado-pagina { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.6rem 1rem; }
+.encabezado-pagina h1 { margin-bottom: 0.4rem; }
+.indice-secciones { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.indice-secciones a { text-decoration: none; font-size: 0.85rem; font-weight: 600; color: var(--marca); background: var(--superficie); border: 1px solid var(--borde); border-radius: 999px; padding: 0.3rem 0.8rem; }
+.indice-secciones a:hover { border-color: var(--marca); background: var(--marca-claro); }
+h2[id] { scroll-margin-top: 1rem; }
+.panel-grupos .form-horario { border: none; box-shadow: none; padding: 0; margin: 0.6rem 0 0; background: none; }
+.panel-grupos .horarios { margin: 0; }
+.horarios li > details { padding: 0; overflow: hidden; }
+.horarios summary { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.15rem 1rem; padding: 0.75rem 0.9rem; cursor: pointer; list-style: none; }
+.horarios summary::-webkit-details-marker { display: none; }
+.horarios summary::after { content: "Editar ▾"; grid-row: 1; grid-column: 2; font-size: 0.8rem; color: var(--marca); font-weight: 600; }
+.horarios details[open] > summary::after { content: "Cerrar ▴"; }
+.horarios details[open] > summary { border-bottom: 1px solid var(--borde); background: var(--superficie-2); }
+.horario-nombre { display: flex; gap: 0.5rem; align-items: center; }
+.horario-resumen { grid-column: 1 / -1; color: var(--tinta); font-size: 0.88rem; }
+.horario-meta { grid-column: 1 / -1; color: var(--gris); font-size: 0.8rem; }
+.horario-edicion { padding: 0.8rem 0.9rem; display: grid; gap: 0.8rem; }
+.nuevo-horario { border-top: 1px dashed var(--borde); padding-top: 0.9rem; }
+.nuevo-horario-cabecera { display: flex; justify-content: space-between; align-items: center; }
+.nuevo-horario-cabecera h3 { margin: 0; font-size: 1rem; }
+.boton-agregar { justify-self: start; }
+@media (max-width: 34rem) { .encabezado-pagina { display: block; } }
+
+/* Texto del acuerdo como documento (la presentación cambia; el texto firmado no). */
+.texto-acuerdo { white-space: normal; font-family: var(--fuente-texto, system-ui), sans-serif; font-size: 0.93rem; line-height: 1.65; color: var(--tinta); }
+.texto-acuerdo p { margin: 0 0 0.75rem; }
+.texto-acuerdo .acuerdo-titulo { font-size: 1.02rem; margin: 0 0 0.2rem; letter-spacing: 0.01em; line-height: 1.35; }
+.texto-acuerdo .acuerdo-meta { font-family: var(--mono); font-size: 0.76rem; color: var(--gris); padding-bottom: 0.75rem; border-bottom: 1px solid var(--borde); }
+.texto-acuerdo .acuerdo-apartado { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.12em; color: var(--marca); margin: 1.1rem 0 0.6rem; }
+.texto-acuerdo .acuerdo-clausula strong { color: var(--marca-oscuro); }
+.texto-acuerdo .acuerdo-inciso { margin: -0.4rem 0 0.75rem 1.2rem; padding-left: 0.7rem; border-left: 2px solid var(--marca-claro); }
+
+/* Panel en el celular: el nombre de la empresa con espacio (solo el isotipo) y filtros ordenados. */
+@media (max-width: 40rem) {
+  .panel-cabecera .marca-texto { display: none; }
+  .panel-empresa strong { max-width: none; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.2; }
+  .panel-cuenta { flex: 1; justify-content: flex-end; }
+  .filtros { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem 0.75rem; align-items: center; }
+  .filtros .filtro-busqueda, .filtros .filtro-ancho { grid-column: 1 / -1; }
+  .filtros .casilla-linea { padding-top: 0; }
+  .filtros .boton { justify-self: end; }
+  .filtros > a { padding-top: 0; grid-column: 1 / -1; justify-self: end; }
+}
+.texto-acuerdo.texto-completo { max-height: none; }

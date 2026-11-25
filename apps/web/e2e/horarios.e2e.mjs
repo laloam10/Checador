@@ -73,7 +73,9 @@ try {
   await nuevo.getByRole("button", { name: "Crear horario" }).click();
   await estado(d, "Horario «Matutino» creado.");
   await d.reload();
-  await d.getByText("Lun–Vie 08:00–17:00 (comida 13:00–14:00) · tolerancia 10 min · 0 personas").waitFor();
+  const resumen = d.locator(".horarios li", { hasText: "Matutino" });
+  await resumen.getByText("Lun–Vie 08:00–17:00 (comida 13:00–14:00)", { exact: true }).waitFor();
+  await resumen.getByText("Tolerancia 10 min · 0 personas", { exact: true }).waitFor();
   paso("el horario se crea y se resume por días");
   const matutino = sql(`select id from public.horarios where empresa_id = '${empresa}' and nombre = 'Matutino'`);
   await d.getByLabel("Horario de la empresa (para quien no tiene uno propio)").selectOption({ label: "Matutino" });

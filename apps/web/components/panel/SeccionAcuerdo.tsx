@@ -5,6 +5,7 @@ import { fechaHora } from "@/lib/formato";
 import type { ContextoPanel } from "@/lib/panel";
 import { generarYFirmarAcuerdo, registrarFirmaAutografa } from "@/app/panel/acciones";
 import { FormAccion } from "./FormAccion";
+import { TextoAcuerdo } from "@/components/TextoAcuerdo";
 
 function Firmas({ a, zona }: { a: Acuerdo; zona: string }) {
   return (
@@ -111,7 +112,7 @@ export async function SeccionAcuerdo({ ctx, trabajadorId, gestor, e }: {
                     Plantilla de referencia: revísala con tu abogado laboral antes de usarla. El texto se genera con los datos
                     actuales de la persona y del centro.
                   </p>
-                  <pre className="texto-acuerdo">{e.textoPropuesto}</pre>
+                  <TextoAcuerdo texto={e.textoPropuesto!} />
                   <FormAccion accion={generarYFirmarAcuerdo} boton={`Firmar versión ${e.siguienteVersion} como empresa`} className="form-plano">
                     <input type="hidden" name="trabajador_id" value={trabajadorId} />
                     <label className="casilla-linea">

@@ -5,6 +5,7 @@ import { estadoAcuerdo, estadosAcuerdosEmpresa, type ClaveEstado } from "@/lib/a
 import { horariosDeEmpresa } from "@/lib/horariosDatos";
 import { esGestor, requierePanel } from "@/lib/panel";
 import { generarAcuerdosPendientes, guardarTrabajador, importarTrabajadores } from "../acciones";
+import { TextoAcuerdo } from "@/components/TextoAcuerdo";
 
 const ACUERDO: Record<ClaveEstado, { texto: string; clase: string }> = {
   vigente: { texto: "Vigente", clase: "insignia-ok" },
@@ -81,7 +82,7 @@ export default async function Trabajadores({
               </select>
             </label>
           )}
-          <label>
+          <label className={(centros ?? []).length > 1 ? "" : "filtro-ancho"}>
             Mostrar
             <select name="filtro" defaultValue={filtro}>
               {(Object.keys(FILTROS) as Filtro[]).map((f) => <option key={f} value={f}>{FILTROS[f]}</option>)}
@@ -145,7 +146,7 @@ export default async function Trabajadores({
                     Plantilla de referencia: revísala con tu abogado laboral. Cada acuerdo se genera con los datos de su
                     persona (método de registro, jornada, descanso y pausa).
                   </p>
-                  <pre className="texto-acuerdo">{muestra.textoPropuesto}</pre>
+                  <TextoAcuerdo texto={muestra.textoPropuesto} />
                 </details>
               )}
               <FormAccion accion={generarAcuerdosPendientes} boton={`Generar y firmar ${porFirmar.length} acuerdo(s) como empresa`}>

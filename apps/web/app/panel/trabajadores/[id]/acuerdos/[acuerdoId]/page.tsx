@@ -5,6 +5,7 @@ import { folio } from "@/lib/acuerdo";
 import { acuerdosDe, firmaDe, MODALIDAD } from "@/lib/acuerdosDatos";
 import { requierePanel } from "@/lib/panel";
 import { fechaHora } from "@/lib/formato";
+import { TextoAcuerdo } from "@/components/TextoAcuerdo";
 
 export default async function VerAcuerdo({ params }: { params: Promise<{ id: string; acuerdoId: string }> }) {
   const { id, acuerdoId } = await params;
@@ -26,7 +27,7 @@ export default async function VerAcuerdo({ params }: { params: Promise<{ id: str
         <Link href={`/panel/trabajadores/${id}`}>← Volver</Link> <BotonImprimir />
       </p>
       <p className="folio">Folio {folio(a.contenido_hash)}</p>
-      <pre className="texto-acuerdo">{a.contenido}</pre>
+      <TextoAcuerdo texto={a.contenido} />
 
       <section className="firmas-documento">
         {(["empleador", "trabajador"] as const).map((quien) => {

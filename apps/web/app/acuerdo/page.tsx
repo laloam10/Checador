@@ -7,6 +7,7 @@ import { acuerdosDe, firmaDe, MODALIDAD } from "@/lib/acuerdosDatos";
 import { misTrabajadores } from "@/lib/datos";
 import { crearClienteServidor, usuarioActual } from "@/lib/supabase/server";
 import { fechaHora } from "@/lib/formato";
+import { TextoAcuerdo } from "@/components/TextoAcuerdo";
 
 export default async function MiAcuerdo() {
   const supabase = await crearClienteServidor();
@@ -40,7 +41,7 @@ export default async function MiAcuerdo() {
           </p>
         </div>
       )}
-      {mostrar && <pre className="texto-acuerdo">{mostrar.contenido}</pre>}
+      {mostrar && <TextoAcuerdo texto={mostrar.contenido} className="texto-completo" />}
       {pendiente && <FormFirmaAcuerdo acuerdoId={pendiente.id} folio={folio(pendiente.contenido_hash)} />}
     </main>
   );

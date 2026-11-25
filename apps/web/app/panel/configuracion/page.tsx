@@ -5,6 +5,7 @@ import { resumenHorario } from "@/lib/horarios";
 import { horariosDeEmpresa } from "@/lib/horariosDatos";
 import { FormAccion } from "@/components/panel/FormAccion";
 import { InterruptorRecordatorios } from "@/components/panel/InterruptorRecordatorios";
+import { NuevoHorario } from "@/components/panel/NuevoHorario";
 import { esGestor, requierePanel, ZONAS_MX } from "@/lib/panel";
 
 export default async function Configuracion() {
@@ -27,130 +28,159 @@ export default async function Configuracion() {
 
   return (
     <>
-      <h1>Configuración</h1>
+      <div className="encabezado-pagina">
+        <h1>Configuración</h1>
+        <nav className="indice-secciones" aria-label="Secciones de Configuración">
+          <a href="#empresa">Empresa</a>
+          <a href="#horarios">Horarios</a>
+          <a href="#recordatorios">Recordatorios</a>
+        </nav>
+      </div>
       {!gestor && (
         <p className="mensaje mensaje-aviso">Solo el propietario o un administrador pueden cambiar la configuración.</p>
       )}
 
-      <section className="ajuste-seccion">
-        <h2>Recordatorios de conformidad</h2>
-        {gestor ? (
-          <InterruptorRecordatorios inicial={recordatorios} />
-        ) : (
-          <p>
-            Los recordatorios están <strong>{recordatorios ? "activados" : "desactivados"}</strong>.
-          </p>
-        )}
-        <p className="ayuda">
-          Cada lunes a las 10:00 (hora del centro de México), Checador envía un correo a quien tenga semanas terminadas sin
-          revisar, o semanas que objetó y que ya corregiste, con un enlace a cada una. Revisa las últimas 8 semanas y envía
-          como máximo un correo por persona a la semana. Solo lo recibe quien tiene correo registrado; quien checa únicamente
-          en el kiosco ve sus semanas pendientes ahí, al identificarse con su PIN. Responder sigue siendo voluntario y el
-          correo lo dice así. El resultado de cada envío está en{" "}
-          <Link href="/panel/objeciones#recordatorios">Objeciones</Link>. Este interruptor también controla el aviso en el
-          teléfono de «semana por revisar», para quien activó los avisos en su app.
-        </p>
-      </section>
-
-      <section className="ajuste-seccion" id="horarios">
-        <h2>Horarios</h2>
-        <p className="ayuda">
-          Define el horario normal de trabajo para ver quién llega tarde, sale antes o trabaja fuera de horario. Es
-          informativo: no impide checar ni descuenta nada, y el tiempo extra se sigue calculando por horas trabajadas, no por
-          la hora del reloj. Si una persona tiene horario, su <strong>jornada pactada por día</strong> sale de él (sin la
-          comida, si en su centro de trabajo se puede salir a comer).
-        </p>
-        {horarios.length > 0 && (
-          <ul className="horarios">
-            {horarios.map((h) => (
-              <li key={h.id}>
-                <details>
-                  <summary>
-                    <strong>{h.nombre}</strong>
-                    {h.id === predeterminado && <span className="insignia-estado insignia-ok">De la empresa</span>}{" "}
-                    <span className="ayuda">
-                      {resumenHorario(h.dias)} · tolerancia {h.tolerancia_min} min · {usan(h.id) === 1 ? "1 persona" : `${usan(h.id)} personas`}
-                    </span>
-                  </summary>
-                  {gestor && (
-                    <>
-                      <FormHorario h={h} />
-                      {usan(h.id) > 0 && (
-                        <p className="mensaje mensaje-aviso">
-                          Al cambiar las horas de este horario se recalcula la jornada pactada de {usan(h.id) === 1 ? "1 persona" : `${usan(h.id)} personas`};
-                          si cambia, sus acuerdos de registro quedan <strong>desactualizados</strong> y habrá que firmar una versión nueva.
-                        </p>
-                      )}
-                      <FormAccion accion={eliminarHorario} boton="Borrar horario" peligro className="form-panel form-linea">
-                        <input type="hidden" name="id" value={h.id} />
-                        <label>Escribe BORRAR para confirmar<input name="confirmar" autoComplete="off" /></label>
-                      </FormAccion>
-                    </>
-                  )}
-                </details>
-              </li>
-            ))}
-          </ul>
-        )}
-        {gestor && horarios.length > 0 && (
-          <FormAccion accion={cambiarHorarioPredeterminado} boton="Guardar" className="form-panel form-linea">
-            <label>
-              Horario de la empresa (para quien no tiene uno propio)
-              <select name="horario_predeterminado" defaultValue={predeterminado ?? ""}>
-                <option value="">Ninguno</option>
-                {horarios.map((h) => <option key={h.id} value={h.id}>{h.nombre}</option>)}
-              </select>
-            </label>
-          </FormAccion>
-        )}
-        {/* Siempre visible (no dentro de un <details>): así el aviso de "creado" no se oculta al recargar la sección. */}
-        {gestor && (
-          <div className="nuevo-horario">
-            <h3>Nuevo horario</h3>
-            <FormHorario />
+      <h2 id="empresa">Empresa</h2>
+      <div className="form-panel panel-grupos">
+        <section className="grupo-campos">
+          <div className="grupo-titulo">
+            <h3>Datos de la empresa</h3>
+            <p>
+              Aparecen en el acuerdo de registro de cada persona. La zona horaria se usa en el tablero; cada centro tiene la
+              suya en <Link href="/panel/centros">Centros</Link>, y esa es la que cuenta para las checadas.
+            </p>
           </div>
-        )}
-        {!gestor && horarios.length === 0 && <p className="vacio">Tu empresa aún no tiene horarios.</p>}
-      </section>
+          <div className="grupo-cuerpo">
+            {gestor ? (
+              <FormAccion accion={guardarEmpresa} boton="Guardar datos" className="form-plano">
+                <div className="campos campos-2">
+                  <label className="campo-2">
+                    Razón social o nombre del negocio
+                    <input name="razon_social" required defaultValue={empresa?.razon_social ?? ""} />
+                  </label>
+                  <label>
+                    <span className="etiqueta-campo">RFC<span className="opcional"> (opcional)</span></span>
+                    <input name="rfc" maxLength={13} autoCapitalize="characters" defaultValue={empresa?.rfc ?? ""} />
+                  </label>
+                  <label>
+                    Zona horaria de la empresa
+                    <select name="zona_horaria" defaultValue={empresa?.zona_horaria ?? "America/Mexico_City"}>
+                      {ZONAS_MX.map((z) => <option key={z.zona} value={z.zona}>{z.etiqueta}</option>)}
+                    </select>
+                  </label>
+                </div>
+                <p className="mensaje mensaje-aviso">
+                  <strong>Antes de cambiar la razón social o el RFC:</strong> al cambiarlos, los acuerdos de todo tu personal
+                  quedan <strong>desactualizados</strong> y habrá que firmar una versión nueva (la anterior sigue vigente
+                  mientras tanto). Hazlo solo si el dato estaba mal o cambió de verdad.
+                </p>
+              </FormAccion>
+            ) : (
+              <dl className="resumen">
+                <dt>Razón social</dt><dd>{empresa?.razon_social}</dd>
+                <dt>RFC</dt><dd>{empresa?.rfc ?? "—"}</dd>
+                <dt>Zona horaria</dt><dd>{zona}</dd>
+              </dl>
+            )}
+          </div>
+        </section>
+      </div>
 
-      <section className="ajuste-seccion">
-        <h2>Datos de la empresa</h2>
-        {gestor ? (
-          <FormAccion accion={guardarEmpresa} boton="Guardar datos">
-            <div className="campos">
-              <label>
-                Razón social o nombre del negocio
-                <input name="razon_social" required defaultValue={empresa?.razon_social ?? ""} />
-              </label>
-              <label>
-                RFC (opcional)
-                <input name="rfc" maxLength={13} defaultValue={empresa?.rfc ?? ""} />
-              </label>
-              <label>
-                Zona horaria de la empresa
-                <select name="zona_horaria" defaultValue={empresa?.zona_horaria ?? "America/Mexico_City"}>
-                  {ZONAS_MX.map((z) => <option key={z.zona} value={z.zona}>{z.etiqueta}</option>)}
-                </select>
-              </label>
-            </div>
-            <p className="mensaje mensaje-aviso">
-              <strong>Antes de cambiar la razón social o el RFC:</strong> aparecen en el acuerdo de registro de cada persona.
-              Al cambiarlos, los acuerdos de todo tu personal quedan <strong>desactualizados</strong> y habrá que firmar una
-              versión nueva (la anterior sigue vigente mientras tanto). Hazlo solo si el dato estaba mal o cambió de verdad.
+      <h2 id="horarios">Horarios</h2>
+      <div className="form-panel panel-grupos">
+        <section className="grupo-campos">
+          <div className="grupo-titulo">
+            <h3>Horario normal de trabajo</h3>
+            <p>
+              Para ver quién llega tarde, sale antes o trabaja fuera de horario. Es informativo: no impide checar ni descuenta
+              nada, y el tiempo extra se sigue calculando por horas trabajadas. Si una persona tiene horario, su{" "}
+              <strong>jornada pactada por día</strong> sale de él.
             </p>
+          </div>
+          <div className="grupo-cuerpo">
+            {horarios.length > 0 ? (
+              <ul className="horarios">
+                {horarios.map((h) => (
+                  <li key={h.id}>
+                    <details>
+                      <summary>
+                        <span className="horario-nombre">
+                          <strong>{h.nombre}</strong>
+                          {h.id === predeterminado && <span className="insignia-estado insignia-ok">De la empresa</span>}
+                        </span>
+                        <span className="horario-resumen">{resumenHorario(h.dias)}</span>
+                        <span className="horario-meta">
+                          Tolerancia {h.tolerancia_min} min · {usan(h.id) === 1 ? "1 persona" : `${usan(h.id)} personas`}
+                        </span>
+                      </summary>
+                      {gestor && (
+                        <div className="horario-edicion">
+                          <FormHorario h={h} />
+                          {usan(h.id) > 0 && (
+                            <p className="mensaje mensaje-aviso">
+                              Al cambiar las horas de este horario se recalcula la jornada pactada de {usan(h.id) === 1 ? "1 persona" : `${usan(h.id)} personas`};
+                              si cambia, sus acuerdos de registro quedan <strong>desactualizados</strong> y habrá que firmar una versión nueva.
+                            </p>
+                          )}
+                          <FormAccion accion={eliminarHorario} boton="Borrar horario" peligro className="form-linea">
+                            <input type="hidden" name="id" value={h.id} />
+                            <label>Escribe BORRAR para confirmar<input name="confirmar" autoComplete="off" /></label>
+                          </FormAccion>
+                        </div>
+                      )}
+                    </details>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="vacio">Tu empresa aún no tiene horarios.</p>
+            )}
+            {gestor && horarios.length > 0 && (
+              <FormAccion accion={cambiarHorarioPredeterminado} boton="Guardar" className="form-linea">
+                <label>
+                  Horario de la empresa (para quien no tiene uno propio)
+                  <select name="horario_predeterminado" defaultValue={predeterminado ?? ""}>
+                    <option value="">Ninguno</option>
+                    {horarios.map((h) => <option key={h.id} value={h.id}>{h.nombre}</option>)}
+                  </select>
+                </label>
+              </FormAccion>
+            )}
+            {gestor && (
+              <NuevoHorario abiertoAlInicio={horarios.length === 0}>
+                <FormHorario />
+              </NuevoHorario>
+            )}
+          </div>
+        </section>
+      </div>
+
+      <h2 id="recordatorios">Recordatorios</h2>
+      <div className="form-panel panel-grupos">
+        <section className="grupo-campos">
+          <div className="grupo-titulo">
+            <h3>Recordatorios de conformidad</h3>
+            <p>
+              Cada lunes a las 10:00 (centro de México), un correo a quien tenga semanas sin revisar o semanas que objetó y ya
+              corregiste. Máximo uno por persona a la semana. Responder sigue siendo voluntario.
+            </p>
+          </div>
+          <div className="grupo-cuerpo">
+            {gestor ? (
+              <InterruptorRecordatorios inicial={recordatorios} />
+            ) : (
+              <p>
+                Los recordatorios están <strong>{recordatorios ? "activados" : "desactivados"}</strong>.
+              </p>
+            )}
             <p className="ayuda">
-              La zona horaria de la empresa se usa en el tablero; cada centro de trabajo tiene la suya en{" "}
-              <Link href="/panel/centros">Centros</Link>, y esa es la que cuenta para las checadas.
+              Revisa las últimas 8 semanas. Solo lo recibe quien tiene correo; quien checa en el kiosco ve sus semanas
+              pendientes ahí, al identificarse con su PIN. Este interruptor también controla el aviso «semana por revisar» en
+              el teléfono. El resultado de cada envío está en <Link href="/panel/objeciones#recordatorios">Objeciones</Link>.
             </p>
-          </FormAccion>
-        ) : (
-          <dl className="resumen">
-            <dt>Razón social</dt><dd>{empresa?.razon_social}</dd>
-            <dt>RFC</dt><dd>{empresa?.rfc ?? "—"}</dd>
-            <dt>Zona horaria</dt><dd>{zona}</dd>
-          </dl>
-        )}
-      </section>
+          </div>
+        </section>
+      </div>
     </>
   );
 }

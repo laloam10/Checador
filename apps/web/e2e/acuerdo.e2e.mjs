@@ -46,7 +46,7 @@ async function generarYFirmar(dueno, trabajadorId, nombre) {
   await dueno.getByRole("heading", { name: "Acuerdo de registro electrónico" }).waitFor();
   const resumen = dueno.getByText(/Revisar y firmar la versión \d+/);
   if (!(await dueno.locator("details[open]").filter({ has: resumen }).count())) await resumen.click();
-  await dueno.locator("pre.texto-acuerdo").filter({ hasText: nombre }).waitFor();
+  await dueno.locator(".texto-acuerdo").filter({ hasText: nombre }).waitFor();
   const boton = dueno.getByRole("button", { name: /Firmar versión \d+ como empresa/ });
   await boton.click();
   await estado(dueno, "Confirma que revisaste el texto");
@@ -78,7 +78,7 @@ try {
   // 2. Ana firma en su app
   await entrar(ana, "ana@ejemplo.mx", "/");
   await ana.getByRole("link", { name: /Tu empleador te envió el acuerdo/ }).click();
-  await ana.locator("pre.texto-acuerdo").filter({ hasText: "ACUERDO PARA EL REGISTRO ELECTRÓNICO" }).waitFor();
+  await ana.locator(".texto-acuerdo").filter({ hasText: "ACUERDO PARA EL REGISTRO ELECTRÓNICO" }).waitFor();
   const firmar = ana.getByRole("button", { name: "Firmar acuerdo" });
   if (!(await firmar.isDisabled())) throw new Error("El botón de firma debería estar deshabilitado sin confirmar la lectura");
   await ana.getByLabel(/Leí el acuerdo completo/).check();
@@ -103,7 +103,7 @@ try {
     await kiosco.getByRole("button", { name: "Continuar" }).click();
   }
   await kiosco.getByRole("button", { name: "Tienes un acuerdo por firmar" }).click();
-  await kiosco.locator("pre.texto-acuerdo").filter({ hasText: "Beto López" }).waitFor();
+  await kiosco.locator(".texto-acuerdo").filter({ hasText: "Beto López" }).waitFor();
   await kiosco.getByRole("button", { name: "Leí el acuerdo y lo firmo con mi PIN" }).click();
   await kiosco.getByText("Acuerdo firmado").waitFor();
   paso("Beto leyó y firmó su acuerdo en el kiosco con su PIN");

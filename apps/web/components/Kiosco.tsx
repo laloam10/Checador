@@ -20,6 +20,7 @@ import { sumarDias } from "@/lib/fechas";
 import { TablaSemana } from "./TablaSemana";
 import { Teclado } from "./Teclado";
 import { fechaHora } from "@/lib/formato";
+import { TextoAcuerdo } from "@/components/TextoAcuerdo";
 
 type Paso =
   | { tipo: "numero" }
@@ -455,7 +456,7 @@ export function Kiosco({
         <section className="kiosco-paso">
           <h1>Acuerdo de registro de jornada</h1>
           <p className="ayuda">Versión {paso.acuerdo.version} · folio {paso.acuerdo.folio}. Léelo con calma.</p>
-          <pre className="texto-acuerdo">{paso.acuerdo.contenido}</pre>
+          <TextoAcuerdo texto={paso.acuerdo.contenido} />
           <div className="acciones">
             <button className="principal" disabled={enviando} onClick={() => firmarAcuerdo(paso.acuerdo, paso.nombre)}>
               Leí el acuerdo y lo firmo con mi PIN

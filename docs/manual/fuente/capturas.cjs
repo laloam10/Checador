@@ -166,7 +166,7 @@ const estado = (p, t) => p.getByRole("status").filter({ hasText: t }).first().wa
   await m.getByRole("link", { name: /Tu empleador te envió el acuerdo/ }).waitFor();
   await shot(m, "11-app-inicio-aviso");
   await m.goto(`${APP}/acuerdo`);
-  await m.locator("pre.texto-acuerdo").waitFor();
+  await m.locator(".texto-acuerdo").waitFor();
   await shot(m, "12-app-acuerdo");
   await m.getByLabel(/Leí el acuerdo completo/).check();
   await shotEl(m.locator(".tarjeta").filter({ hasText: "Firmar acuerdo" }), "12b-app-firmar");
@@ -227,7 +227,7 @@ const estado = (p, t) => p.getByRole("status").filter({ hasText: t }).first().wa
   await k.getByRole("heading", { name: "Hola, José" }).waitFor();
   await shot(k, "18-kiosco-acciones");
   await k.getByRole("button", { name: "Tienes un acuerdo por firmar" }).click();
-  await k.locator("pre.texto-acuerdo").waitFor();
+  await k.locator(".texto-acuerdo").waitFor();
   await shot(k, "19-kiosco-acuerdo");
   await k.getByRole("button", { name: "Leí el acuerdo y lo firmo con mi PIN" }).click();
   await k.getByText("Acuerdo firmado").waitFor();
@@ -286,7 +286,7 @@ const estado = (p, t) => p.getByRole("status").filter({ hasText: t }).first().wa
   const rosa = id("Rosa Díaz");
   await d.goto(`${APP}/panel/trabajadores/${rosa}`);
   await d.getByText("Registrar firma en papel").click();
-  await shotEl(d.locator(".mensaje-aviso").filter({ hasText: "pendiente de firma" }), "26-acuerdo-pendiente-papel");
+  await shotEl(d.locator(".acuerdo-version").filter({ hasText: "pendiente de firma" }), "26-acuerdo-pendiente-papel");
   // Configuración, alta masiva y panel en el celular
   await d.goto(`${APP}/panel/configuracion`);
   await d.getByRole("switch", { name: "Recordatorios de conformidad por correo" }).waitFor();
@@ -332,6 +332,9 @@ const estado = (p, t) => p.getByRole("status").filter({ hasText: t }).first().wa
   // Al final: el horario de la empresa recalcula la jornada pactada y deja acuerdos desactualizados.
   await d.goto(`${APP}/panel/configuracion`);
   const nuevoHorario = d.locator(".nuevo-horario");
+  // Con horarios ya creados, el formulario está detrás de "+ Nuevo horario".
+  const abrirNuevo = nuevoHorario.getByRole("button", { name: "+ Nuevo horario" });
+  if (await abrirNuevo.isVisible()) await abrirNuevo.click();
   await nuevoHorario.getByLabel("Nombre").fill("Matutino");
   for (const dia of ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]) {
     await nuevoHorario.getByLabel(`${dia}: entrada`).fill("08:00");
