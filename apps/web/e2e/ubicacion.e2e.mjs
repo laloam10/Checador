@@ -1,7 +1,9 @@
 // Prueba de la ubicación al checar (opcional, por centro de trabajo). La ubicación de cada
 // navegador la simula Playwright; todo lo demás es real (panel, app, kiosco, API y base).
 // Requisitos: app y Supabase local, psql, semilla-kiosco.sql cargada.
-// Uso: node apps/web/e2e/ubicacion.e2e.mjs
+// Con GOOGLE_MAPS_EMBED_KEY (la misma con que corre la app) prueba la ventana de mapa; sin ella,
+// el enlace a Google Maps. Nunca sale a Google: la prueba responde por él.
+// Uso: [GOOGLE_MAPS_EMBED_KEY=<la misma>] node apps/web/e2e/ubicacion.e2e.mjs
 import { createRequire } from "node:module";
 import { execFileSync } from "node:child_process";
 const { chromium } = createRequire(import.meta.url)("playwright");
@@ -18,6 +20,7 @@ const EMPRESA_K = "aaaaaaaa-0000-0000-0000-000000000001";
 const CENTRO_K = "aaaaaaaa-0000-0000-0000-000000000002";
 const CENTRO = { latitude: 19.4326, longitude: -99.1332 };
 const LEJOS = { latitude: 19.5, longitude: -99.1332 }; // ~7.5 km al norte
+const LLAVE = process.env.GOOGLE_MAPS_EMBED_KEY ?? "";
 const paso = (t) => console.log(`✓ ${t}`);
 const sql = (q) => execFileSync("psql", [DB_URL, "-XtAc", q], { encoding: "utf8" }).trim();
 const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -43,11 +46,15 @@ const ubicacionDe = (correo) => sql(`select u.estado || '|' || coalesce(u.dentro
 
 const browser = await chromium.launch();
 const contextos = [];
+const bloqueos = [];
 const nuevo = async (opciones) => {
   const c = await browser.newContext({ locale: "es-MX", viewport: { width: 1180, height: 860 }, ...opciones });
   contextos.push(c);
+  // Google no se contacta en la prueba: se responde con una página vacía.
+  await c.route("https://www.google.com/**", (r) => r.fulfill({ contentType: "text/html", body: "<p>mapa simulado</p>" }));
   const p = await c.newPage();
   p.on("pageerror", (e) => console.error("Error en la página:", e.message));
+  p.on("console", (m) => /Content Security Policy|Refused to frame/i.test(m.text()) && bloqueos.push(m.text()));
   return p;
 };
 let pagina;
@@ -107,10 +114,40 @@ try {
   const idLeo = sql(`select id from trabajadores where email = '${LEO}'`);
   await d.goto(`${APP}/panel/trabajadores/${idAna}/semana`);
   await d.getByText(/fuera del centro · a 7\.\d km/).waitFor();
-  await d.getByRole("link", { name: "ver en mapa" }).waitFor();
+  if (LLAVE) {
+    await d.getByRole("button", { name: "ver en mapa" }).click();
+    const marco = d.locator("dialog.ventana-mapa iframe");
+    await marco.waitFor();
+    const src = await marco.getAttribute("src");
+    if (!src?.startsWith(`https://www.google.com/maps/embed/v1/place?key=${LLAVE}&q=19.5%2C-99.1332`)) throw new Error(`Mapa: ${src}`);
+    await d.frameLocator("dialog.ventana-mapa iframe").getByText("mapa simulado").waitFor();
+    if (bloqueos.length) throw new Error(`La CSP bloqueó el mapa: ${bloqueos[0]}`);
+    if (process.env.CAPTURAS) await d.screenshot({ path: `${process.env.CAPTURAS}/ventana-mapa.png` });
+    await d.getByRole("button", { name: "Cerrar" }).click();
+    await marco.waitFor({ state: "detached", timeout: 5000 }).catch(() => {
+      throw new Error("Al cerrar la ventana el mapa debía desaparecer");
+    });
+    paso("ver en mapa abre Google Maps en una ventana dentro de Checador (la CSP lo permite)");
+  } else {
+    const href = await d.getByRole("link", { name: "ver en mapa" }).getAttribute("href");
+    if (href !== "https://www.google.com/maps/search/?api=1&query=19.5%2C-99.1332") throw new Error(`Enlace: ${href}`);
+    paso("sin llave, ver en mapa abre Google Maps en otra pestaña");
+  }
   await d.goto(`${APP}/panel/trabajadores/${idLeo}/semana`);
   await d.getByText(/sin permiso de ubicación|ubicación no disponible/).waitFor();
   paso("en la bitácora del panel: fuera del centro con la distancia, y sin permiso");
+
+  // La persona ve su propia ubicación en Mis registros.
+  pagina = a;
+  await a.goto(`${APP}/registros`);
+  await a.getByRole("heading", { name: "Ubicación de tus checadas" }).waitFor();
+  await a.getByText(/fuera del centro · a 7\.\d km/).waitFor();
+  await a.getByText("ver en mapa").waitFor();
+  pagina = l;
+  await l.goto(`${APP}/registros`);
+  await l.getByText(/sin permiso de ubicación|ubicación no disponible/).waitFor();
+  if (process.env.CAPTURAS) await a.screenshot({ path: `${process.env.CAPTURAS}/registros-ubicacion.png`, fullPage: true });
+  paso("cada persona ve su propia ubicación en Mis registros");
 
   // 5. Kiosco con la ubicación activada en su centro.
   sql(`update centros_trabajo set latitud = 19.4326, longitud = -99.1332, ubicacion_kiosco = true where id = '${CENTRO_K}'`);

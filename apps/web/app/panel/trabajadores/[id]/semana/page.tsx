@@ -7,7 +7,8 @@ import { lunesDe, semanaDeTrabajador, sumarDias, trabajadorPorId, type FilaEvent
 import { aHorario, horarioEfectivo, resumenHorario } from "@/lib/horarios";
 import { horariosDeEmpresa } from "@/lib/horariosDatos";
 import { requierePanel } from "@/lib/panel";
-import { distanciaLegible } from "@/lib/ubicacion";
+import { UbicacionChecada } from "@/components/UbicacionChecada";
+import { llaveMapa, ubicacionesDe } from "@/lib/ubicacionesDatos";
 import { agregarChecada, anularChecada, corregirChecada } from "../../../acciones";
 
 const ETIQUETA: Record<string, string> = {
@@ -27,34 +28,6 @@ function nombreSemana(lunes: string) {
   const a = partes(lunes);
   const b = partes(sumarDias(lunes, 6));
   return a.m === b.m ? `del ${a.d} al ${b.d} de ${b.m} de ${b.a}` : `del ${a.d} de ${a.m} al ${b.d} de ${b.m} de ${b.a}`;
-}
-
-interface Ubicacion {
-  evento_id: number;
-  estado: "ok" | "denegada" | "no_disponible";
-  latitud: number | null;
-  longitud: number | null;
-  precision_m: number | null;
-  distancia_m: number | null;
-  dentro: boolean | null;
-}
-
-/** Ubicación al checar: señal informativa (no invalida la checada ni va en las exportaciones). */
-function EtiquetaUbicacion({ u }: { u: Ubicacion }) {
-  if (u.estado !== "ok") {
-    return <span className="etiqueta etiqueta-neutra">{u.estado === "denegada" ? "sin permiso de ubicación" : "ubicación no disponible"}</span>;
-  }
-  const mapa = `https://www.openstreetmap.org/?mlat=${u.latitud}&mlon=${u.longitud}#map=17/${u.latitud}/${u.longitud}`;
-  return (
-    <>
-      <span className={`etiqueta ${u.dentro ? "etiqueta-ok" : ""}`} title={u.precision_m != null ? `Precisión del dispositivo: ±${u.precision_m} m` : undefined}>
-        {u.dentro ? "en el centro" : "fuera del centro"}
-        {u.distancia_m != null && ` · ${distanciaLegible(u.distancia_m)}`}
-        {u.precision_m != null && u.precision_m > 100 && ` (±${u.precision_m} m)`}
-      </span>
-      <a className="enlace-mapa" href={mapa} target="_blank" rel="noopener noreferrer">ver en mapa</a>
-    </>
-  );
 }
 
 interface Captura extends FilaEvento {
@@ -125,13 +98,8 @@ export default async function SemanaPanel({
     return f >= lunes && f <= domingo;
   });
   // Ubicaciones de las checadas (solo existen si el centro las activó; se borran a los 90 días).
-  const { data: filasUbicacion } = capturas.length
-    ? await ctx.supabase
-        .from("ubicaciones_evento")
-        .select("evento_id, estado, latitud, longitud, precision_m, distancia_m, dentro")
-        .in("evento_id", capturas.map((c) => c.id))
-    : { data: [] };
-  const ubicaciones = new Map(((filasUbicacion ?? []) as Ubicacion[]).map((u) => [u.evento_id, u]));
+  const ubicaciones = await ubicacionesDe(ctx.supabase, capturas.map((c) => c.id));
+  const mapa = llaveMapa();
   const ultima = conformidades?.[0];
   const local = (iso: string) => aHoraLocal(iso, zona).replace("T", " ");
   const hoy = ahoraLocal.slice(0, 10);
@@ -236,7 +204,7 @@ export default async function SemanaPanel({
                       <span className={c.anulada ? "tachado" : ""}>{ETIQUETA[c.tipo]}</span>
                       <span className="etiqueta etiqueta-origen">{ORIGEN[c.origen]}</span>
                       {c.diferido && <span className="etiqueta">sin conexión</span>}
-                      {ubicaciones.get(c.id) && <EtiquetaUbicacion u={ubicaciones.get(c.id)!} />}
+                      {ubicaciones.get(c.id) && <UbicacionChecada u={ubicaciones.get(c.id)!} llaveMapa={mapa} />}
                     </div>
                     {c.origen === "panel" && c.motivo && <span className="ajuste">Capturada por el empleador: {c.motivo}</span>}
                     {c.correcciones.map((k) => (

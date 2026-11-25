@@ -4,9 +4,14 @@ import { aHoraLocal } from "@checador/jornada";
 import { FormConformidad } from "@/components/FormConformidad";
 import { TablaSemana } from "@/components/TablaSemana";
 import { Navegacion } from "@/components/Navegacion";
+import { UbicacionChecada } from "@/components/UbicacionChecada";
 import { SinVinculo } from "@/components/SinVinculo";
 import { lunesDe, misTrabajadores, semanaDeTrabajador, sumarDias } from "@/lib/datos";
 import { crearClienteServidor, usuarioActual } from "@/lib/supabase/server";
+import { llaveMapa, ubicacionesDe } from "@/lib/ubicacionesDatos";
+
+const ETIQUETA: Record<string, string> = { entrada: "Entrada", salida: "Salida", inicio_pausa: "Inicio de pausa", fin_pausa: "Fin de pausa" };
+const DIAS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 
 
 export default async function Registros({ searchParams }: { searchParams: Promise<{ semana?: string }> }) {
@@ -23,7 +28,7 @@ export default async function Registros({ searchParams }: { searchParams: Promis
   const domingo = sumarDias(lunes, 6);
   const cerrada = domingo < hoy;
 
-  const [{ semana, reconstruccion }, { data: conformidad }] = await Promise.all([
+  const [{ semana, reconstruccion, filas }, { data: conformidad }] = await Promise.all([
     semanaDeTrabajador(supabase, trabajador, lunes),
     supabase
       .from("conformidades")
@@ -35,6 +40,12 @@ export default async function Registros({ searchParams }: { searchParams: Promis
       .maybeSingle(),
   ]);
 
+  // Su propia ubicación al checar (si su centro la registra): es su dato y debe poder verlo.
+  const checadas = filas.filter((f) => ETIQUETA[f.tipo] && aHoraLocal(f.hora_efectiva, trabajador.zonaHoraria).slice(0, 10) >= lunes
+    && aHoraLocal(f.hora_efectiva, trabajador.zonaHoraria).slice(0, 10) <= domingo);
+  const ubicaciones = await ubicacionesDe(supabase, checadas.map((f) => f.id));
+  const conUbicacion = checadas.filter((f) => ubicaciones.has(f.id)).sort((a, b) => Date.parse(a.hora_efectiva) - Date.parse(b.hora_efectiva));
+  const mapa = llaveMapa();
 
   return (
     <main>
@@ -49,6 +60,30 @@ export default async function Registros({ searchParams }: { searchParams: Promis
         </div>
 
         <TablaSemana lunes={lunes} semana={semana} reconstruccion={reconstruccion} />
+
+        {conUbicacion.length > 0 && (
+          <>
+            <h2>Ubicación de tus checadas</h2>
+            <p className="ayuda">
+              Tu empresa registra la ubicación de tu teléfono o del kiosco solo al momento de checar, para ver si fue en tu
+              centro de trabajo. No cambia tus horas. Se borra a los 90 días.
+            </p>
+            <ul className="bitacora ubicaciones-propias">
+              {conUbicacion.map((f) => {
+                const local = aHoraLocal(f.hora_efectiva, trabajador.zonaHoraria);
+                return (
+                  <li key={f.id}>
+                    <div className="bitacora-fila">
+                      <span className="bitacora-hora">{DIAS[new Date(`${local.slice(0, 10)}T12:00:00Z`).getUTCDay()]} {local.slice(11)}</span>
+                      <span>{ETIQUETA[f.tipo]}</span>
+                      <UbicacionChecada u={ubicaciones.get(f.id)!} llaveMapa={mapa} />
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </>
+        )}
 
         <h2>Tu conformidad</h2>
         {conformidad ? (

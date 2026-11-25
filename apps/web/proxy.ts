@@ -96,6 +96,8 @@ function politicaSeguridad(nonce: string, https: boolean): string {
     "font-src 'self'",
     `connect-src 'self' ${supabase}`.trim(),
     "worker-src 'self'",
+    // Solo la ventana de mapa de una checada (Maps Embed API), y solo al abrirla.
+    "frame-src https://www.google.com/maps/embed/",
     "manifest-src 'self'",
     "object-src 'none'",
     "base-uri 'self'",

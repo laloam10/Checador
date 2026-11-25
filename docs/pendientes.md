@@ -29,6 +29,8 @@ Jemba, WhatsApp, avisos, horarios, Salir con PIN o huella, ubicación al checar 
 - [ ] **Huella o rostro en iPhone** (pantalla de inicio, Llavero de iCloud). En pruebas ya están el secreto `acceso` y
       `ACCESO_SECRETO_SERVICIO`, y en Android funciona (probado el 2026-11-25). En producción falta repetir
       `docs/publicacion.md` §1.12 con un secreto distinto.
+- [ ] **Llave de Google para el mapa en ventana** (opcional, `docs/publicacion.md` §1.13): proyecto de Google Cloud con
+      facturación, Maps Embed API y `GOOGLE_MAPS_EMBED_KEY` en Vercel. Sin ella, el mapa abre en otra pestaña.
 - [ ] **Ubicación al checar en teléfonos reales** (Android y iPhone con Checador en la pantalla de inicio): permiso,
       precisión en interiores y que la checada se registre igual al negar el permiso.
 - [ ] **Avisos en iPhone**: probar con Checador agregado a la pantalla de inicio (Android ya probado el 2026-11-20).
@@ -45,7 +47,7 @@ Jemba, WhatsApp, avisos, horarios, Salir con PIN o huella, ubicación al checar 
       el manual (3.17 y capítulo 6) y la hoja de WhatsApp.
 - [ ] Redacción del método "aplicación" en el acuerdo antes de publicar una app en tiendas (hoy dice "Aplicación
       web"); cambiarla deja desactualizados todos los acuerdos firmados.
-- [ ] Aviso de privacidad: ubicación al checar (si el centro la activa; plazo de 90 días), llave pública de la passkey (huella o rostro), celular y Meta (WhatsApp), identificador del navegador y servicios de notificaciones
+- [ ] Aviso de privacidad: ubicación al checar (si el centro la activa; plazo de 90 días; Google recibe las coordenadas al abrir "ver en mapa"), llave pública de la passkey (huella o rostro), celular y Meta (WhatsApp), identificador del navegador y servicios de notificaciones
       (avisos), y Forja con su proveedor de IA (números no registrados).
 - [ ] Contrato y términos de servicio.
 

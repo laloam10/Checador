@@ -607,3 +607,10 @@ form:has(select[name="horario"] option[data-manual]:checked) .jornada-horario { 
 .etiqueta-ok { background: var(--marca-claro); color: var(--marca-oscuro); }
 .etiqueta-neutra { background: var(--fondo); color: var(--gris); border: 1px solid var(--borde); }
 .enlace-mapa { font-size: 0.75rem; margin-left: 0.4rem; color: var(--gris); }
+button.enlace-mapa { padding: 0; background: none; border: none; text-decoration: underline; cursor: pointer; }
+.ventana-mapa { width: min(40rem, 94vw); padding: 0; border: 1px solid var(--borde); border-radius: var(--radio); }
+.ventana-mapa::backdrop { background: rgb(10 33 3 / 0.55); }
+.ventana-mapa-cabecera { display: flex; justify-content: space-between; align-items: center; padding: 0.7rem 1rem; border-bottom: 1px solid var(--borde); }
+.ventana-mapa iframe { display: block; width: 100%; height: min(60vh, 28rem); border: 0; }
+.ventana-mapa .ayuda { padding: 0.7rem 1rem; margin: 0; }
+.ubicaciones-propias .bitacora-fila { flex-wrap: wrap; }

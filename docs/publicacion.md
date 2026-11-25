@@ -289,6 +289,13 @@ Antes de ofrecerlo a clientes: el aviso de privacidad debe mencionar que, si la 
 identificador de su navegador y que el aviso pasa por el servicio de notificaciones de Google, Apple, Mozilla o
 Microsoft (el contenido va cifrado y no lleva horas ni datos de su jornada).
 
+### 1.11 App instalada desde las tiendas (preparación)
+
+Las rutas del trabajador ya aceptan el token de sesión de una app con Capacitor (ver `docs/plan-app-movil.md`, fase
+2). En Vercel, cuando exista la app, agrega `APP_VERSION_MINIMA` (por ejemplo `1.0.0`): la app la consulta en
+`/api/app/version` y pide actualizar si es más vieja. Sin la variable, el servidor acepta cualquier versión. No hay que
+configurar nada más mientras no haya app publicada.
+
 ### 1.12 Volver a entrar con PIN, huella o rostro
 
 En **Acceso**, la persona trabajadora elige qué pasa al tocar **Salir**: pedir el código del correo (como siempre),
@@ -315,12 +322,32 @@ siempre es con el código del correo (interpretación 11 de `packages/jornada/RE
 Antes de ofrecerlo a clientes: el aviso de privacidad debe decir que, si la persona registra su huella o rostro, se
 guarda una llave pública y el tipo de dispositivo, y que la huella o el rostro nunca salen de su teléfono.
 
-### 1.11 App instalada desde las tiendas (preparación)
+### 1.13 Mapa de la ubicación al checar (opcional)
 
-Las rutas del trabajador ya aceptan el token de sesión de una app con Capacitor (ver `docs/plan-app-movil.md`, fase
-2). En Vercel, cuando exista la app, agrega `APP_VERSION_MINIMA` (por ejemplo `1.0.0`): la app la consulta en
-`/api/app/version` y pide actualizar si es más vieja. Sin la variable, el servidor acepta cualquier versión. No hay que
-configurar nada más mientras no haya app publicada.
+Si un centro activa la ubicación al checar (Centros → Ubicación al checar; migración 28), la bitácora del panel y
+**Mis registros** muestran "en el centro" o "fuera del centro · a X km" con un enlace **ver en mapa**.
+
+- **Sin configurar nada**, "ver en mapa" abre Google Maps en otra pestaña ([Maps URLs](https://developers.google.com/maps/documentation/urls/get-started), sin llave).
+- **Para verlo en una ventana dentro de Checador** se usa la Maps Embed API de Google: no tiene costo ni límite de
+  uso, pero pide una llave y un proyecto de Google Cloud **con facturación activada** (sin ella, el mapa sale
+  oscurecido con "for development purposes only").
+  1. En https://console.cloud.google.com crea un proyecto (por ejemplo, `checador`) y activa la facturación con una
+     tarjeta. La Maps Embed API no genera cargos.
+  2. **APIs y servicios → Biblioteca** → busca **Maps Embed API** → **Habilitar**.
+  3. **APIs y servicios → Credenciales → Crear credenciales → Clave de API**. En la clave:
+     - **Restricciones de aplicaciones → Sitios web**: `https://checador-pruebas.vercel.app/*` y
+       `https://checador.jemba.mx/*`.
+     - **Restricciones de API → Restringir clave → Maps Embed API** (solo esa).
+  4. Vercel → **Environment Variables** → `GOOGLE_MAPS_EMBED_KEY` con la clave (Preview para pruebas, Production
+     después). Vuelve a desplegar.
+
+  La llave aparece en el código de la página: es pública por diseño. Lo que la protege son las dos restricciones del
+  paso 3; sin ellas, otro sitio podría usarla a tu nombre.
+
+El mapa solo se carga al tocar "ver en mapa": hasta entonces no se manda nada a Google. Al abrirlo, Google recibe las
+coordenadas de esa checada y puede poner sus cookies en el navegador de quien lo abre. Menciónalo en el aviso de
+privacidad junto con la ubicación al checar.
+
 
 ## 2. Vercel
 
