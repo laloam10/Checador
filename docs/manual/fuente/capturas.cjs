@@ -114,7 +114,7 @@ const estado = (p, t) => p.getByRole("status").filter({ hasText: t }).first().wa
       await d.getByLabel("Nuevo PIN (4 a 6 dígitos)").fill("3917");
       await d.getByRole("button", { name: "Asignar PIN" }).click();
       await estado(d, "PIN asignado");
-      await shotEl(d.locator("h2", { hasText: "PIN para el kiosco" }).locator("xpath=following-sibling::form[1]"), "06-pin-trabajador");
+      await shotEl(d.locator("section.grupo-campos", { has: d.getByRole("heading", { name: "PIN para el kiosco" }) }), "06-pin-trabajador");
     }
   }
   log("personal");
@@ -315,7 +315,7 @@ const estado = (p, t) => p.getByRole("status").filter({ hasText: t }).first().wa
   await d.getByAltText("Código QR para activar WhatsApp").waitFor();
   // El QR apunta a un número de ejemplo: se difumina para que nadie lo escanee desde el manual.
   await d.addStyleTag({ content: ".activacion-whatsapp img { filter: blur(5px); }" });
-  await shotEl(d.locator("h2", { hasText: "WhatsApp" }).locator("xpath=following-sibling::form[1]"), "32-whatsapp-codigo");
+  await shotEl(d.locator("form.form-whatsapp"), "32-whatsapp-codigo");
   log("whatsapp");
 
   // ---------- Avisos de la trabajadora (la app debe correr con VAPID_PUBLICA) ----------

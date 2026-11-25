@@ -644,3 +644,13 @@ button.enlace-mapa { padding: 0; background: none; border: none; text-decoration
 }
 .etiqueta-campo { display: block; }
 .dias-adicionales .dias-semana { gap: 0.45rem; }
+/* Tarjetas de la ficha con grupos (Kiosco y WhatsApp, Baja). */
+.panel-grupos { padding-top: 0.4rem; padding-bottom: 0.4rem; gap: 0; }
+.panel-grupos .grupo-campos:first-of-type { padding-top: 0.8rem; }
+.panel-grupos .form-linea .mensaje, .panel-grupos .form-linea .activacion-whatsapp { flex-basis: 100%; margin: 0.2rem 0 0; }
+.panel-grupos .grupo-cuerpo > .mensaje { margin: 0; }
+.estado-grupo { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+.estado-grupo .ayuda { margin: 0; font-size: 0.84rem; }
+.panel-peligro { border-color: rgb(185 28 28 / 0.25); }
+.panel-peligro .grupo-titulo h3 { color: #9b1c1c; }
+.grupo-cuerpo { align-content: start; }
