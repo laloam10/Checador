@@ -614,3 +614,33 @@ button.enlace-mapa { padding: 0; background: none; border: none; text-decoration
 .ventana-mapa iframe { display: block; width: 100%; height: min(60vh, 28rem); border: 0; }
 .ventana-mapa .ayuda { padding: 0.7rem 1rem; margin: 0; }
 .ubicaciones-propias .bitacora-fila { flex-wrap: wrap; }
+
+/* Ficha del trabajador: grupos con título a la izquierda y campos alineados a la derecha. */
+.ficha-campos { display: grid; }
+.grupo-campos { display: grid; grid-template-columns: 14rem minmax(0, 1fr); gap: 0.6rem 2rem; padding: 1.1rem 0; border-top: 1px solid var(--borde); }
+.grupo-campos:first-of-type { border-top: none; padding-top: 0.2rem; }
+.grupo-titulo h3 { margin: 0 0 0.3rem; font-size: 0.98rem; }
+.grupo-titulo p { margin: 0; color: var(--gris); font-size: 0.84rem; line-height: 1.45; }
+.grupo-cuerpo { display: grid; gap: 0.9rem; min-width: 0; }
+.campos.campos-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+.campos.campos-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; }
+.campos.campos-7 { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.campos .campo-2 { grid-column: span 2; }
+.campos label .ayuda { display: block; margin-top: 0.3rem; font-size: 0.8rem; line-height: 1.4; font-weight: 400; }
+.opcional { color: var(--gris); font-weight: 400; }
+.dias-adicionales { border: none; padding: 0; margin: 0; display: grid; gap: 0.45rem; }
+.dias-adicionales legend { font-weight: 600; padding: 0; margin-bottom: 0.4rem; }
+.dia-chip { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.7rem; border: 1px solid var(--borde); border-radius: 999px; background: var(--superficie); font-weight: 500; cursor: pointer; }
+.dia-chip input { width: auto; margin: 0; accent-color: var(--marca); }
+.dia-chip:has(input:checked) { border-color: var(--marca); background: var(--marca-claro); color: var(--marca-oscuro); }
+@media (max-width: 56rem) {
+  .grupo-campos { grid-template-columns: minmax(0, 1fr); }
+  .campos.campos-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .campos.campos-7 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 34rem) {
+  .campos.campos-2, .campos.campos-3 { grid-template-columns: minmax(0, 1fr); }
+  .campos .campo-2 { grid-column: auto; }
+}
+.etiqueta-campo { display: block; }
+.dias-adicionales .dias-semana { gap: 0.45rem; }
