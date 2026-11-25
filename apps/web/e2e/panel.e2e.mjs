@@ -141,6 +141,14 @@ try {
   await dueno.locator(".en-turno li", { hasText: "Carla Ruiz" }).getByText("Trabajando").waitFor();
   paso("el tablero muestra a Carla trabajando");
 
+  await dueno.getByRole("heading", { name: "Horas de la semana" }).waitFor();
+  await dueno.getByRole("link", { name: "Semana pasada" }).click();
+  await dueno.waitForURL(/horas=pasada/);
+  await dueno.getByText("Aún no hay horas registradas en esta semana.").waitFor();
+  await dueno.getByRole("link", { name: "Esta semana" }).click();
+  await dueno.waitForURL((u) => !u.search.includes("horas="));
+  paso("la gráfica de horas cambia entre esta semana y la pasada");
+
   // 7. Corrección, checada faltante y anulación
   await dueno.getByRole("link", { name: "Carla Ruiz" }).click();
   await dueno.getByRole("heading", { name: "Bitácora de la semana" }).waitFor();

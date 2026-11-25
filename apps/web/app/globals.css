@@ -949,3 +949,51 @@ main.esqueleto-kiosco { min-height: 100vh; }
 .ventana-accion-peligro { border-top: 1px solid var(--borde); padding-top: 0.9rem; }
 .ventana-accion-peligro h3 { color: #9b1c1c; }
 .ventana-accion-cuerpo > .ayuda { margin: 0; font-size: 0.82rem; }
+
+/* =============================================================================
+   Tablero: horas de la semana por persona (barras horizontales apiladas).
+   Barras de 18 px, extremo de dato redondeado y base recta, separación de 2 px entre
+   tramos, rejilla de 1 px recesiva. El texto nunca lleva el color de la serie.
+   ============================================================================= */
+.tarjeta-grafica { background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--radio); box-shadow: var(--sombra); padding: 1.1rem 1.2rem 1rem; margin: 1.25rem 0; }
+.grafica-cabecera { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 0.6rem 1rem; }
+.grafica-cabecera h2 { margin: 0 0 0.15rem; }
+.grafica-cabecera .ayuda { margin: 0; }
+.filtro-segmentado { display: inline-flex; padding: 0.2rem; border-radius: 999px; background: var(--fondo); border: 1px solid var(--borde); }
+.filtro-segmentado a { text-decoration: none; font-size: 0.84rem; font-weight: 600; color: var(--gris); padding: 0.3rem 0.85rem; border-radius: 999px; }
+.filtro-segmentado a.activo { background: var(--superficie); color: var(--noche); box-shadow: var(--sombra); }
+.leyenda { list-style: none; margin: 0.9rem 0 0.4rem; padding: 0; display: flex; flex-wrap: wrap; gap: 0.35rem 1.1rem; font-size: 0.8rem; color: var(--gris); }
+.leyenda li { display: inline-flex; align-items: center; gap: 0.4rem; }
+.leyenda-muestra { width: 0.8rem; height: 0.8rem; border-radius: 3px; }
+.leyenda-linea { width: 2px; height: 0.9rem; background: #9b1c1c; }
+
+.grafica-horas { --nombre: 10rem; --margen-total: 3.2rem; --separacion: 0.8rem; position: relative; display: grid; gap: 0.45rem; padding: 1.5rem 0 1.7rem; }
+.grafica-rejilla { position: absolute; top: 1.5rem; bottom: 1.7rem; left: calc(var(--nombre) + var(--separacion)); right: var(--margen-total); pointer-events: none; }
+.grafica-marca { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--borde); }
+.grafica-marca > span { position: absolute; bottom: -1.4rem; transform: translateX(-50%); font-family: var(--mono); font-size: 0.7rem; color: var(--gris); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.grafica-maximo { position: absolute; top: -0.4rem; bottom: 0; width: 2px; margin-left: -1px; background: #9b1c1c; opacity: 0.75; z-index: 1; }
+.grafica-maximo > span { position: absolute; top: -1.1rem; transform: translateX(-50%); font-size: 0.7rem; font-weight: 600; color: #9b1c1c; white-space: nowrap; }
+.grafica-fila { display: grid; grid-template-columns: var(--nombre) minmax(0, 1fr); gap: var(--separacion); align-items: center; }
+.grafica-nombre { font-size: 0.86rem; color: var(--tinta); text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.grafica-nombre:hover { text-decoration: underline; }
+.grafica-pista { position: relative; height: 1.6rem; margin-right: var(--margen-total); border-radius: 4px; outline: none; cursor: default; }
+.grafica-pista:focus-visible { box-shadow: 0 0 0 2px var(--marca-claro), 0 0 0 3px var(--marca); }
+.grafica-barra { position: absolute; left: 0; top: calc(50% - 9px); height: 18px; display: flex; gap: 2px; z-index: 2; }
+.grafica-barra > span { display: block; min-width: 2px; height: 100%; }
+.grafica-barra > span:last-child { border-radius: 0 4px 4px 0; }
+.grafica-fila.activa .grafica-barra { filter: brightness(1.12); }
+.grafica-total { position: absolute; top: 50%; transform: translateY(-50%); margin-left: 0.4rem; font-family: var(--mono); font-size: 0.78rem; font-weight: 600; color: var(--tinta); font-variant-numeric: tabular-nums; white-space: nowrap; z-index: 2; }
+.grafica-ventana { position: absolute; top: calc(100% - 0.2rem); width: 13rem; z-index: 10; display: grid; gap: 0.15rem; padding: 0.6rem 0.75rem; background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--radio-chico); box-shadow: var(--sombra-alta); font-size: 0.8rem; color: var(--gris); pointer-events: none; }
+.grafica-ventana-titulo { color: var(--tinta); font-size: 0.84rem; margin-bottom: 0.15rem; }
+.grafica-ventana b { color: var(--tinta); font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.grafica-ventana-total { margin-bottom: 0.2rem; }
+.grafica-ventana-fila { display: flex; align-items: center; gap: 0.4rem; }
+.grafica-ventana-clave { width: 0.7rem; height: 2px; border-radius: 1px; }
+.grafica-tabla { margin-top: 0.4rem; }
+.grafica-tabla .tabla { margin-top: 0.6rem; }
+@media (max-width: 40rem) {
+  .grafica-horas { --nombre: 6.5rem; --margen-total: 2.8rem; --separacion: 0.5rem; }
+  .grafica-nombre { font-size: 0.8rem; }
+  .grafica-ventana { width: 11rem; }
+  .grafica-marca:nth-child(even) > span { display: none; }
+}

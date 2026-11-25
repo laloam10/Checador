@@ -6,7 +6,9 @@ import { estadosAcuerdosEmpresa } from "@/lib/acuerdosDatos";
 import { lunesDe, sumarDias } from "@/lib/datos";
 import { horarioDeHoy, objecionesPendientes, presentesAhora, requierePanel, type ContextoPanel } from "@/lib/panel";
 import { verificarIntegridad } from "./acciones";
-import { fechaConDia } from "@/lib/formato";
+import { fechaConDia, rangoFechas } from "@/lib/formato";
+import { GraficaHoras } from "@/components/panel/GraficaHoras";
+import { horasDeLaSemana } from "@/lib/horasSemana";
 
 interface SemanaPasada {
   lunes: string;
@@ -39,18 +41,21 @@ function duracion(desde: string, hasta: string): string {
 
 const porcentaje = (a: number, b: number) => (b ? Math.round((a / b) * 100) : 0);
 
-export default async function Tablero() {
+export default async function Tablero({ searchParams }: { searchParams: Promise<{ horas?: string }> }) {
+  const { horas: verHoras } = await searchParams;
   const ctx = await requierePanel();
   const zona = ctx.empresa.zonaHoraria;
   const ahora = aHoraLocal(new Date(), zona);
   const hoy = ahora.slice(0, 10);
   const lunesPasado = sumarDias(lunesDe(hoy), -7);
-  const [presentes, objeciones, estados, semana, hoyHorario] = await Promise.all([
+  const lunesHoras = verHoras === "pasada" ? lunesPasado : lunesDe(hoy);
+  const [presentes, objeciones, estados, semana, hoyHorario, horas] = await Promise.all([
     presentesAhora(ctx),
     objecionesPendientes(ctx),
     estadosAcuerdosEmpresa(ctx.supabase, ctx.empresa.id),
     semanaPasada(ctx, lunesPasado),
     horarioDeHoy(ctx),
+    horasDeLaSemana(ctx, lunesHoras),
   ]);
   const alta = await calcularAlta(ctx, estados);
 
@@ -150,6 +155,28 @@ export default async function Tablero() {
         </ul>
       )}
       <PrimerosPasos alta={alta} />
+
+      <section className="tarjeta-grafica" aria-labelledby="titulo-horas">
+        <div className="grafica-cabecera">
+          <div>
+            <h2 id="titulo-horas">Horas de la semana</h2>
+            <p className="ayuda">
+              {rangoFechas(lunesHoras, sumarDias(lunesHoras, 6))}
+              {horas.personas.length > 0 && ` · ${horas.personas.length} ${horas.personas.length === 1 ? "persona" : "personas"} con horas`}
+              {horas.sinHoras > 0 && ` · ${horas.sinHoras} sin horas`}
+            </p>
+          </div>
+          <nav className="filtro-segmentado" aria-label="Semana">
+            <Link href="/panel" className={verHoras !== "pasada" ? "activo" : ""} aria-current={verHoras !== "pasada" ? "true" : undefined} scroll={false}>Esta semana</Link>
+            <Link href="/panel?horas=pasada" className={verHoras === "pasada" ? "activo" : ""} aria-current={verHoras === "pasada" ? "true" : undefined} scroll={false}>Semana pasada</Link>
+          </nav>
+        </div>
+        {horas.personas.length ? (
+          <GraficaHoras personas={horas.personas} maximoMin={horas.maximoMin} lunes={lunesHoras} />
+        ) : (
+          <p className="vacio">Aún no hay horas registradas en esta semana.</p>
+        )}
+      </section>
       {alta.completa && pendientes.length === 0 && (
         <p className="todo-en-orden"><span aria-hidden>✓</span> Todo en orden: no hay nada pendiente por atender.</p>
       )}

@@ -97,6 +97,18 @@ export async function misTrabajadores(supabase: Cliente, userId: string): Promis
   return ((data ?? []) as FilaTrabajador[]).map(filaATrabajador);
 }
 
+/** Personal activo de una empresa (RLS decide si el usuario puede verlo). */
+export async function trabajadoresActivos(supabase: Cliente, empresaId: string): Promise<Trabajador[]> {
+  const { data, error } = await supabase
+    .from("trabajadores")
+    .select(SELECT_TRABAJADOR)
+    .eq("empresa_id", empresaId)
+    .is("fecha_baja", null)
+    .order("nombre");
+  if (error) throw error;
+  return ((data ?? []) as FilaTrabajador[]).map(filaATrabajador);
+}
+
 /** Un trabajador por id (RLS decide si el usuario puede verlo). */
 export async function trabajadorPorId(supabase: Cliente, id: string): Promise<Trabajador | null> {
   const { data, error } = await supabase.from("trabajadores").select(SELECT_TRABAJADOR).eq("id", id).maybeSingle();
