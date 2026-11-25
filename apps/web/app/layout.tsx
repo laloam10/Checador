@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
+import { headers } from "next/headers";
 import { connection } from "next/server";
 import { AvisoActualizacion } from "@/components/AvisoActualizacion";
 import { RegistrarServiceWorker } from "@/components/RegistrarServiceWorker";
@@ -11,12 +12,26 @@ const titulos = Space_Grotesk({ subsets: ["latin"], display: "swap", variable: "
 // Horas, folios y etiquetas: cifras de ancho fijo para que las columnas no "bailen".
 const mono = JetBrains_Mono({ subsets: ["latin"], display: "swap", variable: "--fuente-mono" });
 
-export const metadata: Metadata = {
-  title: "Checador",
-  description: "Registro electrónico de jornada laboral",
-  appleWebApp: { capable: true, title: "Checador", statusBarStyle: "default" },
-  icons: { icon: [{ url: "/icon.svg", type: "image/svg+xml" }], apple: "/icon-180.png" },
-};
+const DESCRIPCION = "Registro electrónico de jornada para tu negocio: entradas, salidas y horas extra desde el celular, un kiosco o WhatsApp.";
+
+// La vista previa al compartir un enlace (WhatsApp, Facebook, correo) usa app/opengraph-image.png
+// (se regenera con scripts/imagen-compartir.mjs). Su dirección debe ser absoluta: se arma con el
+// dominio de la petición, para que pruebas y producción apunten cada una a su propia imagen.
+export async function generateMetadata(): Promise<Metadata> {
+  const h = await headers();
+  const host = h.get("x-forwarded-host") ?? h.get("host") ?? "checador.jemba.mx";
+  const protocolo = h.get("x-forwarded-proto") ?? (host.startsWith("127.") || host.startsWith("localhost") ? "http" : "https");
+  return {
+    metadataBase: new URL(`${protocolo}://${host}`),
+    title: "Checador",
+    description: DESCRIPCION,
+    applicationName: "Checador",
+    appleWebApp: { capable: true, title: "Checador", statusBarStyle: "default" },
+    icons: { icon: [{ url: "/icon.svg", type: "image/svg+xml" }], apple: "/icon-180.png" },
+    openGraph: { type: "website", locale: "es_MX", siteName: "Checador por Jemba", title: "Checador: registro de jornada", description: DESCRIPCION },
+    twitter: { card: "summary_large_image", title: "Checador: registro de jornada", description: DESCRIPCION },
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: "#0A2103",

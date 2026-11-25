@@ -168,7 +168,6 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--marca); width:
 .acciones-2 { grid-template-columns: 1fr 1fr; }
 .kiosco-listo { padding: 2rem 0; color: var(--marca); }
 .kiosco-listo.listo-aviso { color: var(--ambar); }
-.palomita { font-size: 4rem; line-height: 1; }
 .kiosco-pie { margin-top: auto; padding: 1rem 0; font-size: 0.85rem; color: var(--gris); text-align: left; }
 
 /* ---- Panel del empleador ---- */
@@ -1020,3 +1019,100 @@ main.esqueleto-kiosco { min-height: 100vh; }
   .kiosco-reposo, .reposo-punto { animation: none; }
   .reposo-contenido { transition: none; }
 }
+
+/* =============================================================================
+   Cuenta sin vínculo: con qué correo entró y qué hacer.
+   ============================================================================= */
+.sin-vinculo { max-width: 34rem; margin: 1.5rem auto; background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--radio); box-shadow: var(--sombra); padding: 1.6rem 1.4rem 1.3rem; display: grid; gap: 0.8rem; }
+.sin-vinculo h1 { margin: 0; font-size: 1.45rem; line-height: 1.2; }
+.sin-vinculo .ayuda { margin: 0; }
+.sin-vinculo-icono { display: grid; place-items: center; width: 3.4rem; height: 3.4rem; border-radius: 1rem; background: var(--marca-claro); color: var(--marca); }
+.sin-vinculo-correo { margin: 0; padding: 0.65rem 0.85rem; border-radius: var(--radio-chico); background: var(--fondo); border: 1px dashed var(--borde-fuerte); color: var(--gris); overflow-wrap: anywhere; }
+.sin-vinculo-correo strong { color: var(--tinta); font-family: var(--mono); font-weight: 600; }
+.sin-vinculo-pasos { list-style: none; margin: 0.3rem 0 0; padding: 0; display: grid; gap: 0.7rem; }
+.sin-vinculo-pasos li { display: grid; grid-template-columns: 1.7rem 1fr; gap: 0.7rem; align-items: start; color: var(--gris); }
+.sin-vinculo-pasos li strong { color: var(--tinta); }
+.sin-vinculo-pasos li > span { display: grid; place-items: center; width: 1.7rem; height: 1.7rem; border-radius: 50%; background: var(--noche); color: var(--lima); font-family: var(--mono); font-size: 0.8rem; font-weight: 700; }
+.sin-vinculo-acciones { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.5rem; }
+.sin-vinculo-acciones .boton { text-decoration: none; }
+.sin-vinculo-negocio { margin: 0.3rem 0 0; padding-top: 0.9rem; border-top: 1px solid var(--borde); font-size: 0.9rem; color: var(--gris); }
+.revisar-vinculo { display: contents; }
+.revisar-vinculo .mensaje { flex-basis: 100%; margin: 0; order: 3; }
+
+/* =============================================================================
+   Kiosco: confirmación al checar. Aro y palomita que se dibujan, nombre y hora grandes y
+   una barra que se vacía hasta volver solo al inicio. Ámbar si quedó guardada sin conexión.
+   ============================================================================= */
+.kiosco .kiosco-listo { position: relative; justify-items: center; gap: 0.35rem; padding: 2.2rem 0 1.4rem; margin: auto 0; color: var(--lima); }
+.kiosco .kiosco-listo.listo-aviso { color: #f5c451; }
+.listo-icono { width: 7.5rem; height: 7.5rem; margin-bottom: 0.6rem; overflow: visible; }
+.listo-aro, .listo-trazo { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; }
+.listo-aro { stroke-width: 5; stroke-dasharray: 264; stroke-dashoffset: 264; opacity: 0.9; transform: rotate(-90deg); transform-origin: 50% 50%; animation: listo-dibujo 0.55s cubic-bezier(0.65, 0, 0.35, 1) forwards; }
+.listo-trazo { stroke-width: 7; stroke-dasharray: 80; stroke-dashoffset: 80; animation: listo-dibujo 0.4s 0.45s cubic-bezier(0.65, 0, 0.35, 1) forwards; }
+.listo-icono { animation: listo-pulso 0.5s 0.8s ease-out; }
+.kiosco .kiosco-listo h1 { margin: 0; font-size: 1.15rem; font-family: var(--mono); font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: currentColor; }
+.listo-nombre { margin: 0.5rem 0 0; font-family: var(--fuente-titulos, inherit), sans-serif; font-size: clamp(1.9rem, 6vw, 2.6rem); font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; color: var(--noche-tinta); }
+.listo-hora { margin: 0; font-family: var(--fuente-titulos, inherit), sans-serif; font-size: clamp(3.4rem, 13vw, 5rem); font-weight: 500; letter-spacing: -0.04em; line-height: 1; font-variant-numeric: tabular-nums; color: var(--noche-tinta); }
+.listo-detalle { margin: 0.4rem 0 0; color: var(--noche-sub); font-size: 1.05rem; }
+.listo-aviso .listo-detalle, .listo-aviso .listo-hora + .listo-detalle { color: #f5c451; }
+.listo-siguiente { margin-top: 1.4rem; background: transparent; border: 1px solid var(--noche-linea); color: var(--noche-tinta); padding: 0.75rem 1.6rem; border-radius: 999px; font-weight: 600; font-size: 1rem; }
+.listo-siguiente:active { background: var(--noche-2); }
+.listo-cuenta { display: block; width: min(16rem, 70%); height: 3px; margin-top: 1rem; border-radius: 2px; background: currentColor; opacity: 0.5; transform-origin: left; animation: listo-cuenta var(--confirmacion, 4s) linear forwards; }
+@keyframes listo-dibujo { to { stroke-dashoffset: 0; } }
+@keyframes listo-pulso { 0% { transform: scale(1); } 40% { transform: scale(1.08); } 100% { transform: scale(1); } }
+@keyframes listo-cuenta { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+@media (prefers-reduced-motion: reduce) {
+  .listo-aro, .listo-trazo { animation: none; stroke-dashoffset: 0; }
+  .listo-icono { animation: none; }
+}
+
+/* =============================================================================
+   Accesos: personas y tabletas en tarjetas, invitación en ventana y pasos del kiosco con QR.
+   ============================================================================= */
+.contador { display: inline-grid; place-items: center; min-width: 1.6rem; height: 1.6rem; padding: 0 0.45rem; margin-left: 0.4rem; border-radius: 999px; background: var(--marca-claro); color: var(--marca-oscuro); font-family: var(--mono); font-size: 0.78rem; vertical-align: 0.15em; }
+.contador-pendiente { background: #fdf3dc; color: #7a5410; font-family: inherit; font-weight: 600; }
+.lista-accesos { list-style: none; margin: 0.6rem 0 1.5rem; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr)); gap: 0.6rem; }
+.acceso { display: grid; grid-template-columns: 2.6rem minmax(0, 1fr) auto; gap: 0.8rem; align-items: center; padding: 0.8rem 0.9rem; background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--radio); box-shadow: var(--sombra); }
+.acceso-pendiente { background: transparent; border-style: dashed; border-color: var(--borde-fuerte); box-shadow: none; }
+.acceso-avatar { display: grid; place-items: center; width: 2.6rem; height: 2.6rem; border-radius: 0.8rem; font-family: var(--fuente-titulos, inherit), sans-serif; font-weight: 700; font-size: 1.05rem; background: var(--marca-claro); color: var(--marca-oscuro); }
+.acceso[data-rol="propietario"] .acceso-avatar, .acceso[data-rol="admin"] .acceso-avatar { background: var(--noche); color: var(--lima); }
+.acceso[data-rol="kiosco"] .acceso-avatar { background: #eef2e3; color: var(--noche); }
+.acceso-pendiente .acceso-avatar { background: #fdf3dc; color: #7a5410; }
+.acceso-datos { display: grid; gap: 0.2rem; min-width: 0; }
+.acceso-datos > strong { font-size: 0.95rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.acceso-datos > span { font-size: 0.82rem; color: var(--gris); }
+.chip-rol { display: inline-block; padding: 0.05rem 0.5rem; border-radius: 999px; border: 1px solid var(--borde-fuerte); font-size: 0.75rem; font-weight: 700; color: var(--tinta); }
+.acceso-accion { margin: 0; }
+.boton-quitar:hover { border-color: #9b1c1c; color: #9b1c1c; background: #fdf1f0; }
+
+.preparar-kiosco { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1.5rem; align-items: center; margin: 0 0 1.5rem; padding: 1.4rem 1.5rem; border-radius: var(--radio); background: radial-gradient(40rem 20rem at 100% 120%, rgb(200 230 0 / 0.12), transparent 70%), var(--noche); color: var(--noche-tinta); }
+.preparar-kiosco h2 { margin: 0 0 0.9rem; color: var(--noche-tinta); }
+.preparar-kiosco ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.9rem; }
+.preparar-kiosco li { display: grid; grid-template-columns: 1.8rem 1fr; gap: 0.75rem; }
+.preparar-kiosco li > span { display: grid; place-items: center; width: 1.8rem; height: 1.8rem; border-radius: 50%; background: var(--lima); color: var(--noche); font-family: var(--mono); font-weight: 700; font-size: 0.85rem; }
+.preparar-kiosco li p { margin: 0.2rem 0 0; color: var(--noche-sub); font-size: 0.9rem; }
+.preparar-kiosco code { color: var(--lima); background: rgb(255 255 255 / 0.06); padding: 0.15rem 0.45rem; border-radius: 0.4rem; font-size: 0.92rem; }
+.preparar-kiosco .boton-secundario { margin-top: 0.6rem; background: transparent; color: var(--lima); border-color: var(--lima); }
+.preparar-kiosco .boton-secundario:hover { background: rgb(200 230 0 / 0.1); }
+.preparar-kiosco .mensaje { margin-top: 0.6rem; }
+.preparar-kiosco-qr { margin: 0; display: grid; justify-items: center; gap: 0.5rem; }
+.preparar-kiosco-qr img { display: block; padding: 0.6rem; background: #fff; border-radius: 0.9rem; }
+.preparar-kiosco-qr figcaption { font-size: 0.78rem; color: var(--noche-sub); }
+
+.opciones-rol { border: none; margin: 0 0 0.8rem; padding: 0; display: grid; gap: 0.5rem; }
+.opciones-rol legend { font-weight: 600; font-size: 0.9rem; margin-bottom: 0.4rem; padding: 0; }
+.opciones-rol label { display: grid; grid-template-columns: auto 1fr; gap: 0.1rem 0.6rem; align-items: center; padding: 0.65rem 0.8rem; border: 1px solid var(--borde); border-radius: var(--radio-chico); cursor: pointer; font-weight: 400; }
+.opciones-rol label.elegida { border-color: var(--marca); background: var(--marca-claro); box-shadow: inset 0 0 0 1px var(--marca); }
+.opciones-rol input { grid-row: span 2; margin: 0; accent-color: var(--marca); width: 1.1rem; height: 1.1rem; }
+.opciones-rol span { grid-column: 2; font-size: 0.82rem; color: var(--gris); }
+.roles-acceso dl { margin: 0.6rem 0 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); gap: 0.6rem; }
+.roles-acceso dl > div { padding: 0.7rem 0.85rem; border: 1px solid var(--borde); border-radius: var(--radio-chico); background: var(--superficie); }
+.roles-acceso dt { font-weight: 700; font-size: 0.9rem; }
+.roles-acceso dd { margin: 0.25rem 0 0; font-size: 0.84rem; color: var(--gris); }
+@media (max-width: 40rem) {
+  .preparar-kiosco { grid-template-columns: 1fr; }
+  .preparar-kiosco-qr { justify-self: start; }
+  .acceso { grid-template-columns: 2.6rem minmax(0, 1fr); }
+  .acceso-accion { grid-column: 2; }
+}
+.ventana-accion .ayuda { color: var(--gris); }

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Isotipo } from "@/components/Marca";
-import { leerPendientes } from "@/lib/cola";
+import { salirDeLaApp } from "@/lib/salir";
 
 // Secciones de la persona trabajadora. Íconos de trazo (24×24), como en el panel.
 const SECCIONES = [
@@ -17,23 +17,6 @@ const SECCIONES = [
 export function Navegacion({ panel = false }: { panel?: boolean }) {
   const ruta = usePathname();
   const activo = (s: (typeof SECCIONES)[number]) => (s.exacto ? ruta === s.href : ruta.startsWith(s.href));
-
-  async function salir() {
-    const pendientes = await leerPendientes();
-    if (
-      pendientes.some((p) => !p.rechazo) &&
-      !confirm("Tienes checadas sin enviar. Si sales ahora se enviarán cuando vuelvas a entrar. ¿Salir?")
-    ) {
-      return;
-    }
-    // Las páginas guardadas para uso sin conexión contienen datos personales.
-    if ("caches" in window) {
-      for (const k of await caches.keys()) await caches.delete(k);
-    }
-    // Si la persona eligió volver a entrar con su PIN o su huella, Salir solo bloquea este teléfono.
-    const r = await fetch("/api/salir", { method: "POST" }).then((x) => x.json()).catch(() => ({}));
-    window.location.href = (r as { bloqueada?: boolean }).bloqueada ? "/desbloquear" : "/entrar";
-  }
 
   return (
     <>
@@ -51,7 +34,7 @@ export function Navegacion({ panel = false }: { panel?: boolean }) {
         </nav>
         <div className="app-cabecera-acciones">
           {panel && <Link href="/panel" className="chip-panel">Panel</Link>}
-          <button className="enlace" onClick={salir}>Salir</button>
+          <button className="enlace" onClick={salirDeLaApp}>Salir</button>
         </div>
       </header>
 

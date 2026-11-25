@@ -109,11 +109,14 @@ try {
   // 4. Invitar kiosco
   await dueno.getByRole("link", { name: "Accesos" }).click();
   await dueno.getByRole("heading", { name: "Accesos" }).waitFor();
-  await dueno.getByLabel("Correo").fill(KIOSCO);
-  await dueno.getByLabel("Centro (solo kiosco)").selectOption({ label: "Matriz" });
-  await dueno.getByRole("button", { name: "Invitar" }).click();
+  await dueno.getByRole("button", { name: "Invitar un kiosco" }).click();
+  const invitacion = dueno.getByRole("dialog", { name: "Invitar" }).last();
+  await invitacion.getByRole("radio", { name: /Kiosco/ }).isChecked().then((v) => { if (!v) throw new Error("El rol Kiosco debía venir elegido"); });
+  await invitacion.getByLabel("Correo").fill(KIOSCO);
+  await invitacion.getByLabel("Centro de trabajo").selectOption({ label: "Matriz" });
+  await invitacion.getByRole("button", { name: "Enviar invitación" }).click();
   await mensaje(dueno, "Invitación creada");
-  await dueno.getByText("invitación pendiente").waitFor();
+  await dueno.getByText(/invitación pendiente desde/).waitFor();
   paso("kiosco invitado por correo, sin tocar SQL");
 
   // 5. El kiosco entra y la trabajadora checa
@@ -187,9 +190,10 @@ try {
   // 9. Accesos: el kiosco ya es miembro; quitarle el acceso
   await dueno.getByRole("link", { name: "Accesos" }).click();
   await dueno.getByRole("heading", { name: "Accesos" }).waitFor();
-  const fila = dueno.getByRole("row", { name: new RegExp(KIOSCO.replace(/\./g, "\\.")) });
-  await fila.getByRole("cell", { name: "Kiosco", exact: true }).waitFor();
-  await fila.getByRole("button", { name: "Quitar acceso" }).click();
+  const fila = dueno.locator(".acceso", { hasText: KIOSCO });
+  await fila.locator(".chip-rol", { hasText: "Kiosco" }).waitFor();
+  if (await fila.getByText(/invitación pendiente/).count()) throw new Error("La invitación debía quedar aceptada");
+  await fila.getByRole("button", { name: `Quitar acceso a ${KIOSCO}` }).click();
   await fila.waitFor({ state: "detached" });
   paso("la invitación quedó aceptada y el acceso del kiosco se puede quitar");
 

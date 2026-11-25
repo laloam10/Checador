@@ -79,7 +79,8 @@ try {
   await page.getByRole("heading", { name: "Hola, Beto" }).waitFor();
   await page.getByRole("button", { name: "Registrar entrada" }).click();
   await page.getByText("Entrada registrada").waitFor();
-  await page.getByText(/Beto López · \d{2}:\d{2}/).waitFor();
+  await page.locator(".listo-nombre", { hasText: "Beto López" }).waitFor();
+  await page.locator(".listo-hora").filter({ hasText: /^\d{2}:\d{2}$/ }).waitFor();
   paso("entrada registrada con número de empleado y PIN");
   await page.getByRole("heading", { name: "Número de empleado" }).waitFor({ timeout: 8000 });
   paso("la pantalla vuelve sola al inicio");

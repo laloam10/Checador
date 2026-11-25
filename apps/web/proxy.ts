@@ -109,7 +109,8 @@ function politicaSeguridad(nonce: string, https: boolean): string {
 
 export const config = {
   matcher: [
-    // Todo excepto estáticos, íconos, manifiesto y service worker.
-    "/((?!_next/static|_next/image|favicon.ico|icon\\.svg|icon-.*\\.png|manifest.webmanifest|sw.js).*)",
+    // Todo excepto estáticos, íconos, imagen para compartir, manifiesto y service worker.
+    // La imagen para compartir es pública: la piden WhatsApp y otras apps sin sesión.
+    "/((?!_next/static|_next/image|favicon.ico|icon\\.svg|icon-.*\\.png|opengraph-image|twitter-image|manifest.webmanifest|sw.js).*)",
   ],
 };

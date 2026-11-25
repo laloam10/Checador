@@ -97,8 +97,9 @@ try {
   await estado(p, "PIN asignado");
   await p.goto(`${APP}/panel/accesos`);
   await p.getByRole("heading", { name: "Accesos" }).waitFor();
-  await p.getByLabel("Correo").fill(KIOSCO);
-  await p.getByRole("button", { name: "Invitar" }).click();
+  await p.getByRole("button", { name: "Invitar un kiosco" }).click();
+  await p.getByRole("dialog", { name: "Invitar" }).last().getByLabel("Correo").fill(KIOSCO);
+  await p.getByRole("dialog", { name: "Invitar" }).last().getByRole("button", { name: "Enviar invitación" }).click();
   await estado(p, "Invitación creada");
   await tablero();
   await pasoHecho("Cada persona tiene cómo checar").waitFor();

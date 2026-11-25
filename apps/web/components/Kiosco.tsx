@@ -44,7 +44,7 @@ type Paso =
     }
   | { tipo: "acuerdo"; nombre: string; acuerdo: AcuerdoPendiente }
   | { tipo: "acciones-sin-red" }
-  | { tipo: "listo"; titulo: string; detalle: string; aviso?: boolean };
+  | { tipo: "listo"; titulo: string; detalle: string; aviso?: boolean; nombre?: string; hora?: string };
 
 const ETIQUETA: Record<TipoCaptura, string> = {
   entrada: "Entrada",
@@ -206,6 +206,16 @@ export function Kiosco({
     };
   }, [versionNueva, enReposo]);
 
+  // Al confirmar, una vibración corta (dos si quedó guardada sin conexión), en tabletas que la tienen.
+  useEffect(() => {
+    if (paso.tipo !== "listo") return;
+    try {
+      navigator.vibrate?.(paso.aviso ? [70, 80, 70] : 60);
+    } catch {
+      // sin vibración
+    }
+  }, [paso]);
+
   // Pantalla de reposo: tras un rato sin uso en la pantalla del número. Cualquier toque o
   // tecla reinicia la espera; tocar la pantalla de reposo vuelve al teclado sin marcar nada.
   useEffect(() => {
@@ -365,14 +375,15 @@ export function Kiosco({
     const r = await enviarKiosco(datos);
     if (r.tipo === "ok") {
       const h = r.horaEfectiva ? aHoraLocal(r.horaEfectiva, zonaHoraria).slice(11) : aHoraLocal(hora, zonaHoraria).slice(11);
-      setPaso({ tipo: "listo", titulo: `${ETIQUETA[tipo]} registrada`, detalle: `${r.nombre} · ${h}` });
+      setPaso({ tipo: "listo", titulo: `${ETIQUETA[tipo]} registrada`, detalle: `${r.nombre} · ${h}`, nombre: r.nombre, hora: h });
     } else if (r.tipo === "sin-red" || r.tipo === "sesion") {
       await encolarKiosco({ ...datos, horaDispositivo: hora.toISOString() });
       await recargarCola();
       setPaso({
         tipo: "listo",
         titulo: `${ETIQUETA[tipo]} guardada sin conexión`,
-        detalle: `${aHoraLocal(hora, zonaHoraria).slice(11)} · se enviará al volver la conexión`,
+        detalle: "Se enviará sola al volver la conexión",
+        hora: aHoraLocal(hora, zonaHoraria).slice(11),
         aviso: true,
       });
       if (r.tipo === "sesion") window.location.href = "/entrar?siguiente=/kiosco";
@@ -450,7 +461,8 @@ export function Kiosco({
         {!enLinea && <span className="etiqueta">sin conexión</span>}
       </header>
 
-      <div className="reloj">{reloj || "--:--:--"}</div>
+      {/* En la confirmación la hora grande es la de la checada: no se repite el reloj. */}
+      {paso.tipo !== "listo" && <div className="reloj">{reloj || "--:--:--"}</div>}
 
       {error && <p className="mensaje mensaje-error">{error}</p>}
 
@@ -591,10 +603,20 @@ export function Kiosco({
       )}
 
       {paso.tipo === "listo" && (
-        <section className={`kiosco-paso kiosco-listo ${paso.aviso ? "listo-aviso" : ""}`} role="status">
-          <div className="palomita" aria-hidden>{paso.aviso ? "⏳" : "✓"}</div>
+        <section className={`kiosco-paso kiosco-listo ${paso.aviso ? "listo-aviso" : ""}`} role="status"
+          style={{ "--confirmacion": `${CONFIRMACION_MS}ms` } as React.CSSProperties}>
+          <svg className="listo-icono" viewBox="0 0 96 96" aria-hidden>
+            <circle className="listo-aro" cx="48" cy="48" r="42" />
+            {paso.aviso
+              ? <path className="listo-trazo" d="M48 26v24l14 9" />
+              : <path className="listo-trazo" d="M29 49l13 13 26-28" />}
+          </svg>
           <h1>{paso.titulo}</h1>
-          <p>{paso.detalle}</p>
+          {paso.nombre && <p className="listo-nombre">{paso.nombre}</p>}
+          {paso.hora && <p className="listo-hora">{paso.hora}</p>}
+          {!paso.nombre && <p className="listo-detalle">{paso.detalle}</p>}
+          <button type="button" className="listo-siguiente" onClick={reiniciar}>Siguiente persona</button>
+          <span className="listo-cuenta" aria-hidden />
         </section>
       )}
 

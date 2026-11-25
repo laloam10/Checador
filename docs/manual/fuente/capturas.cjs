@@ -151,9 +151,10 @@ const estado = (p, t) => p.getByRole("status").filter({ hasText: t }).first().wa
   await shotEl(d.locator("table.tabla"), "07-lista-trabajadores");
   await d.goto(`${APP}/panel/accesos`);
   await d.getByRole("heading", { name: "Accesos" }).waitFor();
-  await d.getByLabel("Correo").fill(C.kiosco);
-  await d.getByLabel("Centro (solo kiosco)").selectOption({ label: "Matriz" });
-  await d.getByRole("button", { name: "Invitar" }).click();
+  await d.getByRole("button", { name: "Invitar un kiosco" }).click();
+  await d.getByRole("dialog", { name: "Invitar" }).last().getByLabel("Correo").fill(C.kiosco);
+  await d.getByRole("dialog", { name: "Invitar" }).last().getByLabel("Centro de trabajo").selectOption({ label: "Matriz" });
+  await d.getByRole("dialog", { name: "Invitar" }).last().getByRole("button", { name: "Enviar invitación" }).click();
   await estado(d, "Invitación creada");
   await shot(d, "09-accesos", { fullPage: true });
   await d.goto(`${APP}/panel/centros`);
