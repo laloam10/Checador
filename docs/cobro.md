@@ -17,7 +17,7 @@ persona nunca cuesta más de $50. Ejemplos: 5 personas $349, 10 personas $599, 2
 40 personas $1,499. Precios **más IVA** (se muestra también el total con IVA).
 
 - **Anual:** 10 meses (2 de regalo).
-- **Prueba:** 30 días con todas las funciones, sin tarjeta. Empieza al crear la empresa.
+- **Prueba:** 14 días con todas las funciones, sin tarjeta. Empieza al crear la empresa (antes 30; cambio del 2026-11-26, migración `20261202000001`).
 - **Un solo plan:** todas las funciones para todos; el precio solo depende de cuántas personas.
 - **Quién cuenta:** personas trabajadoras dadas de alta y sin baja. Dueño, administradores,
   supervisores y kioscos son ilimitados y sin costo.
@@ -29,7 +29,7 @@ algunas personas, que es justo el incumplimiento que Checador ayuda a evitar.
 
 ## Fases
 
-1. **Estado y prueba (hecha).** Tabla `suscripciones` (migración `20261201000001`), prueba de 30
+1. **Estado y prueba (hecha).** Tabla `suscripciones` (migración `20261201000001`), prueba de 14
    días automática y sección **Configuración → Suscripción** con el estado y el precio de ese mes
    con su desglose. No restringe nada.
 2. **Pago en línea y factura (pendiente).** Stripe Billing con precio por tramos

@@ -1,5 +1,5 @@
 -- =============================================================================
--- Pruebas de la suscripción de cada empresa (fase 1: estado y prueba). Continúa sobre 10–105.
+-- Pruebas de la suscripción de cada empresa (fase 1: estado y prueba). Continúa sobre 10–105. La prueba dura 14 días (migración 20261202000001).
 -- =============================================================================
 \set QUIET on
 \pset tuples_only on
@@ -15,9 +15,9 @@ select id as empresa_b from public.empresas where razon_social = 'Empresa B SA d
 -- Toda empresa tiene su suscripción en prueba por 30 días.
 select tests.afirmar(not exists (select 1 from public.empresas e left join public.suscripciones s on s.empresa_id = e.id where s.empresa_id is null),
   'cada empresa tiene su suscripción');
-select tests.afirmar((select estado = 'prueba' and prueba_hasta between now() + interval '29 days' and now() + interval '31 days'
+select tests.afirmar((select estado = 'prueba' and prueba_hasta between now() + interval '13 days' and now() + interval '15 days'
                         from public.suscripciones where empresa_id = :'empresa_a'),
-  'la prueba dura 30 días');
+  'la prueba dura 14 días');
 
 -- Una empresa nueva empieza en prueba.
 set role authenticated;
