@@ -5,6 +5,7 @@ import { resumenHorario } from "@/lib/horarios";
 import { horariosDeEmpresa } from "@/lib/horariosDatos";
 import { FormAccion } from "@/components/panel/FormAccion";
 import { InterruptorRecordatorios } from "@/components/panel/InterruptorRecordatorios";
+import { SeccionSuscripcion, type DatosSuscripcion } from "@/components/panel/SeccionSuscripcion";
 import { NuevoHorario } from "@/components/panel/NuevoHorario";
 import { esGestor, requierePanel, ZONAS_MX } from "@/lib/panel";
 
@@ -17,9 +18,11 @@ export default async function Configuracion() {
     .eq("id", ctx.empresa.id)
     .single();
   const recordatorios = empresa?.recordatorios_conformidad ?? true;
-  const [{ horarios, predeterminado }, { data: personal }] = await Promise.all([
+  const [{ horarios, predeterminado }, { data: personal }, { data: suscripcion }] = await Promise.all([
     horariosDeEmpresa(ctx.supabase, ctx.empresa.id),
     ctx.supabase.from("trabajadores").select("horario_id, sin_horario_fijo").eq("empresa_id", ctx.empresa.id).is("fecha_baja", null),
+    // Solo propietarios y administradores la ven (RLS).
+    ctx.supabase.from("suscripciones").select("estado, prueba_hasta, periodo_fin").eq("empresa_id", ctx.empresa.id).maybeSingle<DatosSuscripcion>(),
   ]);
   // Cuántas personas activas usa cada horario (las que no tienen uno propio usan el de la empresa).
   const usan = (id: string) =>
@@ -34,6 +37,7 @@ export default async function Configuracion() {
           <a href="#empresa">Empresa</a>
           <a href="#horarios">Horarios</a>
           <a href="#recordatorios">Recordatorios</a>
+          {suscripcion && <a href="#suscripcion">Suscripción</a>}
         </nav>
       </div>
       {!gestor && (
@@ -181,6 +185,13 @@ export default async function Configuracion() {
           </div>
         </section>
       </div>
+
+      {suscripcion && (
+        <>
+          <h2 id="suscripcion">Suscripción</h2>
+          <SeccionSuscripcion suscripcion={suscripcion} personas={personal?.length ?? 0} zonaHoraria={ctx.empresa.zonaHoraria} />
+        </>
+      )}
     </>
   );
 }

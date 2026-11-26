@@ -1164,3 +1164,25 @@ main.esqueleto-kiosco { min-height: 100vh; }
 .guia-acciones .boton-secundario { background: transparent; color: var(--noche-tinta); border-color: var(--noche-linea); text-decoration: none; }
 .guia-pie { margin-top: 1.6rem; text-align: center; font-size: 0.8rem; color: var(--gris); }
 .entrar-guia { white-space: nowrap; }
+
+/* =============================================================================
+   Configuración → Suscripción: estado de la prueba y precio escalonado con su desglose.
+   ============================================================================= */
+.suscripcion { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 1rem; margin-bottom: 1.5rem; }
+.suscripcion > section { background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--radio); box-shadow: var(--sombra); padding: 1.1rem 1.2rem; }
+.suscripcion-estado { display: grid; align-content: start; gap: 0.4rem; background: radial-gradient(26rem 14rem at 0% 0%, rgb(200 230 0 / 0.18), transparent 70%), var(--superficie) !important; }
+.chip-estado { justify-self: start; padding: 0.2rem 0.7rem; border-radius: 999px; background: var(--noche); color: var(--lima); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.02em; }
+.chip-estado.chip-aviso { background: #fdf3dc; color: #7a5410; }
+.suscripcion-dias { margin: 0.3rem 0 0; font-size: 1.05rem; color: var(--gris); }
+.suscripcion-dias strong { font-family: var(--fuente-titulos, inherit), sans-serif; font-size: 2.4rem; color: var(--noche); margin-right: 0.2rem; letter-spacing: -0.03em; }
+.suscripcion-estado .ayuda, .suscripcion-precio .ayuda { margin: 0; }
+.suscripcion-pago { margin: 0.6rem 0 0; padding: 0.6rem 0.75rem; border-radius: var(--radio-chico); background: var(--fondo); border: 1px dashed var(--borde-fuerte); font-size: 0.85rem; color: var(--gris); }
+.suscripcion-precio h3 { margin: 0; font-size: 0.82rem; font-weight: 600; color: var(--gris); }
+.suscripcion-total { margin: 0.2rem 0 0.1rem; font-family: var(--fuente-titulos, inherit), sans-serif; font-size: 2.2rem; font-weight: 700; letter-spacing: -0.03em; color: var(--noche); font-variant-numeric: tabular-nums; }
+.suscripcion-total span { font-family: var(--fuente-texto, inherit), sans-serif; font-size: 0.95rem; font-weight: 500; letter-spacing: 0; color: var(--gris); }
+.suscripcion-desglose { width: 100%; border-collapse: collapse; margin: 0.8rem 0 0.6rem; font-size: 0.88rem; }
+.suscripcion-desglose th { text-align: left; font-weight: 500; color: var(--tinta); padding: 0.45rem 0; border-top: 1px solid var(--borde); }
+.suscripcion-desglose th small { color: var(--gris); }
+.suscripcion-desglose td { text-align: right; font-family: var(--mono); padding: 0.45rem 0; border-top: 1px solid var(--borde); font-variant-numeric: tabular-nums; }
+.suscripcion-nota { font-size: 0.8rem; }
+@media (max-width: 46rem) { .suscripcion { grid-template-columns: 1fr; } }
