@@ -24,9 +24,9 @@ Jemba, WhatsApp, avisos, horarios, Salir con PIN o huella, ubicación al checar 
 
 ## Del usuario (en pruebas)
 
-- [ ] **Publicar la guía rápida en jemba.mx**: subir `docs/publicar/guia-rapida-checador.html` (archivo completo, no
-      pegado en un bloque: trae sus propios estilos). Sus botones llevan a `checador.jemba.mx`, que no funciona hasta
-      reactivar producción. Si cambia `/guia`, regenerarlo con `node scripts/guia-html.mjs` (con la app corriendo).
+- [x] **Guía rápida publicada en jemba.mx** (2026-11-26) con `docs/publicar/guia-rapida-checador.html`. Sus botones
+      llevan a `checador.jemba.mx`, que no funciona hasta reactivar producción. Si cambia `/guia`, regenerarla con
+      `node scripts/guia-html.mjs` (con la app corriendo) y volver a subirla.
 
 - [ ] **WhatsApp con Meta** (`docs/publicacion.md` §1.9): app de Meta con número de prueba, secreto de servicio
       `whatsapp`, variables `WHATSAPP_*` en Vercel (Preview, rama `pruebas`) y webhook con
