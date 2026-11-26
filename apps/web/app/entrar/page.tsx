@@ -153,6 +153,7 @@ export default function Entrar() {
 
         <p className="entrar-empresa">
           ¿Tienes un negocio? <a href="/alta-empresa">Registra tu empresa</a> y lleva el registro de jornada de tu personal.
+          {" "}<a href="/guia" className="entrar-guia">Ver la guía rápida</a>
         </p>
         <p className="legal">
           Tus registros de jornada se conservan conforme a la Ley Federal del Trabajo. Consulta el aviso de privacidad

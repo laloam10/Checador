@@ -51,7 +51,8 @@ export async function proxy(request: NextRequest) {
 
   const { data } = await supabase.auth.getClaims();
   const ruta = request.nextUrl.pathname;
-  const publica = ruta.startsWith("/entrar") || ruta.startsWith("/api");
+  // /guia: guía rápida pública, para enlazarla desde la página de Jemba.
+  const publica = ruta.startsWith("/entrar") || ruta.startsWith("/api") || ruta === "/guia";
 
   if (!data?.claims && !publica) {
     const url = request.nextUrl.clone();
