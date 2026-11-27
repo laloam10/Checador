@@ -1186,3 +1186,26 @@ main.esqueleto-kiosco { min-height: 100vh; }
 .suscripcion-desglose td { text-align: right; font-family: var(--mono); padding: 0.45rem 0; border-top: 1px solid var(--borde); font-variant-numeric: tabular-nums; }
 .suscripcion-nota { font-size: 0.8rem; }
 @media (max-width: 46rem) { .suscripcion { grid-template-columns: 1fr; } }
+.alta-prueba { margin: 0.6rem 0 0; padding: 0.6rem 0.85rem; border-radius: var(--radio-chico); background: var(--marca-claro); color: var(--marca-oscuro); font-size: 0.92rem; }
+.alta-prueba a { font-weight: 700; }
+
+/* Guía → Precios: tramos, ejemplos y calculadora (también en el HTML de jemba.mx). */
+.guia-precios { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: 0.7rem; }
+.guia-precios-tramos, .calculadora { background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--radio); box-shadow: var(--sombra); padding: 1rem 1.1rem; }
+.guia-precios-intro { margin: 0 0 0.6rem; color: var(--gris); line-height: 1.5; }
+.guia-precios-intro strong { color: var(--noche); }
+.guia-precios-tramos ul { list-style: none; margin: 0; padding: 0; }
+.guia-precios-tramos li { display: flex; justify-content: space-between; gap: 1rem; padding: 0.5rem 0; border-top: 1px solid var(--borde); font-size: 0.92rem; color: var(--tinta); }
+.guia-precios-tramos li strong { font-family: var(--mono); font-weight: 600; color: var(--noche); white-space: nowrap; }
+.guia-precios-ejemplos { margin: 0.6rem 0 0; font-size: 0.84rem; color: var(--gris); line-height: 1.5; }
+.guia-precios-ejemplos strong { color: var(--tinta); }
+.calculadora { display: grid; align-content: start; gap: 0.5rem; background: radial-gradient(22rem 12rem at 100% 0%, rgb(200 230 0 / 0.2), transparent 70%), var(--superficie); }
+.calculadora-pregunta { display: flex; justify-content: space-between; align-items: baseline; gap: 0.6rem; font-size: 0.9rem; font-weight: 600; color: var(--noche); }
+.calculadora-pregunta output { font-family: var(--mono); font-size: 1rem; color: var(--marca); white-space: nowrap; }
+.calculadora input[type="range"] { width: 100%; accent-color: var(--marca); margin: 0.2rem 0; }
+.calculadora-total { margin: 0.2rem 0 0; font-family: var(--fuente-titulos, inherit), sans-serif; font-size: 2.2rem; font-weight: 700; letter-spacing: -0.03em; color: var(--noche); font-variant-numeric: tabular-nums; }
+.calculadora-total small { font-family: var(--fuente-texto, inherit), sans-serif; font-size: 0.9rem; font-weight: 500; letter-spacing: 0; color: var(--gris); }
+.calculadora-detalle { margin: 0; font-size: 0.82rem; color: var(--gris); line-height: 1.5; }
+.guia-precios-notas { margin: 0.6rem 0.2rem 0; padding-left: 1.1rem; font-size: 0.84rem; color: var(--gris); line-height: 1.6; }
+.guia-precios-notas strong { color: var(--tinta); }
+@media (max-width: 40rem) { .guia-precios { grid-template-columns: 1fr; } }

@@ -94,13 +94,39 @@ const cssPestanas = `
 #sistema-android:focus-visible ~ .guia-pestanas label[for="sistema-android"],
 #sistema-iphone:focus-visible ~ .guia-pestanas label[for="sistema-iphone"] { outline: 2px solid var(--marca); }
 #sistema-android:checked ~ .guia-lista-iphone, #sistema-android:checked ~ .guia-nota-iphone,
-#sistema-iphone:checked ~ .guia-lista-android, #sistema-iphone:checked ~ .guia-nota-android { display: none; }`;
+#sistema-iphone:checked ~ .guia-lista-android, #sistema-iphone:checked ~ .guia-nota-android { display: none; }
+/* Sin scripts la calculadora no respondería: se oculta y quedan los tramos y los ejemplos. */
+.sin-js .calculadora { display: none; }
+.sin-js .guia-precios { grid-template-columns: 1fr; }`;
 
 // Preselecciona iPhone en iPhone si el sitio permite scripts (si no, queda Android).
-const script = `<script>if (/iPhone|iPad|iPod/.test(navigator.userAgent)) document.getElementById("sistema-iphone").checked = true;</script>`;
+// Calculadora de precios: lee los textos ya calculados (data-precios, de lib/precios.ts).
+// Sin scripts, la tabla de tramos y los ejemplos siguen visibles.
+const script = `<script>
+document.documentElement.classList.remove("sin-js");
+if (/iPhone|iPad|iPod/.test(navigator.userAgent)) document.getElementById("sistema-iphone").checked = true;
+(function () {
+  var c = document.querySelector(".calculadora");
+  if (!c) return;
+  var d = JSON.parse(c.getAttribute("data-precios"));
+  var r = c.querySelector("input[type=range]");
+  var m = d.length;
+  var $ = function (id) { return document.getElementById(id); };
+  function pintar() {
+    var n = Number(r.value), e = d[n - 1];
+    $("calculadora-cuantas").textContent = n === m ? "Más de " + (m - 1) : String(n);
+    $("calculadora-total").textContent = e.total;
+    $("calculadora-unidad").textContent = n < m ? " al mes + IVA" : "";
+    $("calculadora-detalle").textContent = e.detalle;
+    r.setAttribute("aria-valuetext", n === m ? "Más de " + (m - 1) + " personas" : n + " personas");
+  }
+  r.addEventListener("input", pintar);
+  pintar();
+})();
+</script>`;
 
 const documento = `<!doctype html>
-<html lang="es-MX" class="${resultado.clasesHtml}">
+<html lang="es-MX" class="${resultado.clasesHtml} sin-js">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">

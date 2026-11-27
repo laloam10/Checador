@@ -19,6 +19,10 @@ export default async function AltaEmpresa() {
         <Marca tamano={36} subtitulo="Registro de jornada" />
         <h1>Bienvenido a Checador</h1>
         <p>En tres pasos tu personal empieza a registrar su jornada. Serás el propietario de la cuenta.</p>
+        <p className="alta-prueba">
+          <strong>14 días de prueba gratis</strong> con todas las funciones, sin tarjeta. Después pagas según cuántas personas
+          trabajan contigo: <a href="/guia#precios">ver precios</a>.
+        </p>
         <ol className="pasos-alta" aria-label="Pasos para empezar">
           <li className="actual"><span>1</span>Tu empresa</li>
           <li><span>2</span>Tu personal</li>

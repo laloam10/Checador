@@ -55,6 +55,7 @@ try {
   // 1. Alta de empresa
   await entrar(dueno, DUENO, "/panel");
   await dueno.waitForURL(`${APP}/alta-empresa`);
+  await dueno.getByText("14 días de prueba gratis").waitFor();
   await dueno.getByLabel("Razón social o nombre del negocio").fill(EMPRESA);
   await dueno.getByLabel("RFC (opcional)").fill("XXX");
   await dueno.getByLabel("No, debe quedarse en el lugar").check();
@@ -237,6 +238,18 @@ try {
   await dueno.getByRole("button", { name: "Guardar datos" }).click();
   await mensaje(dueno, "El RFC no tiene un formato válido.");
   paso("Configuración: el interruptor de recordatorios se guarda al tocarlo y el RFC se valida");
+
+  // 13. Suscripción: prueba de 14 días y precio escalonado (1 persona activa: $199 al mes)
+  const suscripcion = dueno.locator(".suscripcion");
+  await suscripcion.getByText("Prueba gratis").waitFor();
+  await suscripcion.locator(".suscripcion-dias").filter({ hasText: /^14 días de prueba$/ }).waitFor();
+  await suscripcion.locator(".suscripcion-total").filter({ hasText: "$199 al mes + IVA" }).waitFor();
+  await suscripcion.getByText("$230.84 con IVA").waitFor();
+  if (sql(`select estado || ',' || (prueba_hasta - creada_en between interval '13 days 23 hours' and interval '14 days 1 hour')
+           from suscripciones s join empresas e on e.id = s.empresa_id where e.razon_social = '${EMPRESA}'`) !== "prueba,true") {
+    throw new Error("La suscripción debía estar en prueba por 14 días");
+  }
+  paso("Suscripción: la empresa nueva tiene 14 días de prueba y ve su precio ($199 + IVA con 1 persona)");
 
   const conteo = sql(`select count(*) filter (where e.tipo in ('correccion','anulacion')) || ',' || count(*)
                       from eventos e join empresas x on x.id = e.empresa_id where x.razon_social = '${EMPRESA}'`);

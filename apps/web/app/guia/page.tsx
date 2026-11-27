@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
+import { CalculadoraPrecio, type PrecioCalculado } from "@/components/guia/CalculadoraPrecio";
 import { PestanasInstalacion } from "@/components/guia/PestanasInstalacion";
 import { Marca } from "@/components/Marca";
+import { BASE_CENTAVOS, MAXIMO_SIN_COTIZAR, PERSONAS_EN_BASE, TRAMOS, pesos, precioMensual } from "@/lib/precios";
 
 export const metadata: Metadata = {
   title: "Guía rápida · Checador",
@@ -16,6 +18,16 @@ export default async function Guia() {
   const h = await headers();
   const dominio = h.get("x-forwarded-host") ?? h.get("host") ?? "checador.jemba.mx";
   const iphone = /iPhone|iPad|iPod/.test(h.get("user-agent") ?? "");
+  // Calculadora: textos ya calculados para 1 a 40 personas y "más de 40".
+  const precios: PrecioCalculado[] = Array.from({ length: MAXIMO_SIN_COTIZAR + 1 }, (_, i) => {
+    const p = precioMensual(i + 1);
+    if (p.cotizar) return { personas: i + 1, total: "Cotización", detalle: `Con más de ${MAXIMO_SIN_COTIZAR} personas te preparamos una cotización.` };
+    return {
+      personas: i + 1,
+      total: pesos(p.mensualCentavos),
+      detalle: `${pesos(p.mensualConIvaCentavos)} con IVA · ${pesos(p.anualCentavos)} al año + IVA · ${pesos(Math.round(p.mensualCentavos / p.personas))} por persona`,
+    };
+  });
 
   return (
     <main className="guia">
@@ -29,6 +41,7 @@ export default async function Guia() {
         <a href="#empresa">Para la empresa</a>
         <a href="#personal">Para tu personal</a>
         <a href="#semana">Cada semana</a>
+        <a href="#precios">Precios</a>
         <a href="#preguntas">Preguntas</a>
       </nav>
 
@@ -98,8 +111,38 @@ export default async function Guia() {
         </ul>
       </section>
 
+      <section aria-labelledby="precios">
+        <h2 id="precios" className="guia-seccion">5 · Precios</h2>
+        <div className="guia-precios">
+          <div className="guia-precios-tramos">
+            <p className="guia-precios-intro">
+              <strong>Un solo plan con todo incluido.</strong> Pagas por persona trabajadora activa, y el precio por persona baja
+              conforme crece tu equipo.
+            </p>
+            <ul>
+              <li><span>Hasta {PERSONAS_EN_BASE} personas</span><strong>{pesos(BASE_CENTAVOS)} al mes</strong></li>
+              {TRAMOS.map((t) => (
+                <li key={t.desde}><span>De la {t.desde}.ª a la {t.hasta}.ª persona</span><strong>{pesos(t.porPersonaCentavos)} por persona</strong></li>
+              ))}
+              <li><span>Más de {MAXIMO_SIN_COTIZAR} personas</span><strong>Cotización</strong></li>
+            </ul>
+            <p className="guia-precios-ejemplos">
+              Por ejemplo: {[5, 10, 20, 40].map((n, i) => (
+                <span key={n}>{i > 0 && " · "}{n} personas, <strong>{pesos(precioMensual(n).mensualCentavos)}</strong></span>
+              ))}{" "}al mes.
+            </p>
+          </div>
+          <CalculadoraPrecio precios={precios} />
+        </div>
+        <ul className="guia-precios-notas">
+          <li><strong>14 días de prueba gratis</strong> con todas las funciones, sin tarjeta.</li>
+          <li>El dueño, los administradores, los supervisores y los kioscos no tienen costo: solo cuentan las personas que checan.</li>
+          <li>Pago anual: 10 meses y te llevas 12. Precios en pesos mexicanos, más IVA.</li>
+        </ul>
+      </section>
+
       <section aria-labelledby="preguntas">
-        <h2 id="preguntas" className="guia-seccion">5 · Preguntas frecuentes</h2>
+        <h2 id="preguntas" className="guia-seccion">6 · Preguntas frecuentes</h2>
         <div className="guia-preguntas">
           <Pregunta titulo="¿Tengo que descargar algo de una tienda de apps?">
             No. Checador funciona en el navegador del celular, la tableta o la computadora. Instalarlo en la pantalla de inicio es opcional, pero más cómodo.
@@ -121,7 +164,7 @@ export default async function Guia() {
 
       <section className="guia-cierre">
         <h2>¿Listo para empezar?</h2>
-        <p>Registra tu negocio y da de alta a tu personal hoy mismo.</p>
+        <p>Registra tu negocio y prueba Checador 14 días gratis, sin tarjeta.</p>
         <div className="guia-acciones">
           <a href="/entrar?siguiente=/alta-empresa" className="boton">Registrar mi empresa</a>
           <a href="/entrar" className="boton-secundario">Ya tengo cuenta</a>
