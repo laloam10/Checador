@@ -24,10 +24,8 @@ Jemba, WhatsApp, avisos, horarios, Salir con PIN o huella, ubicación al checar 
 
 ## Del usuario (en pruebas)
 
-- [ ] **Activar el cobro en pruebas** (`docs/publicacion.md` §1.14): en Vercel (Preview, rama `pruebas`)
-      `STRIPE_SECRET_KEY` (sk_test), `COBRO_SECRETO_SERVICIO` (y el mismo en `configurar_secreto_servicio('cobro', …)`)
-      y `STRIPE_WEBHOOK_SECRET` del destino de avisos en Stripe con el bypass de Vercel. Después, probar
-      **Agregar tarjeta** con la tarjeta 4242 4242 4242 4242.
+- [x] **Cobro activado en pruebas** (2026-11-28): variables en Vercel, secreto `cobro`, destino de avisos con los
+      eventos de suscripción. Probado: tarjeta 4242 registrada en prueba y avisos entregados a la app.
 
 - [x] **Guía rápida publicada en jemba.mx** (2026-11-26; con precios y calculadora desde el 2026-11-27) con
       `docs/publicar/guia-rapida-checador.html`. Sus botones
