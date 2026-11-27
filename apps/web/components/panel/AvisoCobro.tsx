@@ -8,6 +8,8 @@ export interface SituacionCobro {
   desde?: string;
   solo_lectura_desde?: string;
   suspendida_desde?: string;
+  /** Términos 9.3: hasta cuándo se conservan los registros en solo lectura (12 meses desde la suspensión). */
+  conservar_hasta?: string;
 }
 
 /**
@@ -29,10 +31,10 @@ export function AvisoCobro({ situacion, zonaHoraria, gestor }: { situacion: Situ
     detalle = `No puedes dar de alta personas, corregir checadas ni generar acuerdos. Tu personal sigue checando hasta el ${dia(situacion.suspendida_desde)}; ese día se suspende el registro.`;
   } else if (motivo === "cancelada") {
     titulo = "Tu suscripción está cancelada";
-    detalle = "Tu personal ya no puede checar. Puedes consultar y exportar todos tus registros; para volver a registrar la jornada, contrata de nuevo.";
+    detalle = `Tu personal ya no puede checar. Puedes consultar y exportar todos tus registros hasta el ${dia(situacion.conservar_hasta)}; después se borrarán. Para volver a registrar la jornada, contrata de nuevo.`;
   } else {
     titulo = "El registro de jornada está suspendido por falta de pago";
-    detalle = `Desde el ${dia(situacion.suspendida_desde)} tu personal no puede checar. Tus registros siguen disponibles para consultar y exportar.`;
+    detalle = `Desde el ${dia(situacion.suspendida_desde)} tu personal no puede checar. Tus registros siguen disponibles para consultar y exportar hasta el ${dia(situacion.conservar_hasta)}; si no reactivas la suscripción, después de esa fecha se borrarán.`;
   }
 
   return (

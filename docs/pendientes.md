@@ -10,7 +10,7 @@ Jemba, WhatsApp, avisos, horarios, Salir con PIN o huella, ubicación al checar 
       2026-11-16, probablemente pausado por inactividad. Mientras tanto nadie puede entrar ni checar en
       `checador.jemba.mx` y la verificación de cada lunes falla. En el plan gratuito, a los 90 días ya no se reactiva
       desde el panel.
-- [ ] **Paso a producción** (lo hace Claude una vez reactivada): migraciones 18 a 36 (incluye horarios, Salir con PIN o huella, ubicación al checar, diseño de correos, suscripciones con prueba de 14 días, cobro con Stripe, restricciones por falta de pago y aceptación de los términos), código de `pruebas` a `main`,
+- [ ] **Paso a producción** (lo hace Claude una vez reactivada): migraciones 18 a 37 (incluye horarios, Salir con PIN o huella, ubicación al checar, diseño de correos, suscripciones con prueba de 14 días, cobro con Stripe, restricciones por falta de pago, aceptación de los términos, conservación y avisos a clientes), código de `pruebas` a `main`,
       manual 1.3 con sus cuatro hojas y verificación de producción (`verificar-produccion.yml`). El usuario pone en
       producción los secretos y variables de WhatsApp (§1.9) y avisos (§1.10); producción no necesita el bypass de
       Vercel.
@@ -29,9 +29,14 @@ Jemba, WhatsApp, avisos, horarios, Salir con PIN o huella, ubicación al checar 
 - [x] **Aceptación de los términos** (2026-11-28, migración `20261207000001`): casilla al crear la empresa y aviso
       en el panel para el propietario que no ha aceptado la versión vigente; se guardan fecha, cuenta, versiones, IP y
       navegador. Se activa al publicar (`LEGAL_PUBLICADO=1`).
-- [ ] **Lo que el borrador aún promete y la app no hace:** solo lectura y exportación durante el plazo de
-      conservación después de cancelar, con aviso 30 días antes del borrado; el CFDI; y avisar por correo los cambios
-      de precio o de términos.
+- [x] **Conservación y avisos a clientes** (2026-11-28, migración `20261208000001`; `docs/cobro.md`, fase 4):
+      12 meses de consulta y exportación desde la suspensión, con la fecha en el panel; correo 30 días antes del
+      borrado; lista `empresas_por_borrar()`; y `avisar_cambio_a_clientes()` para cambios de precio o términos
+      (correo a propietarios y aviso en el panel, con 30 días mínimos).
+- [ ] **Lo que el borrador aún promete y la app no hace:** el CFDI.
+- [ ] **Procedimiento de borrado o anonimización de una empresa** (términos 9.3). Sin prisa: el primer caso llega
+      al menos 13 meses después de la primera cancelación en producción. Debe revisarse a mano cada caso
+      (`empresas_por_borrar()`), y decidir con el abogado qué se anonimiza en lugar de borrarse.
 - [ ] **Avisos de privacidad** (borradores en `docs/legal/`): el de Jemba para clientes y usuarios del panel, y el
       modelo que cada empresa completa y entrega a su personal (con versión simplificada). Revisión del abogado (notas
       al final de cada uno).

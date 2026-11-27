@@ -68,7 +68,53 @@ algunas personas, que es justo el incumplimiento que Checador ayuda a evitar.
    - El panel muestra un aviso en todas sus páginas con lo que pasa y la fecha de la siguiente etapa.
    - Pruebas: `supabase/tests/108_falta_de_pago.sql` y el paso 6 de `apps/web/e2e/cobro.e2e.mjs`.
 
+4. **Conservación después de terminar y avisos a los clientes (hecha, 2026-11-28; migración `20261208000001`).**
+
+   **Conservación (términos 7.2 y 9.3; LFT art. 804).** Una empresa suspendida (cancelada, prueba terminada sin
+   pago o más de 30 días sin pagar) conserva la consulta y la exportación durante **12 meses desde la
+   suspensión**. `situacion_cobro()` agrega `conservar_hasta` y el panel lo dice en el aviso de cobro. Si vuelve
+   a contratar, el plazo desaparece.
+   - **Aviso de borrado:** `enviar_avisos_borrado()` corre a diario (pg_cron, 10:40 hora del centro) y manda un
+     correo a cada propietario 30 días antes de `conservar_hasta`, con el enlace a Exportar. Si el envío falla, se
+     reintenta al día siguiente. Cada envío queda en `correos_clientes` (no se lee desde la API).
+   - **El borrado es manual.** Nunca se borra solo: la bitácora es de solo inserción y antes hay que revisar que no
+     exista una obligación de conservar (juicio laboral, inspección). En el editor SQL de Supabase:
+
+     ```sql
+     select * from public.empresas_por_borrar();
+     ```
+
+     Una empresa se puede borrar solo si `lista_para_borrar` es verdadero: venció el plazo **y** el aviso se
+     entregó hace al menos 30 días (si el aviso salió tarde, `borrar_desde` se recorre). El procedimiento de
+     borrado (o anonimización) de una empresa todavía no está escrito: el primer caso no llegará antes de
+     ~13 meses después de la primera cancelación en producción (ver docs/pendientes.md).
+
+   **Avisos de cambios de precio, términos o aviso de privacidad (términos 6.6 y 15).** Los publica Jemba desde
+   el editor SQL. Primero, sin enviar, para ver a cuántos llega y un ejemplo del correo:
+
+   ```sql
+   select public.avisar_cambio_a_clientes('precio', '2027-03-01',
+     'La persona adicional del tramo 3 a 10 pasa de $50 a $55 al mes, más IVA.', 'https://jemba.mx/checador');
+   ```
+
+   Si el ejemplo está bien, la misma llamada con `p_enviar => true` (quinto argumento `true`) registra el aviso y
+   manda los correos. Reglas:
+   - `tipo`: `precio`, `terminos` o `privacidad`. La fecha debe ser **al menos 30 días después de hoy** (la función
+     rechaza una fecha más cercana).
+   - Llega a los propietarios de las empresas en prueba, activas o con pago vencido (las canceladas no).
+   - El panel lo muestra a propietarios y administradores hasta el día en que entra en vigor.
+   - El aviso no se puede editar ni borrar (es la prueba de que se avisó). Si tiene un error, publica uno nuevo que
+     lo corrija.
+   - Una hora después, revisa las entregas: `select estado, count(*) from correos_clientes where aviso_cambio_id = <id> group by 1`.
+   - Un cambio de precio también hay que hacerlo en Stripe (precio nuevo) y en `apps/web/lib/precios.ts`; un cambio de
+     términos, en `apps/web/content/legal/` con versión nueva (el panel pedirá aceptarla).
+   - Pruebas: `supabase/tests/110_conservacion_y_avisos.sql` y `apps/web/e2e/conservacion.e2e.mjs`.
+
 ## Pendientes de decisión
+
+- **Desde cuándo corren los 12 meses:** hoy, desde la suspensión, también por falta de pago. La cláusula 9.3 dice
+  «después de que termine la suscripción»; una suspensión por falta de pago no es una terminación. Si el abogado lo
+  ve así, conviene que los términos digan que la suspensión de más de [N] días termina el contrato.
 
 - **Suspender las checadas a los 30 días:** pregunta abierta para el abogado (nota 3 de los términos).
 

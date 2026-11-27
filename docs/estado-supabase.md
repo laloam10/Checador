@@ -37,6 +37,7 @@ Bitácora de lo aplicado en los proyectos en la nube. No contiene secretos.
 | Migración 34: prueba terminada, solo lectura al día siguiente (`20261205000001`) | ✅ aplicada por API (2026-11-28) | ⏳ pendiente (junto con la 18–33) |
 | Migración 35: prueba terminada, suspensión a los 7 días (`20261206000001`) | ✅ aplicada por API (2026-11-28) | ⏳ pendiente (junto con la 18–34) |
 | Migración 36: aceptación de términos y aviso de privacidad de la empresa (`20261207000001`) | ✅ aplicada por API (2026-11-28) | ⏳ pendiente (junto con la 18–35) |
+| Migración 37: conservación de 12 meses, aviso de borrado y avisos de cambios (`20261208000001`) | ✅ aplicada por API (2026-11-28) | ⏳ pendiente (junto con la 18–36) |
 | Avisos: secreto `avisos`, `checador_avisos_secreto` en Vault y `VAPID_*` en Vercel (guía, 1.10) | ✅ (2026-11-20), con `checador_vercel_bypass`; aviso real entregado en Android | ⏳ pendiente |
 | Secreto de servicio de WhatsApp (`configurar_secreto_servicio`) y variables `WHATSAPP_*` en Vercel | ⏳ pendiente | ⏳ pendiente |
 | `verificar-seguridad.sql` | ✅ 0 hallazgos | ✅ 0 hallazgos |

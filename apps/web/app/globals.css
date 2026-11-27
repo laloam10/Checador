@@ -1252,3 +1252,8 @@ main.esqueleto-kiosco { min-height: 100vh; }
 .alta-acepto { margin: 0.4rem 0 0.8rem; font-size: 0.9rem; }
 .aviso-legal { background: var(--marca-claro); border-color: var(--borde-fuerte); border-left-color: var(--marca); }
 .aviso-legal-form { margin: 0; }
+
+/* Cambios próximos de precio o términos (components/panel/AvisoCambios.tsx). */
+.aviso-cambios { background: #eef4fb; border-color: #c9dbee; border-left-color: #2b6cb0; }
+.aviso-cambio + .aviso-cambio { margin-top: 0.7rem; }
+.aviso-cambios p.aviso-cambios-pie { margin-top: 0.6rem; font-size: 0.82rem; color: var(--gris); }
