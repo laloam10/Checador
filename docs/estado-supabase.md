@@ -18,27 +18,27 @@ Bitácora de lo aplicado en los proyectos en la nube. No contiene secretos.
 | Secretos de Vault para recordatorios (guía, sección 1.8) | ✅ llave `checador-recordatorios-pruebas`; envío de prueba aceptado por Resend (2026-11-10) | ✅ llave `checador-recordatorios-produccion` |
 | Migración 16: revisar recordatorios cada hora (`20261117000001`) | ✅ aplicada por API (2026-11-10) | ✅ aplicada por API (2026-11-10) |
 | Migración 17: días de descanso adicionales (`20261118000001`) | ✅ aplicada por API (2026-11-10) | ✅ aplicada por API (2026-11-10) |
-| Migración 18: checada por WhatsApp (`20261119000001`) | ✅ aplicada por API (2026-11-11) | ⏳ pendiente (se aplica al llevar WhatsApp a producción) |
-| Migración 19: código de activación de WhatsApp (`20261120000001`) | ✅ aplicada por API (2026-11-11) | ⏳ pendiente (junto con la 18) |
-| Migración 20: conformidad semanal por WhatsApp (`20261121000001`) | ✅ aplicada por API (2026-11-11) | ⏳ pendiente (junto con la 18 y la 19) |
-| Migración 21: límite de reenvíos al asistente (`20261122000001`) | ✅ aplicada por API (2026-11-11) | ⏳ pendiente (junto con la 18, 19 y 20) |
-| Migración 22: avisos por notificación (`20261123000001`) | ✅ aplicada por API (2026-11-19) | ⏳ pendiente |
-| Migración 23: bypass de Vercel en el disparador de avisos (`20261124000001`) | ✅ aplicada por API (2026-11-20) | ⏳ pendiente (no lo necesita, pero va con la 22) |
-| Migración 24: origen `app` en la bitácora (`20261125000001`) | ✅ aplicada por API (2026-11-20) | ⏳ pendiente (junto con la 18–23) |
-| Migración 25: horarios de trabajo (`20261126000001`) | ✅ aplicada por API (2026-11-21) | ⏳ pendiente (junto con la 18–24) |
-| Migración 26: Salir con bloqueo y PIN (`20261127000001`) | ✅ aplicada por API (2026-11-23) | ⏳ pendiente (junto con la 18–25) |
-| Migración 27: huella o rostro, passkeys (`20261128000001`) | ✅ aplicada por API (2026-11-23) | ⏳ pendiente (junto con la 18–26) |
-| Migración 28: ubicación al checar (`20261129000001`) | ✅ aplicada por API (2026-11-25) | ⏳ pendiente (junto con la 18–27) |
-| Migración 29: diseño de los correos (`20261130000001`) | ✅ aplicada por API (2026-11-25) | ⏳ pendiente (junto con la 18–28) |
-| Migración 30: suscripciones, fase 1 (`20261201000001`) | ✅ aplicada por API (2026-11-26) | ⏳ pendiente (junto con la 18–29) |
-| Migración 31: prueba de 14 días (`20261202000001`) | ✅ aplicada por API (2026-11-26) | ⏳ pendiente (junto con la 18–30) |
-| Migración 32: cobro con Stripe (`20261203000001`) | ✅ aplicada por API (2026-11-27) | ⏳ pendiente (junto con la 18–31) |
-| Migración 33: restricciones por falta de pago (`20261204000001`) | ✅ aplicada por API (2026-11-28) | ⏳ pendiente (junto con la 18–32) |
-| Migración 34: prueba terminada, solo lectura al día siguiente (`20261205000001`) | ✅ aplicada por API (2026-11-28) | ⏳ pendiente (junto con la 18–33) |
-| Migración 35: prueba terminada, suspensión a los 7 días (`20261206000001`) | ✅ aplicada por API (2026-11-28) | ⏳ pendiente (junto con la 18–34) |
-| Migración 36: aceptación de términos y aviso de privacidad de la empresa (`20261207000001`) | ✅ aplicada por API (2026-11-28) | ⏳ pendiente (junto con la 18–35) |
-| Migración 37: conservación de 12 meses, aviso de borrado y avisos de cambios (`20261208000001`) | ✅ aplicada por API (2026-11-28) | ⏳ pendiente (junto con la 18–36) |
-| Migración 38: interruptor del cobro (`20261209000001`) | ✅ aplicada por API (2026-11-27); cobro **encendido** (tiene suscripciones de Stripe) | ⏳ pendiente (junto con la 18–37); arranca **apagado** |
+| Migración 18: checada por WhatsApp (`20261119000001`) | ✅ aplicada por API (2026-11-11) | ✅ aplicada por API (2026-11-27) |
+| Migración 19: código de activación de WhatsApp (`20261120000001`) | ✅ aplicada por API (2026-11-11) | ✅ aplicada por API (2026-11-27) |
+| Migración 20: conformidad semanal por WhatsApp (`20261121000001`) | ✅ aplicada por API (2026-11-11) | ✅ aplicada por API (2026-11-27) |
+| Migración 21: límite de reenvíos al asistente (`20261122000001`) | ✅ aplicada por API (2026-11-11) | ✅ aplicada por API (2026-11-27) |
+| Migración 22: avisos por notificación (`20261123000001`) | ✅ aplicada por API (2026-11-19) | ✅ aplicada por API (2026-11-27) |
+| Migración 23: bypass de Vercel en el disparador de avisos (`20261124000001`) | ✅ aplicada por API (2026-11-20) | ✅ aplicada por API (2026-11-27) |
+| Migración 24: origen `app` en la bitácora (`20261125000001`) | ✅ aplicada por API (2026-11-20) | ✅ aplicada por API (2026-11-27) |
+| Migración 25: horarios de trabajo (`20261126000001`) | ✅ aplicada por API (2026-11-21) | ✅ aplicada por API (2026-11-27) |
+| Migración 26: Salir con bloqueo y PIN (`20261127000001`) | ✅ aplicada por API (2026-11-23) | ✅ aplicada por API (2026-11-27) |
+| Migración 27: huella o rostro, passkeys (`20261128000001`) | ✅ aplicada por API (2026-11-23) | ✅ aplicada por API (2026-11-27) |
+| Migración 28: ubicación al checar (`20261129000001`) | ✅ aplicada por API (2026-11-25) | ✅ aplicada por API (2026-11-27) |
+| Migración 29: diseño de los correos (`20261130000001`) | ✅ aplicada por API (2026-11-25) | ✅ aplicada por API (2026-11-27) |
+| Migración 30: suscripciones, fase 1 (`20261201000001`) | ✅ aplicada por API (2026-11-26) | ✅ aplicada por API (2026-11-27) |
+| Migración 31: prueba de 14 días (`20261202000001`) | ✅ aplicada por API (2026-11-26) | ✅ aplicada por API (2026-11-27) |
+| Migración 32: cobro con Stripe (`20261203000001`) | ✅ aplicada por API (2026-11-27) | ✅ aplicada por API (2026-11-27) |
+| Migración 33: restricciones por falta de pago (`20261204000001`) | ✅ aplicada por API (2026-11-28) | ✅ aplicada por API (2026-11-27) |
+| Migración 34: prueba terminada, solo lectura al día siguiente (`20261205000001`) | ✅ aplicada por API (2026-11-28) | ✅ aplicada por API (2026-11-27) |
+| Migración 35: prueba terminada, suspensión a los 7 días (`20261206000001`) | ✅ aplicada por API (2026-11-28) | ✅ aplicada por API (2026-11-27) |
+| Migración 36: aceptación de términos y aviso de privacidad de la empresa (`20261207000001`) | ✅ aplicada por API (2026-11-28) | ✅ aplicada por API (2026-11-27) |
+| Migración 37: conservación de 12 meses, aviso de borrado y avisos de cambios (`20261208000001`) | ✅ aplicada por API (2026-11-28) | ✅ aplicada por API (2026-11-27) |
+| Migración 38: interruptor del cobro (`20261209000001`) | ✅ aplicada por API (2026-11-27); cobro **encendido** (tiene suscripciones de Stripe) | ✅ aplicada por API (2026-11-27); cobro **apagado** |
 | Avisos: secreto `avisos`, `checador_avisos_secreto` en Vault y `VAPID_*` en Vercel (guía, 1.10) | ✅ (2026-11-20), con `checador_vercel_bypass`; aviso real entregado en Android | ⏳ pendiente |
 | Secreto de servicio de WhatsApp (`configurar_secreto_servicio`) y variables `WHATSAPP_*` en Vercel | ⏳ pendiente | ⏳ pendiente |
 | `verificar-seguridad.sql` | ✅ 0 hallazgos | ✅ 0 hallazgos |
