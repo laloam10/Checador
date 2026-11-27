@@ -22,6 +22,17 @@ Jemba, WhatsApp, avisos, horarios, Salir con PIN o huella, ubicación al checar 
       registros, ver en mapa), nuevo acomodo de la ficha del trabajador (Datos, Kiosco y WhatsApp, Baja; capturas 05, 06,
       31 y 32), cabecera de la ficha con indicadores y acuerdo plegado, app del trabajador (barra inferior, tarjeta del reloj, pendientes), fechas legibles en toda la app, Configuración por tarjetas, texto del acuerdo como documento, Trabajadores en el celular, Objeciones, Exportar, constancia PDF, correos, entrada y alta de la empresa, páginas de error y de carga, ventana para corregir o anular en la bitácora, gráfica de horas de la semana en el Tablero, pantalla de reposo del kiosco (reloj grande tras 45 s sin uso), Accesos en tarjetas con ventana para invitar y pasos del kiosco con QR (captura 09; el capturador ya usa el flujo nuevo), confirmación del kiosco al checar, pantalla "Tu cuenta aún no está vinculada a un empleador" con Volver a revisar (cambia su texto en el manual y la hoja del trabajador), y lo que se pula después. Regenerar con `docs/manual/fuente/capturas.cjs` y `generar.cjs`; para capturas con historial realista (varias semanas, objeciones, ubicación) está la empresa de ejemplo de `scripts/ejemplo/` (solo Supabase local).
 
+## Términos del servicio (borrador en `docs/legal/terminos-del-servicio.md`)
+
+- [ ] **Revisión del abogado** del borrador (con sus notas al final) y llenar los datos entre corchetes: razón social,
+      RFC, domicilio, correos de contacto y soporte, ciudad para tribunales y plazos.
+- [ ] **Lo que el borrador promete y la app aún no hace** (hacerlo antes de publicar los términos):
+      registrar la aceptación de los términos al crear la empresa (fecha, hora, cuenta y versión); la fase 3 de
+      `docs/cobro.md` (falta de pago); solo lectura y exportación durante el plazo de conservación después de cancelar,
+      con aviso 30 días antes del borrado; el CFDI; y avisar por correo los cambios de precio o de términos.
+- [ ] Aviso de privacidad de Jemba (para los usuarios del panel y el cobro) y modelo de aviso para que el Cliente lo
+      dé a su personal.
+
 ## Del usuario (en pruebas)
 
 - [x] **Cobro activado en pruebas** (2026-11-28): variables en Vercel, secreto `cobro`, destino de avisos con los
