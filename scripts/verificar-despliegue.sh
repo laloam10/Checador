@@ -43,7 +43,8 @@ revisa "CSP prohíbe incrustar la app en otros sitios" '[[ $CSP == *"frame-ances
 revisa "el nonce cambia en cada petición" '[[ $(curl -sI "$APP_URL/entrar" | grep -io "nonce-[^'"'"']*") != $(grep -io "nonce-[^'"'"']*" <<<"$CSP") ]]'
 revisa "X-Frame-Options: DENY" '[[ $(cabecera x-frame-options) == DENY ]]'
 revisa "X-Content-Type-Options: nosniff" '[[ $(cabecera x-content-type-options) == nosniff ]]'
-revisa "Permissions-Policy bloquea cámara y ubicación" '[[ $(cabecera permissions-policy) == *"camera=()"* && $(cabecera permissions-policy) == *"geolocation=()"* ]]'
+# La ubicación al checar (migración 20261129000001) necesita geolocation=(self): solo el propio sitio.
+revisa "Permissions-Policy bloquea la cámara y limita la ubicación al propio sitio" '[[ $(cabecera permissions-policy) == *"camera=()"* && $(cabecera permissions-policy) =~ geolocation=\((self)?\) ]]'
 revisa "no revela la tecnología (sin X-Powered-By)" '[[ -z $(cabecera x-powered-by) ]]'
 [ "${LOCAL:-0}" != 1 ] && revisa "HSTS de al menos un año" '[[ $(cabecera strict-transport-security) =~ max-age=([0-9]+) && ${BASH_REMATCH[1]} -ge 31536000 ]]'
 revisa "sin sesión, / redirige a /entrar" '[[ $(curl -s -o /dev/null -w "%{redirect_url}" "$APP_URL/") == */entrar* ]]'
