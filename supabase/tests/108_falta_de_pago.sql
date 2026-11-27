@@ -15,6 +15,9 @@ select id as wendy, telefono as tel_wendy from public.trabajadores where empresa
 -- Wendy checa por WhatsApp (activada y sin baja, para probar el mensaje de rechazo).
 update public.trabajadores set telefono_verificado_en = coalesce(telefono_verificado_en, now()), fecha_baja = null where id = :'wendy';
 
+-- El interruptor (20261209000001) arranca apagado en una base sin suscripciones de Stripe.
+update public.ajustes_cobro set activo = true;
+
 create function pg_temp.vencido_hace(p_empresa uuid, p_dias int) returns void language sql as $$
   update public.suscripciones set estado = 'pago_vencido', pago_vencido_desde = now() - make_interval(days => p_dias)
    where empresa_id = p_empresa

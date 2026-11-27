@@ -110,6 +110,26 @@ algunas personas, que es justo el incumplimiento que Checador ayuda a evitar.
      términos, en `apps/web/content/legal/` con versión nueva (el panel pedirá aceptarla).
    - Pruebas: `supabase/tests/110_conservacion_y_avisos.sql` y `apps/web/e2e/conservacion.e2e.mjs`.
 
+5. **Interruptor del cobro (hecho, 2026-11-27; migración `20261209000001`).** Las reglas de cobro (prueba que
+   termina, falta de pago, conservación y aviso de borrado) solo aplican con el cobro **encendido**. Apagado,
+   ninguna empresa tiene restricciones y Configuración → Suscripción dice «Sin costo por ahora» con el precio de
+   referencia, sin días de prueba ni botón de contratar. Sirve para tener la versión con cobro en producción antes
+   de que Stripe esté activo.
+   - Valor inicial: encendido donde ya hay suscripciones de Stripe (checador-pruebas y el Supabase local),
+     **apagado en producción**.
+   - Encenderlo (en el editor SQL de producción, el día que Stripe esté en modo real y configurado según
+     `docs/publicacion.md` §1.14):
+
+     ```sql
+     select public.activar_cobro();      -- 30 días de prueba desde hoy a quien esté en prueba sin tarjeta
+     ```
+
+     Acepta otro número de días (mínimo 14). Sin esa extensión, las pruebas que «vencieron» con el cobro apagado
+     pasarían a solo lectura en cuanto se encienda.
+   - Antes de encenderlo, avisa a los clientes con al menos 30 días: `avisar_cambio_a_clientes('precio', …)`.
+   - Emergencia (por ejemplo, Stripe caído): `select public.desactivar_cobro();` quita todas las restricciones.
+   - Pruebas: `supabase/tests/111_interruptor_cobro.sql` y el paso 3 de `apps/web/e2e/conservacion.e2e.mjs`.
+
 ## Pendientes de decisión
 
 - **Desde cuándo corren los 12 meses:** hoy, desde la suspensión, también por falta de pago. La cláusula 9.3 dice

@@ -20,11 +20,12 @@ export default async function Configuracion({ searchParams }: { searchParams: Pr
     .eq("id", ctx.empresa.id)
     .single();
   const recordatorios = empresa?.recordatorios_conformidad ?? true;
-  const [{ horarios, predeterminado }, { data: personal }, { data: suscripcion }] = await Promise.all([
+  const [{ horarios, predeterminado }, { data: personal }, { data: suscripcion }, { data: situacion }] = await Promise.all([
     horariosDeEmpresa(ctx.supabase, ctx.empresa.id),
     ctx.supabase.from("trabajadores").select("horario_id, sin_horario_fijo").eq("empresa_id", ctx.empresa.id).is("fecha_baja", null),
     // Solo propietarios y administradores la ven (RLS).
     ctx.supabase.from("suscripciones").select("estado, prueba_hasta, periodo_fin, pago_vencido_desde, ciclo, suscripcion_externa").eq("empresa_id", ctx.empresa.id).maybeSingle<DatosSuscripcion>(),
+    ctx.supabase.rpc("situacion_cobro", { p_empresa: ctx.empresa.id }),
   ]);
   // Cuántas personas activas usa cada horario (las que no tienen uno propio usan el de la empresa).
   const usan = (id: string) =>
@@ -206,6 +207,7 @@ export default async function Configuracion({ searchParams }: { searchParams: Pr
             personas={personal?.length ?? 0}
             zonaHoraria={ctx.empresa.zonaHoraria}
             cobroDisponible={configCobro() !== null}
+            cobroActivo={(situacion as { cobro_activo?: boolean } | null)?.cobro_activo !== false}
             aviso={pago === "listo" || pago === "cancelado" ? pago : undefined}
           />
         </>

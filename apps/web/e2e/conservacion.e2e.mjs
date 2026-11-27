@@ -35,6 +35,7 @@ async function entrar(page, correo, destino) {
 const RESUMEN = `Prueba ${sufijo}: la persona adicional del tramo 3 a 10 pasa de $50 a $55 al mes, más IVA.`;
 const browser = await chromium.launch();
 let aviso;
+let cobroApagado = false;
 try {
   const page = await (await browser.newContext({ viewport: { width: 1200, height: 900 }, locale: "es-MX" })).newPage();
   const DUENO = `dueno.conservacion.${sufijo}@ejemplo.mx`;
@@ -75,11 +76,25 @@ try {
   await page.getByRole("heading", { level: 1 }).waitFor();
   paso("cancelada: la página de exportación sigue disponible");
 
+  // 3. Cobro apagado (interruptor, migración 20261209000001): sin restricciones ni días de prueba.
+  sql(`update ajustes_cobro set activo = false`);
+  cobroApagado = true;
+  await page.goto(`${APP}/panel`);
+  await page.locator(".panel-contenido").waitFor();
+  if (await page.locator(".aviso-cobro-suspendida").count()) throw new Error("Con el cobro apagado no debía haber aviso de cobro");
+  sql(`update suscripciones set estado = 'prueba', periodo_fin = null, prueba_hasta = now() - interval '10 days' where empresa_id = '${empresa}'`);
+  await page.goto(`${APP}/panel/configuracion#suscripcion`);
+  await page.getByText("Sin costo por ahora").waitFor();
+  if (await page.getByText(/días de prueba|Prueba terminada/).count()) throw new Error("Con el cobro apagado no debían mostrarse días de prueba");
+  await page.getByText("Con tu personal de hoy pagarías").waitFor();
+  paso("cobro apagado: sin aviso de cobro, «Sin costo por ahora» y el precio de referencia");
+
   console.log("\nPrueba de conservación y avisos: OK");
 } catch (e) {
   console.error("\nFALLÓ:", e.message);
   process.exitCode = 1;
 } finally {
+  if (cobroApagado) sql(`update ajustes_cobro set activo = true`);
   if (aviso) sql(`set session_replication_role = replica; delete from avisos_cambios where id = ${aviso}`);
   await browser.close();
 }

@@ -23,11 +23,13 @@ const ESTADO: Record<DatosSuscripcion["estado"], string> = {
  * Estado de la suscripción, lo que la empresa paga (o pagaría) con su desglose por tramos y,
  * si el cobro está configurado, contratar con tarjeta o administrar el pago (docs/cobro.md).
  */
-export function SeccionSuscripcion({ suscripcion, personas, zonaHoraria, cobroDisponible, aviso }: {
+export function SeccionSuscripcion({ suscripcion, personas, zonaHoraria, cobroDisponible, cobroActivo, aviso }: {
   suscripcion: DatosSuscripcion;
   personas: number;
   zonaHoraria: string;
   cobroDisponible: boolean;
+  /** Interruptor del cobro (migración 20261209000001): apagado, no aplica la prueba ni se cobra. */
+  cobroActivo: boolean;
   aviso?: "listo" | "cancelado";
 }) {
   const precio = precioMensual(personas);
@@ -37,6 +39,21 @@ export function SeccionSuscripcion({ suscripcion, personas, zonaHoraria, cobroDi
   const enPrueba = suscripcion.estado === "prueba";
   const pruebaTerminada = enPrueba && !contratada && dias <= 0;
   const conPruebaEnStripe = enPrueba && dias > 2; // Stripe pide al menos 48 h de prueba para no cobrar ya
+
+  if (!cobroActivo && !contratada) {
+    return (
+      <div className="suscripcion">
+        <section className="suscripcion-estado">
+          <span className="chip-estado">Sin costo por ahora</span>
+          <p className="ayuda">
+            Checador está en lanzamiento y por ahora no se cobra: tienes todas las funciones. Antes de empezar a cobrar te
+            avisaremos por correo y aquí, con anticipación, y tendrás un periodo de prueba para decidir.
+          </p>
+        </section>
+        <PrecioDeReferencia personas={personas} contratada={false} />
+      </div>
+    );
+  }
 
   return (
     <div className="suscripcion">
@@ -87,43 +104,51 @@ export function SeccionSuscripcion({ suscripcion, personas, zonaHoraria, cobroDi
         )}
       </section>
 
-      <section className="suscripcion-precio" aria-labelledby="titulo-precio">
-        <h3 id="titulo-precio">{contratada ? "Con tu personal de hoy pagas" : "Con tu personal de hoy pagarías"}</h3>
-        {precio.cotizar ? (
-          <>
-            <p className="suscripcion-total">Cotización</p>
-            <p className="ayuda">
-              Tienes {personas} personas activas. Con más de {MAXIMO_SIN_COTIZAR} te preparamos una cotización: escríbenos en{" "}
-              <a href="https://jemba.mx">jemba.mx</a>.
-            </p>
-          </>
-        ) : (
-          <>
-            <p className="suscripcion-total">{pesos(precio.mensualCentavos)}<span> al mes + IVA</span></p>
-            <p className="ayuda">
-              {pesos(precio.mensualConIvaCentavos)} con IVA · o {pesos(precio.anualCentavos)} al año + IVA (2 meses de regalo)
-            </p>
-            <table className="suscripcion-desglose" aria-label="Desglose por tramos">
-              <tbody>
-                <tr>
-                  <th scope="row">Hasta {PERSONAS_EN_BASE} personas</th>
-                  <td>{pesos(BASE_CENTAVOS)}</td>
-                </tr>
-                {precio.renglones.map((r) => (
-                  <tr key={r.desde}>
-                    <th scope="row">{r.personas} {r.personas === 1 ? "persona" : "personas"} × {pesos(r.porPersonaCentavos)} <small>(de la {r.desde}.ª a la {r.hasta}.ª)</small></th>
-                    <td>{pesos(r.subtotalCentavos)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </>
-        )}
-        <p className="ayuda suscripcion-nota">
-          {personas} {personas === 1 ? "persona trabajadora activa" : "personas trabajadoras activas"}. Solo cuentan ellas: el dueño, los administradores,
-          los supervisores y los kioscos no tienen costo. Si das de alta o de baja a alguien, el cobro se ajusta por los días.
-        </p>
-      </section>
+      <PrecioDeReferencia personas={personas} contratada={contratada} />
     </div>
+  );
+}
+
+/** Lo que la empresa paga (o pagaría) con su personal de hoy, con el desglose por tramos. */
+function PrecioDeReferencia({ personas, contratada }: { personas: number; contratada: boolean }) {
+  const precio = precioMensual(personas);
+  return (
+    <section className="suscripcion-precio" aria-labelledby="titulo-precio">
+      <h3 id="titulo-precio">{contratada ? "Con tu personal de hoy pagas" : "Con tu personal de hoy pagarías"}</h3>
+      {precio.cotizar ? (
+        <>
+          <p className="suscripcion-total">Cotización</p>
+          <p className="ayuda">
+            Tienes {personas} personas activas. Con más de {MAXIMO_SIN_COTIZAR} te preparamos una cotización: escríbenos en{" "}
+            <a href="https://jemba.mx">jemba.mx</a>.
+          </p>
+        </>
+      ) : (
+        <>
+          <p className="suscripcion-total">{pesos(precio.mensualCentavos)}<span> al mes + IVA</span></p>
+          <p className="ayuda">
+            {pesos(precio.mensualConIvaCentavos)} con IVA · o {pesos(precio.anualCentavos)} al año + IVA (2 meses de regalo)
+          </p>
+          <table className="suscripcion-desglose" aria-label="Desglose por tramos">
+            <tbody>
+              <tr>
+                <th scope="row">Hasta {PERSONAS_EN_BASE} personas</th>
+                <td>{pesos(BASE_CENTAVOS)}</td>
+              </tr>
+              {precio.renglones.map((r) => (
+                <tr key={r.desde}>
+                  <th scope="row">{r.personas} {r.personas === 1 ? "persona" : "personas"} × {pesos(r.porPersonaCentavos)} <small>(de la {r.desde}.ª a la {r.hasta}.ª)</small></th>
+                  <td>{pesos(r.subtotalCentavos)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
+      <p className="ayuda suscripcion-nota">
+        {personas} {personas === 1 ? "persona trabajadora activa" : "personas trabajadoras activas"}. Solo cuentan ellas: el dueño, los administradores,
+        los supervisores y los kioscos no tienen costo. Si das de alta o de baja a alguien, el cobro se ajusta por los días.
+      </p>
+    </section>
   );
 }
