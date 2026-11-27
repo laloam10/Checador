@@ -82,15 +82,17 @@ update public.suscripciones set estado = 'cancelada', pago_vencido_desde = null,
 select tests.afirmar(pg_temp.nivel(:'empresa_a') = 'suspendida', 'cancelada: suspendida');
 
 -- Prueba terminada sin forma de pago: aviso el primer día, solo lectura desde el día siguiente
--- y suspendida a los 30 días (migración 20261205000001).
+-- y suspendida a los 7 días (migraciones 20261205000001 y 20261206000001).
 update public.suscripciones set estado = 'prueba', periodo_fin = null, suscripcion_externa = null, prueba_hasta = now() - interval '12 hours' where empresa_id = :'empresa_a';
 select tests.afirmar(pg_temp.nivel(:'empresa_a') = 'aviso', 'prueba terminada hace 12 horas sin tarjeta: aviso');
 update public.suscripciones set prueba_hasta = now() - interval '2 days' where empresa_id = :'empresa_a';
 select tests.afirmar(pg_temp.nivel(:'empresa_a') = 'solo_lectura', 'prueba terminada hace 2 días sin tarjeta: solo lectura');
 select tests.afirmar((public._cobro_situacion(:'empresa_a') ->> 'solo_lectura_desde')::timestamptz = (select prueba_hasta + interval '1 day' from public.suscripciones where empresa_id = :'empresa_a'),
   'la solo lectura empieza un día después del fin de la prueba');
-update public.suscripciones set prueba_hasta = now() - interval '31 days' where empresa_id = :'empresa_a';
-select tests.afirmar(pg_temp.nivel(:'empresa_a') = 'suspendida', 'prueba terminada hace 31 días sin tarjeta: suspendida');
+update public.suscripciones set prueba_hasta = now() - interval '6 days' where empresa_id = :'empresa_a';
+select tests.afirmar(pg_temp.nivel(:'empresa_a') = 'solo_lectura', 'prueba terminada hace 6 días sin tarjeta: todavía solo lectura');
+update public.suscripciones set prueba_hasta = now() - interval '8 days' where empresa_id = :'empresa_a';
+select tests.afirmar(pg_temp.nivel(:'empresa_a') = 'suspendida', 'prueba terminada hace 8 días sin tarjeta: suspendida');
 update public.suscripciones set prueba_hasta = now() - interval '2 days' where empresa_id = :'empresa_a';
 update public.suscripciones set suscripcion_externa = 'sub_Prueba123' where empresa_id = :'empresa_a';
 select tests.afirmar(pg_temp.nivel(:'empresa_a') = 'ninguna', 'prueba con tarjeta registrada: el proveedor cobra, sin restricciones');

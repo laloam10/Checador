@@ -62,16 +62,14 @@ algunas personas, que es justo el incumplimiento que Checador ayuda a evitar.
    - **Suspendida:** además, no se registran checadas; la app, el kiosco y WhatsApp dicen el motivo. Una checada hecha
      **sin conexión antes** de la suspensión se acepta aunque llegue después (no se pierde un registro real).
    - **Cancelada:** suspendida desde que Stripe la cancela (al terminar el periodo pagado).
-   - **Prueba terminada sin tarjeta** (decisión del 2026-11-28, migración `20261205000001`): aviso el primer día, solo
-     lectura desde el día siguiente y suspendida a los 30 días del fin de la prueba. Con tarjeta registrada no hay
-     restricción; Stripe cobra al terminar.
+   - **Prueba terminada sin tarjeta** (decisión del 2026-11-28, migraciones `20261205000001` y `20261206000001`):
+     aviso el primer día, solo lectura desde el día siguiente y suspendida a los 7 días del fin de la prueba. Con
+     tarjeta registrada no hay restricción; Stripe cobra al terminar.
    - El panel muestra un aviso en todas sus páginas con lo que pasa y la fecha de la siguiente etapa.
    - Pruebas: `supabase/tests/108_falta_de_pago.sql` y el paso 6 de `apps/web/e2e/cobro.e2e.mjs`.
 
 ## Pendientes de decisión
 
-- **Suspensión tras una prueba sin tarjeta:** hoy es a los 30 días del fin de la prueba (29 días de solo lectura en
-  los que el personal sigue checando). Se puede adelantar en `_cobro_situacion()`.
 - **Suspender las checadas a los 30 días:** pregunta abierta para el abogado (nota 3 de los términos).
 
 - PAC para los CFDI (¿el que ya se usa en la empresa?).
