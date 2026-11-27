@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { FormFirmaAcuerdo } from "@/components/FormFirmaAcuerdo";
+import { AvisoPrivacidadEmpresa } from "@/components/AvisoPrivacidadEmpresa";
 import { Navegacion } from "@/components/Navegacion";
 import { SinVinculo } from "@/components/SinVinculo";
 import { folio } from "@/lib/acuerdo";
@@ -43,6 +44,7 @@ export default async function MiAcuerdo() {
       )}
       {mostrar && <TextoAcuerdo texto={mostrar.contenido} className="texto-completo" />}
       {pendiente && <FormFirmaAcuerdo acuerdoId={pendiente.id} folio={folio(pendiente.contenido_hash)} />}
+      <AvisoPrivacidadEmpresa empresa={trabajador.empresa} url={trabajador.avisoPrivacidad} />
     </main>
   );
 }

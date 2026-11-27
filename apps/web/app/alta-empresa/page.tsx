@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { Marca } from "@/components/Marca";
 import { FormAccion } from "@/components/panel/FormAccion";
 import { crearEmpresa } from "@/app/panel/acciones";
+import { legalPublicado } from "@/lib/legal";
 import { membresiaPanel, ZONAS_MX } from "@/lib/panel";
 import { crearClienteServidor, usuarioActual } from "@/lib/supabase/server";
 
@@ -70,6 +71,16 @@ export default async function AltaEmpresa() {
             </fieldset>
           </div>
         </section>
+        {legalPublicado() && (
+          <label className="casilla-linea alta-acepto">
+            <input type="checkbox" name="acepto" required />
+            <span>
+              Leí y acepto los <a href="/terminos" target="_blank" rel="noopener">Términos del servicio</a> y el{" "}
+              <a href="/privacidad" target="_blank" rel="noopener">Aviso de privacidad</a> de Checador, en nombre de la
+              empresa.
+            </span>
+          </label>
+        )}
       </FormAccion>
       <p className="ayuda alta-despues">
         Después podrás dar de alta a tu personal (uno por uno o desde Excel), invitar a administradores, supervisores y

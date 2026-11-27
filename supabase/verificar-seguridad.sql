@@ -108,6 +108,7 @@ select 'ALTO', 'Función privilegiada ejecutable por authenticated sin estar en 
      'crear_reto_acceso', 'registrar_passkey', 'borrar_passkey', 'registrar_ubicacion',
      'cobro_vincular_cliente', 'cobro_actualizar',
      'situacion_cobro',
+     'aceptar_documentos_legales',
      'trabajadores_con_pin', 'mi_rol', 'es_gestor', 'puede_consultar', 'soy_trabajador', 'trabajo_en')
 union all
 -- 11. Solo vincular_mi_cuenta() liga una ficha de trabajador a una cuenta (si no, el empleador

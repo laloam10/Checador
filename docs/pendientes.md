@@ -10,7 +10,7 @@ Jemba, WhatsApp, avisos, horarios, Salir con PIN o huella, ubicación al checar 
       2026-11-16, probablemente pausado por inactividad. Mientras tanto nadie puede entrar ni checar en
       `checador.jemba.mx` y la verificación de cada lunes falla. En el plan gratuito, a los 90 días ya no se reactiva
       desde el panel.
-- [ ] **Paso a producción** (lo hace Claude una vez reactivada): migraciones 18 a 35 (incluye horarios, Salir con PIN o huella, ubicación al checar, diseño de correos, suscripciones con prueba de 14 días, cobro con Stripe y restricciones por falta de pago), código de `pruebas` a `main`,
+- [ ] **Paso a producción** (lo hace Claude una vez reactivada): migraciones 18 a 36 (incluye horarios, Salir con PIN o huella, ubicación al checar, diseño de correos, suscripciones con prueba de 14 días, cobro con Stripe, restricciones por falta de pago y aceptación de los términos), código de `pruebas` a `main`,
       manual 1.3 con sus cuatro hojas y verificación de producción (`verificar-produccion.yml`). El usuario pone en
       producción los secretos y variables de WhatsApp (§1.9) y avisos (§1.10); producción no necesita el bypass de
       Vercel.
@@ -22,19 +22,24 @@ Jemba, WhatsApp, avisos, horarios, Salir con PIN o huella, ubicación al checar 
       registros, ver en mapa), nuevo acomodo de la ficha del trabajador (Datos, Kiosco y WhatsApp, Baja; capturas 05, 06,
       31 y 32), cabecera de la ficha con indicadores y acuerdo plegado, app del trabajador (barra inferior, tarjeta del reloj, pendientes), fechas legibles en toda la app, Configuración por tarjetas, texto del acuerdo como documento, Trabajadores en el celular, Objeciones, Exportar, constancia PDF, correos, entrada y alta de la empresa, páginas de error y de carga, ventana para corregir o anular en la bitácora, gráfica de horas de la semana en el Tablero, pantalla de reposo del kiosco (reloj grande tras 45 s sin uso), Accesos en tarjetas con ventana para invitar y pasos del kiosco con QR (captura 09; el capturador ya usa el flujo nuevo), confirmación del kiosco al checar, pantalla "Tu cuenta aún no está vinculada a un empleador" con Volver a revisar (cambia su texto en el manual y la hoja del trabajador), y lo que se pula después. Regenerar con `docs/manual/fuente/capturas.cjs` y `generar.cjs`; para capturas con historial realista (varias semanas, objeciones, ubicación) está la empresa de ejemplo de `scripts/ejemplo/` (solo Supabase local).
 
-## Términos del servicio (borrador en `docs/legal/terminos-del-servicio.md`)
+## Términos del servicio (borradores en `apps/web/content/legal/`; ver `docs/legal/README.md`)
 
 - [ ] **Revisión del abogado** del borrador (con sus notas al final) y llenar los datos entre corchetes: razón social,
       RFC, domicilio, correos de contacto y soporte, ciudad para tribunales y plazos.
-- [ ] **Lo que el borrador promete y la app aún no hace** (hacerlo antes de publicar los términos):
-      registrar la aceptación de los términos al crear la empresa (fecha, hora, cuenta y versión); solo lectura y exportación durante el plazo de conservación después de cancelar,
-      con aviso 30 días antes del borrado; el CFDI; y avisar por correo los cambios de precio o de términos.
+- [x] **Aceptación de los términos** (2026-11-28, migración `20261207000001`): casilla al crear la empresa y aviso
+      en el panel para el propietario que no ha aceptado la versión vigente; se guardan fecha, cuenta, versiones, IP y
+      navegador. Se activa al publicar (`LEGAL_PUBLICADO=1`).
+- [ ] **Lo que el borrador aún promete y la app no hace:** solo lectura y exportación durante el plazo de
+      conservación después de cancelar, con aviso 30 días antes del borrado; el CFDI; y avisar por correo los cambios
+      de precio o de términos.
 - [ ] **Avisos de privacidad** (borradores en `docs/legal/`): el de Jemba para clientes y usuarios del panel, y el
       modelo que cada empresa completa y entrega a su personal (con versión simplificada). Revisión del abogado (notas
       al final de cada uno).
-- [ ] **En la app:** un campo en Configuración para el enlace al aviso de privacidad de la empresa, que se muestre a su
-      personal (hoy la entrada dice "consulta el aviso de tu empleador" sin enlace); publicar el de Jemba en
-      `/privacidad` y los términos en `/terminos` cuando estén revisados.
+- [x] **En la app** (2026-11-28): `/terminos` y `/privacidad` (en pruebas como borrador; en producción no existen
+      hasta publicar) y el enlace al aviso de privacidad de cada empresa en Configuración, visible para su personal en
+      la app (Checar y Acuerdo) y como texto en el kiosco.
+- [ ] **Publicar** cuando el abogado los apruebe: llenar los corchetes, cambiar a `Versión 1.0` y quitar "BORRADOR" del
+      recuadro inicial de `apps/web/content/legal/*.md`, y poner `LEGAL_PUBLICADO=1` en Vercel (producción y pruebas).
 
 ## Del usuario (en pruebas)
 

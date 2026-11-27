@@ -22,6 +22,8 @@ export interface Trabajador {
   empresaId: string;
   nombre: string;
   empresa: string;
+  /** Enlace al aviso de privacidad de la empresa para su personal (Configuración), si lo capturó. */
+  avisoPrivacidad: string | null;
   centro: string;
   zonaHoraria: string;
   /** Su centro registra la ubicación del celular al checar (migración 20261129000001_ubicacion.sql). */
@@ -44,7 +46,7 @@ export interface FilaEvento {
 
 const COLUMNAS_EVENTO = "id, tipo, origen, hora_efectiva, hora_servidor, puede_salir, corrige_evento_id, diferido, motivo";
 const SELECT_TRABAJADOR =
-  "id, empresa_id, nombre, dia_descanso, dias_descanso_adicionales, jornada_pactada_min, empresas(razon_social), centros_trabajo(nombre, zona_horaria, ubicacion_celular)";
+  "id, empresa_id, nombre, dia_descanso, dias_descanso_adicionales, jornada_pactada_min, empresas(razon_social, aviso_privacidad_url), centros_trabajo(nombre, zona_horaria, ubicacion_celular)";
 
 interface FilaTrabajador {
   id: string;
@@ -72,13 +74,14 @@ export function configDe(diaDescanso: number, jornadaPactadaMin: unknown, adicio
 
 function filaATrabajador(t: FilaTrabajador): Trabajador {
   const centro = uno(t.centros_trabajo) as { nombre: string; zona_horaria: string; ubicacion_celular: boolean } | null;
-  const empresa = uno(t.empresas) as { razon_social: string } | null;
+  const empresa = uno(t.empresas) as { razon_social: string; aviso_privacidad_url: string | null } | null;
   const config = configDe(t.dia_descanso, t.jornada_pactada_min, t.dias_descanso_adicionales ?? []);
   return {
     id: t.id,
     empresaId: t.empresa_id,
     nombre: t.nombre,
     empresa: empresa?.razon_social ?? "",
+    avisoPrivacidad: empresa?.aviso_privacidad_url ?? null,
     centro: centro?.nombre ?? "",
     zonaHoraria: centro?.zona_horaria ?? "America/Mexico_City",
     ubicacionCelular: centro?.ubicacion_celular ?? false,

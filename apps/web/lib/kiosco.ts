@@ -7,6 +7,8 @@ type Cliente = Awaited<ReturnType<typeof crearClienteServidor>>;
 
 export interface KioscoConfig {
   empresa: string;
+  /** Enlace al aviso de privacidad de la empresa para su personal (Configuración), si lo capturó. */
+  avisoPrivacidad: string | null;
   centro: string | null;
   zonaHoraria: string;
   /** Su centro registra la ubicación del kiosco al checar (migración 20261129000001_ubicacion.sql). */
@@ -17,13 +19,13 @@ export interface KioscoConfig {
 export async function miKiosco(supabase: Cliente, userId: string): Promise<KioscoConfig | null> {
   const { data, error } = await supabase
     .from("miembros")
-    .select("empresa_id, empresas(razon_social, zona_horaria), centros_trabajo(nombre, zona_horaria, ubicacion_kiosco)")
+    .select("empresa_id, empresas(razon_social, zona_horaria, aviso_privacidad_url), centros_trabajo(nombre, zona_horaria, ubicacion_kiosco)")
     .eq("user_id", userId)
     .eq("rol", "kiosco")
     .maybeSingle();
   if (error) throw error;
   if (!data) return null;
-  const empresa = uno(data.empresas) as { razon_social: string; zona_horaria: string } | null;
+  const empresa = uno(data.empresas) as { razon_social: string; zona_horaria: string; aviso_privacidad_url: string | null } | null;
   const centro = uno(data.centros_trabajo) as { nombre: string; zona_horaria: string; ubicacion_kiosco: boolean } | null;
   // Un kiosco sin centro fijo atiende a toda la empresa: pide la ubicación si algún centro la activó
   // (la base solo la guarda si el centro de la persona la tiene activada).
@@ -36,6 +38,7 @@ export async function miKiosco(supabase: Cliente, userId: string): Promise<Kiosc
   return {
     ubicacion,
     empresa: empresa?.razon_social ?? "",
+    avisoPrivacidad: empresa?.aviso_privacidad_url ?? null,
     centro: centro?.nombre ?? null,
     zonaHoraria: centro?.zona_horaria ?? empresa?.zona_horaria ?? "America/Mexico_City",
   };

@@ -557,6 +557,12 @@ Las migraciones van **antes** que el código que depende de ellas. Nunca modifiq
 
 ## 7. Lo legal antes del piloto
 
+**Términos del servicio y aviso de privacidad** (`docs/legal/README.md`): el texto vive en
+`apps/web/content/legal/` y se publica en `/terminos` y `/privacidad`. Mientras la variable de Vercel
+`LEGAL_PUBLICADO` no valga `1`, en producción esas páginas dan 404 y no se pide aceptarlos; en pruebas se ven como
+borrador. Al publicarlos, el alta de empresa pide aceptarlos y el panel se los pide al propietario de las empresas que
+ya existían; cada aceptación queda en `aceptaciones_legales` (migración 36).
+
 No son tareas de código, pero sin ellas no deberías dar acceso a un cliente:
 
 1. **Aviso de privacidad.** El empleador es el *responsable* de los datos de su personal y tú eres el *encargado*. Debe decir qué datos se tratan (los de la cláusula novena del acuerdo), para qué (incluidos los recordatorios semanales por correo), y que se almacenan en servidores fuera de México. La app remite al aviso del empleador.

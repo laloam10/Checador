@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import { aHoraLocal, localAInstante } from "@checador/jornada";
 import { generarTextoAcuerdo } from "@/lib/acuerdo";
 import { sincronizarPersonas } from "@/lib/cobro";
+import { legalPublicado, versionesLegales } from "@/lib/legal";
 import { datosActuales, estadosAcuerdosEmpresa } from "@/lib/acuerdosDatos";
 import { trabajadorPorId } from "@/lib/datos";
 import { horarioDesdeFormulario } from "@/lib/horarios";
@@ -64,6 +65,7 @@ export async function crearEmpresa(_: Estado, fd: FormData): Promise<Estado> {
   const pausa = texto(fd, "pausa_puede_salir");
   if (!razon) return fallo("Escribe la razón social o nombre del negocio.");
   if (pausa !== "si" && pausa !== "no") return fallo("Indica si tu personal puede salir del lugar durante la pausa de comida.");
+  if (legalPublicado() && fd.get("acepto") !== "on") return fallo("Para crear la empresa, acepta los Términos del servicio y el Aviso de privacidad.");
 
   const { data: empresaId, error } = await supabase.rpc("crear_empresa", { p_razon_social: razon, p_rfc: rfc });
   if (error) return fallo(traducir(error));
@@ -78,7 +80,28 @@ export async function crearEmpresa(_: Estado, fd: FormData): Promise<Estado> {
   ]);
   if (r1.error) return fallo(traducir(r1.error));
   if (r2.error) return fallo(traducir(r2.error));
+  // Aceptación de los términos (fecha, cuenta, versiones, IP y navegador). Si fallara, el panel la vuelve a pedir.
+  if (legalPublicado()) await registrarAceptacionLegal(supabase, String(empresaId));
   redirect("/panel");
+}
+
+/** Registra que el propietario aceptó las versiones vigentes de los términos y el aviso de privacidad. */
+async function registrarAceptacionLegal(supabase: Awaited<ReturnType<typeof crearClienteServidor>>, empresaId: string) {
+  const v = versionesLegales();
+  const { error } = await supabase.rpc("aceptar_documentos_legales", {
+    p_empresa: empresaId, p_terminos: v.terminos, p_privacidad: v.privacidad, p_evidencia: await evidenciaAccion(),
+  });
+  return error;
+}
+
+/** Aceptar las versiones vigentes desde el panel (empresas creadas antes o con una versión nueva). */
+export async function aceptarDocumentosLegales(_: Estado): Promise<Estado> {
+  const ctx = await requierePanel();
+  if (ctx.rol !== "propietario") return fallo("Solo el propietario de la cuenta puede aceptarlos.");
+  const error = await registrarAceptacionLegal(ctx.supabase, ctx.empresa.id);
+  if (error) return fallo(traducir(error));
+  refrescar();
+  return ok("Gracias: quedó registrada tu aceptación.");
 }
 
 // --- Centros de trabajo -----------------------------------------------------------
@@ -214,9 +237,11 @@ export async function guardarEmpresa(_: Estado, fd: FormData): Promise<Estado> {
   const zona = texto(fd, "zona_horaria");
   if (!razon) return fallo("Escribe la razón social o nombre del negocio.");
   if (!ZONAS_MX.some((z) => z.zona === zona)) return fallo("Elige la zona horaria.");
+  const aviso = texto(fd, "aviso_privacidad_url") || null;
+  if (aviso && !/^https:\/\/\S+$/.test(aviso)) return fallo("El enlace al aviso de privacidad debe empezar con https://");
   const { data, error } = await ctx.supabase
     .from("empresas")
-    .update({ razon_social: razon, rfc, zona_horaria: zona })
+    .update({ razon_social: razon, rfc, zona_horaria: zona, aviso_privacidad_url: aviso })
     .eq("id", ctx.empresa.id)
     .select("id");
   if (error) return fallo(traducir(error));

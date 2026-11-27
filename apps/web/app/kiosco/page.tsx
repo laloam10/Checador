@@ -25,5 +25,5 @@ export default async function PaginaKiosco() {
     );
   }
 
-  return <Kiosco empresa={kiosco.empresa} centro={kiosco.centro} zonaHoraria={kiosco.zonaHoraria} ubicacion={kiosco.ubicacion} />;
+  return <Kiosco empresa={kiosco.empresa} centro={kiosco.centro} zonaHoraria={kiosco.zonaHoraria} ubicacion={kiosco.ubicacion} avisoPrivacidad={kiosco.avisoPrivacidad} />;
 }

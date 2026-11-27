@@ -16,7 +16,7 @@ export default async function Configuracion({ searchParams }: { searchParams: Pr
   const gestor = esGestor(ctx.rol);
   const { data: empresa } = await ctx.supabase
     .from("empresas")
-    .select("razon_social, rfc, zona_horaria, recordatorios_conformidad")
+    .select("razon_social, rfc, zona_horaria, recordatorios_conformidad, aviso_privacidad_url")
     .eq("id", ctx.empresa.id)
     .single();
   const recordatorios = empresa?.recordatorios_conformidad ?? true;
@@ -74,6 +74,15 @@ export default async function Configuracion({ searchParams }: { searchParams: Pr
                       {ZONAS_MX.map((z) => <option key={z.zona} value={z.zona}>{z.etiqueta}</option>)}
                     </select>
                   </label>
+                  <label className="campo-2">
+                    <span className="etiqueta-campo">Enlace a tu aviso de privacidad<span className="opcional"> (opcional)</span></span>
+                    <input name="aviso_privacidad_url" type="url" inputMode="url" placeholder="https://tuempresa.mx/aviso-de-privacidad"
+                      defaultValue={empresa?.aviso_privacidad_url ?? ""} />
+                    <small className="ayuda">
+                      Tu empresa es responsable de los datos de tu personal y debe darle su aviso de privacidad. Checador muestra
+                      este enlace en la aplicación y en el kiosco.
+                    </small>
+                  </label>
                 </div>
                 <p className="mensaje mensaje-aviso">
                   <strong>Antes de cambiar la razón social o el RFC:</strong> al cambiarlos, los acuerdos de todo tu personal
@@ -85,6 +94,7 @@ export default async function Configuracion({ searchParams }: { searchParams: Pr
               <dl className="resumen">
                 <dt>Razón social</dt><dd>{empresa?.razon_social}</dd>
                 <dt>RFC</dt><dd>{empresa?.rfc ?? "—"}</dd>
+                <dt>Aviso de privacidad</dt><dd>{empresa?.aviso_privacidad_url ? <a href={empresa.aviso_privacidad_url} target="_blank" rel="noopener">{empresa.aviso_privacidad_url}</a> : "—"}</dd>
                 <dt>Zona horaria</dt><dd>{zona}</dd>
               </dl>
             )}

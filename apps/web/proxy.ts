@@ -15,6 +15,11 @@ import { cabecerasCors, origenAppPermitido, rutaDeApp } from "@/lib/appMovil";
  *     rutas que usa (lib/appMovil.ts). La app manda su token en Authorization, sin cookies.
  */
 export async function proxy(request: NextRequest) {
+  // Términos y aviso de privacidad sin publicar (docs/legal/README.md): en producción no existen.
+  if (["/terminos", "/privacidad"].includes(request.nextUrl.pathname)
+      && process.env.VERCEL_ENV === "production" && process.env.LEGAL_PUBLICADO !== "1") {
+    return new NextResponse("No encontrado", { status: 404, headers: { "Content-Type": "text/plain; charset=utf-8" } });
+  }
   const origen = request.headers.get("origin");
   const cors = rutaDeApp(request.nextUrl.pathname) && origenAppPermitido(origen, process.env.APP_ORIGENES_EXTRA)
     ? cabecerasCors(origen!)
@@ -51,8 +56,8 @@ export async function proxy(request: NextRequest) {
 
   const { data } = await supabase.auth.getClaims();
   const ruta = request.nextUrl.pathname;
-  // /guia: guía rápida pública, para enlazarla desde la página de Jemba.
-  const publica = ruta.startsWith("/entrar") || ruta.startsWith("/api") || ruta === "/guia";
+  // Públicas: /guia (guía rápida para la página de Jemba), /terminos y /privacidad.
+  const publica = ruta.startsWith("/entrar") || ruta.startsWith("/api") || ["/guia", "/terminos", "/privacidad"].includes(ruta);
 
   if (!data?.claims && !publica) {
     const url = request.nextUrl.clone();

@@ -17,6 +17,8 @@ function despliegue(): string {
 const nextConfig: NextConfig = {
   transpilePackages: ["@checador/jornada"],
   poweredByHeader: false,
+  // Términos y aviso de privacidad: las páginas leen estos archivos al responder (lib/legal.ts).
+  outputFileTracingIncludes: { "/*": ["./content/legal/**/*.md"] },
   env: { NEXT_PUBLIC_CHECADOR_DESPLIEGUE: despliegue() },
   async headers() {
     return [

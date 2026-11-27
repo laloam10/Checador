@@ -89,12 +89,15 @@ export function Kiosco({
   centro,
   zonaHoraria,
   ubicacion = false,
+  avisoPrivacidad = null,
 }: {
   empresa: string;
   centro: string | null;
   zonaHoraria: string;
   /** Su centro registra la ubicación del kiosco al checar (nunca impide checar). */
   ubicacion?: boolean;
+  /** Aviso de privacidad de la empresa: se muestra como texto (un enlace sacaría a la tableta del kiosco). */
+  avisoPrivacidad?: string | null;
 }) {
   const [paso, setPaso] = useState<Paso>({ tipo: "numero" });
   const [numero, setNumero] = useState("");
@@ -622,6 +625,7 @@ export function Kiosco({
 
       <footer className="kiosco-pie">
         {ubicacion && <span>Este kiosco registra su ubicación al checar.</span>}
+        {avisoPrivacidad && <span>Aviso de privacidad de {empresa}: {avisoPrivacidad.replace(/^https:\/\//, "")}</span>}
         {porEnviar > 0 && <span>{porEnviar} checada(s) pendientes de enviar</span>}
         {rechazados.length > 0 && (
           <details>

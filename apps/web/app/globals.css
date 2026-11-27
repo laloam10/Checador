@@ -1229,3 +1229,26 @@ main.esqueleto-kiosco { min-height: 100vh; }
 .aviso-cobro-aviso { background: #fdf6e3; border-color: #ecd9a8; border-left-color: var(--acento); }
 .aviso-cobro-solo_lectura { background: #fdeee4; border-color: #f0c9b0; border-left-color: #c2591b; }
 .aviso-cobro-suspendida { background: var(--rojo-claro); border-color: rgb(180 35 24 / 0.2); border-left-color: var(--rojo); }
+
+/* Términos y aviso de privacidad (/terminos, /privacidad). */
+.legal { max-width: 46rem; padding: 2.2rem 1.2rem 3rem; line-height: 1.65; }
+.legal-marca { display: inline-block; margin-bottom: 1.4rem; text-decoration: none; }
+.legal h1 { margin: 0; font-size: 1.9rem; color: var(--noche); line-height: 1.2; }
+.legal-version { margin: 0.4rem 0 1.6rem; font-family: var(--mono); font-size: 0.82rem; color: var(--gris); }
+.legal h2 { margin: 2rem 0 0.6rem; font-size: 1.15rem; color: var(--noche); }
+.legal h3 { margin: 1.4rem 0 0.4rem; font-size: 1rem; color: var(--noche); }
+.legal p, .legal li { color: var(--tinta); }
+.legal ul, .legal ol { padding-left: 1.3rem; }
+.legal li { margin: 0.25rem 0; }
+.legal mark { background: #fff3b0; padding: 0 0.15rem; border-radius: 3px; }
+.legal code { font-family: var(--mono); font-size: 0.88em; }
+.legal-borrador { padding: 0.75rem 0.95rem; border-radius: var(--radio-chico); background: #fdf6e3; border-left: 4px solid var(--acento); font-size: 0.9rem; }
+.legal-tabla { overflow-x: auto; margin: 0.8rem 0 1rem; }
+.legal-tabla table { width: 100%; border-collapse: collapse; font-size: 0.9rem; background: var(--superficie); }
+.legal-tabla th, .legal-tabla td { text-align: left; padding: 0.5rem 0.7rem; border: 1px solid var(--borde); vertical-align: top; }
+.legal-tabla th { background: var(--marca-claro); color: var(--noche); }
+.legal-pie { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--borde); font-size: 0.85rem; color: var(--gris); }
+.aviso-privacidad-empresa { margin: 1.6rem 0 0.4rem; text-align: center; font-size: 0.82rem; color: var(--gris); }
+.alta-acepto { margin: 0.4rem 0 0.8rem; font-size: 0.9rem; }
+.aviso-legal { background: var(--marca-claro); border-color: var(--borde-fuerte); border-left-color: var(--marca); }
+.aviso-legal-form { margin: 0; }

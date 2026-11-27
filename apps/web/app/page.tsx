@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { Checador } from "@/components/Checador";
+import { AvisoPrivacidadEmpresa } from "@/components/AvisoPrivacidadEmpresa";
 import { Navegacion } from "@/components/Navegacion";
 import { SinVinculo } from "@/components/SinVinculo";
 import { Pendientes } from "@/components/Pendientes";
@@ -72,6 +73,7 @@ export default async function Inicio() {
           />
         }
       />
+      <AvisoPrivacidadEmpresa empresa={trabajador.empresa} url={trabajador.avisoPrivacidad} />
     </main>
   );
 }
