@@ -30,8 +30,12 @@ Jemba, WhatsApp, avisos, horarios, Salir con PIN o huella, ubicación al checar 
       registrar la aceptación de los términos al crear la empresa (fecha, hora, cuenta y versión); la fase 3 de
       `docs/cobro.md` (falta de pago); solo lectura y exportación durante el plazo de conservación después de cancelar,
       con aviso 30 días antes del borrado; el CFDI; y avisar por correo los cambios de precio o de términos.
-- [ ] Aviso de privacidad de Jemba (para los usuarios del panel y el cobro) y modelo de aviso para que el Cliente lo
-      dé a su personal.
+- [ ] **Avisos de privacidad** (borradores en `docs/legal/`): el de Jemba para clientes y usuarios del panel, y el
+      modelo que cada empresa completa y entrega a su personal (con versión simplificada). Revisión del abogado (notas
+      al final de cada uno).
+- [ ] **En la app:** un campo en Configuración para el enlace al aviso de privacidad de la empresa, que se muestre a su
+      personal (hoy la entrada dice "consulta el aviso de tu empleador" sin enlace); publicar el de Jemba en
+      `/privacidad` y los términos en `/terminos` cuando estén revisados.
 
 ## Del usuario (en pruebas)
 
