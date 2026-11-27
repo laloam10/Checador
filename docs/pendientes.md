@@ -24,9 +24,8 @@ Jemba, WhatsApp, avisos, horarios, Salir con PIN o huella, ubicación al checar 
 
 ## Del usuario (en pruebas)
 
-- [ ] **Volver a subir la guía rápida a jemba.mx**: ahora trae la sección de precios con calculadora
-      (`docs/publicar/guia-rapida-checador.html`, regenerado el 2026-11-27).
-- [x] **Guía rápida publicada en jemba.mx** (2026-11-26) con `docs/publicar/guia-rapida-checador.html`. Sus botones
+- [x] **Guía rápida publicada en jemba.mx** (2026-11-26; con precios y calculadora desde el 2026-11-27) con
+      `docs/publicar/guia-rapida-checador.html`. Sus botones
       llevan a `checador.jemba.mx`, que no funciona hasta reactivar producción. Si cambia `/guia`, regenerarla con
       `node scripts/guia-html.mjs` (con la app corriendo) y volver a subirla.
 
