@@ -1,7 +1,7 @@
 "use client";
 
 import { Marca } from "@/components/Marca";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { crearClienteNavegador } from "@/lib/supabase/client";
 
 /**
@@ -17,6 +17,28 @@ export default function Entrar() {
   const [error, setError] = useState<string | null>(null);
   const [espera, setEspera] = useState(0); // segundos para poder reenviar el código
   const [reenviado, setReenviado] = useState(false);
+  // Viene de «Registra tu empresa»: /alta-empresa pide sesión y redirige aquí. Se lee en el
+  // navegador (no durante el render del servidor).
+  const [alta, setAlta] = useState(false);
+  const campoCorreo = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setAlta(new URLSearchParams(window.location.search).get("siguiente") === "/alta-empresa");
+  }, []);
+
+  function irAAlta(e: React.MouseEvent) {
+    e.preventDefault();
+    window.history.replaceState(null, "", "/entrar?siguiente=%2Falta-empresa");
+    setAlta(true);
+    campoCorreo.current?.focus();
+  }
+
+  function irAEntrar(e: React.MouseEvent) {
+    e.preventDefault();
+    window.history.replaceState(null, "", "/entrar");
+    setAlta(false);
+    campoCorreo.current?.focus();
+  }
 
   useEffect(() => {
     if (espera <= 0) return;
@@ -94,9 +116,11 @@ export default function Entrar() {
 
       <section className="entrar-formulario">
         <div className="entrar-marca-chica"><Marca tamano={40} subtitulo="Registro de jornada" /></div>
-        <h1 className="entrar-titulo">{paso === "correo" ? "Entra con tu correo" : "Revisa tu correo"}</h1>
+        <h1 className="entrar-titulo">{paso === "codigo" ? "Revisa tu correo" : alta ? "Registra tu empresa" : "Entra con tu correo"}</h1>
         <p className="subtitulo">
-          {paso === "correo" ? "Te enviaremos un código; no necesitas contraseña." : <>Enviamos un código a <strong>{correo}</strong>.</>}
+          {paso === "codigo" ? <>Enviamos un código a <strong>{correo}</strong>.</>
+            : alta ? "Primero escribe tu correo: te enviaremos un código y después capturas los datos de tu negocio. No necesitas contraseña."
+            : "Te enviaremos un código; no necesitas contraseña."}
         </p>
 
         {paso === "correo" ? (
@@ -104,6 +128,7 @@ export default function Entrar() {
             <label>
               Tu correo
               <input
+                ref={campoCorreo}
                 type="email"
                 inputMode="email"
                 autoComplete="email"
@@ -151,10 +176,17 @@ export default function Entrar() {
 
         {error && <p className="mensaje mensaje-error">{error}</p>}
 
-        <p className="entrar-empresa">
-          ¿Tienes un negocio? <a href="/alta-empresa">Registra tu empresa</a> y lleva el registro de jornada de tu personal.
-          {" "}<a href="/guia" className="entrar-guia">Ver la guía rápida</a>
-        </p>
+        {alta ? (
+          <p className="entrar-empresa">
+            ¿Ya tienes cuenta o solo registras tu jornada? <a href="/entrar" onClick={irAEntrar}>Entra con tu correo</a>.
+            {" "}<a href="/guia" className="entrar-guia">Ver la guía rápida</a>
+          </p>
+        ) : (
+          <p className="entrar-empresa">
+            ¿Tienes un negocio? <a href="/alta-empresa" onClick={irAAlta}>Registra tu empresa</a> y lleva el registro de jornada de tu personal.
+            {" "}<a href="/guia" className="entrar-guia">Ver la guía rápida</a>
+          </p>
+        )}
         <p className="legal">
           Tus registros de jornada se conservan conforme a la Ley Federal del Trabajo. Consulta el aviso de privacidad
           de tu empleador.
