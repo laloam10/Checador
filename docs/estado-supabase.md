@@ -6,8 +6,8 @@ Bitácora de lo aplicado en los proyectos en la nube. No contiene secretos.
 |---|---|---|
 | Project Ref | `iydppfmwuktjlgtvrdif` | `ajfplcfirscvxhrmqhhr` |
 | Región / Postgres | us-east-1 / 17.11 | us-east-1 / 17.11 |
-| Plan de la organización | Gratuito (subir a **Pro** antes del primer cliente) | ídem |
-| Estado del proyecto | ✅ activo (2026-11-18) | ⛔ **sin respuesta desde el 2026-11-16**, probablemente pausado por inactividad. Pendiente: reactivarlo al pasar a Pro (ver abajo) |
+| Plan de la organización | **Pro** (desde el 2026-11-27; incluye los dos proyectos, con límite de gasto activado) | ídem |
+| Estado del proyecto | ✅ activo (2026-11-18) | ✅ restaurado el 2026-11-27 (estuvo pausado desde el 2026-11-16); `Verificar producción`: 40 de 40 |
 | Migraciones (10) | ✅ aplicadas por API | ✅ aplicadas por API |
 | Migración 11: recordatorios de conformidad (`20261112000001`) | ✅ aplicada por API (2026-11-09); tareas de pg_cron creadas | ✅ aplicada por API (2026-11-10); tareas de pg_cron creadas |
 | Migración 12: conformidad en el kiosco (`20261113000001`, requiere la 11) | ✅ aplicada por API (2026-11-09) | ✅ aplicada por API (2026-11-10) |
@@ -54,7 +54,7 @@ Bitácora de lo aplicado en los proyectos en la nube. No contiene secretos.
 | Network restrictions | ⏳ manual, en el dashboard | ⏳ manual |
 | Token de administración | `checador-migraciones` (guardado en el entorno de Claude el 2026-11-19); `checador-configuracion-2` ya no es válido: bórralo de Supabase | |
 
-## Pendiente: producción sin base de datos (desde el 2026-11-16)
+## Resuelto: producción sin base de datos (del 2026-11-16 al 2026-11-27)
 
 La verificación semanal (`verificar-produccion.yml`, lunes 07:17 hora del centro) falló el 2026-11-16: la app
 responde, pero `ajfplcfirscvxhrmqhhr.supabase.co` no acepta conexiones. El proyecto de pruebas sí responde.

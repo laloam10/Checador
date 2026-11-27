@@ -6,10 +6,8 @@ Jemba, WhatsApp, avisos, horarios, Salir con PIN o huella, ubicación al checar 
 
 ## Bloquea producción
 
-- [ ] **Supabase Pro y reactivar el proyecto de producción** (`ajfplcfirscvxhrmqhhr`). Sin respuesta desde el
-      2026-11-16, probablemente pausado por inactividad. Mientras tanto nadie puede entrar ni checar en
-      `checador.jemba.mx` y la verificación de cada lunes falla. En el plan gratuito, a los 90 días ya no se reactiva
-      desde el panel.
+- [x] **Supabase Pro y reactivar el proyecto de producción** (2026-11-27): la organización pasó a Pro y producción
+      se restauró; `Verificar producción` pasó 40 de 40.
 - [ ] **Paso a producción** (lo hace Claude una vez reactivada): migraciones 18 a 37 (incluye horarios, Salir con PIN o huella, ubicación al checar, diseño de correos, suscripciones con prueba de 14 días, cobro con Stripe, restricciones por falta de pago, aceptación de los términos, conservación y avisos a clientes), código de `pruebas` a `main`,
       manual 1.3 con sus cuatro hojas y verificación de producción (`verificar-produccion.yml`). El usuario pone en
       producción los secretos y variables de WhatsApp (§1.9) y avisos (§1.10); producción no necesita el bypass de
