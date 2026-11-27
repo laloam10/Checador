@@ -72,7 +72,10 @@ Jemba, WhatsApp, avisos, horarios, Salir con PIN o huella, ubicación al checar 
 
 ## Revisión legal (antes del primer cliente)
 
-- [ ] Plantilla del acuerdo de registro (`apps/web/lib/acuerdo.ts`).
+- [ ] Plantilla del acuerdo de registro (`apps/web/lib/acuerdo.ts`). Va en el Anexo C del Word para el abogado
+      (2026-11-28). Al aplicar sus cambios, corregir también el doble punto cuando la dirección del centro termina en
+      punto ("Guadalajara, Jal..") y subir `PLANTILLA_VERSION` una sola vez (cambiarla deja desactualizados los acuerdos
+      firmados).
 - [ ] Interpretación 11 (volver a entrar con PIN sin cambiar el acuerdo).
 - [ ] **Interpretación 12 (ubicación al checar)** antes de activarla para un cliente: texto de la cláusula NOVENA,
       si basta el aviso de privacidad o hace falta un consentimiento separado, y el plazo de 90 días.
