@@ -67,7 +67,11 @@ tarjeta. Durante la prueba no se cobra nada.
 
 **5.2** Si el Cliente registra su forma de pago durante la prueba, el primer cobro se hace cuando la prueba termina.
 
-**5.3** Una prueba por Cliente. Jemba puede negar una prueba nueva a quien ya la usó con otra cuenta.
+**5.3** Si la prueba termina sin que el Cliente haya registrado una forma de pago, al día siguiente el panel queda en
+solo lectura (como en la cláusula 7.1) y, a los 30 días de terminada la prueba, se dejan de registrar checadas. La
+cláusula 7.2 aplica igual: el Cliente siempre puede exportar sus Registros y cada persona consultar los suyos.
+
+**5.4** Una prueba por Cliente. Jemba puede negar una prueba nueva a quien ya la usó con otra cuenta.
 
 ## 6. Precio y pago
 

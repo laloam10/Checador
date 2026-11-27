@@ -39,7 +39,7 @@ Jemba, WhatsApp, avisos, horarios, Salir con PIN o huella, ubicación al checar 
 ## Del usuario (en pruebas)
 
 - [ ] **Empresas de prueba sin tarjeta en checador-pruebas:** desde la fase 3 (2026-11-28), su prueba de 14 días
-      termina hacia el 10 de diciembre; 15 días después quedan en solo lectura y 30 días después se suspende el
+      termina hacia el 10 de diciembre; al día siguiente quedan en solo lectura y 30 días después se suspende el
       registro. Para seguir usándolas, registra la tarjeta de prueba 4242 en cada una.
 - [ ] **Correos de Stripe por pago fallido:** en Stripe → Settings → Billing → Revenue recovery (o "Recuperación de
       ingresos"), activar los correos al cliente cuando falla un cobro o vence la tarjeta. Checador no envía esos
