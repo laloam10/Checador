@@ -146,14 +146,32 @@ try {
   await dueno.getByText(/Próximo cobro:/).waitFor();
   paso("al terminar la prueba se cobran $249 + IVA = $288.84 y la suscripción queda activa");
 
-  // 6. Cancelación
+  // 6. Falta de pago (fase 3): 20 días sin pagar → panel en solo lectura; las restricciones las pone la base
+  const empresaId = sesion.metadata.empresa_id;
+  sql(`update suscripciones set estado = 'pago_vencido', pago_vencido_desde = now() - interval '20 days' where empresa_id = '${empresaId}'`);
+  await dueno.goto(`${APP}/panel`);
+  await dueno.locator(".aviso-cobro-solo_lectura").getByText("El panel está en solo lectura por falta de pago").waitFor();
+  await dueno.goto(`${APP}/panel/trabajadores`);
+  await dueno.getByLabel("Nombre completo").fill("Eva Cobro");
+  await dueno.getByLabel("Número de empleado").fill("205");
+  await dueno.getByLabel("Fecha de ingreso").fill("2026-01-10");
+  await dueno.getByRole("button", { name: "Dar de alta" }).click();
+  await dueno.getByRole("status").filter({ hasText: "El panel está en solo lectura por falta de pago" }).first().waitFor();
+  if (sql(`select count(*) from trabajadores where empresa_id = '${empresaId}' and nombre = 'Eva Cobro'`) !== "0") throw new Error("En solo lectura no debía darse de alta");
+  await aviso("customer.subscription.updated", { id: suscripcion.id }); // Stripe sigue activa: vuelve a la normalidad
+  await dueno.goto(`${APP}/panel`);
+  if (await dueno.locator(".aviso-cobro").count()) throw new Error("Con el pago al corriente no debía haber aviso");
+  paso("con 20 días sin pagar el panel avisa y no deja dar de alta; al estar al corriente, el aviso desaparece");
+
+  // 7. Cancelación
   await stripe.subscriptions.cancel(suscripcion.id);
   await aviso("customer.subscription.deleted", { id: suscripcion.id });
   if (fila().estado !== "cancelada") throw new Error("Debía quedar cancelada");
-  await dueno.reload();
+  await dueno.goto(`${APP}/panel/configuracion#suscripcion`);
   await dueno.locator(".chip-estado", { hasText: "Cancelada" }).waitFor();
   await dueno.getByRole("button", { name: "Contratar" }).waitFor();
-  paso("al cancelar, la suscripción queda cancelada y se puede volver a contratar");
+  await dueno.locator(".aviso-cobro-suspendida").getByText("Tu suscripción está cancelada").waitFor();
+  paso("al cancelar, la suscripción queda cancelada, el panel lo avisa y se puede volver a contratar");
 
   console.log("\nPrueba de cobro: OK");
 } catch (e) {

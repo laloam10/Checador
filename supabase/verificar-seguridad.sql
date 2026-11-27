@@ -107,6 +107,7 @@ select 'ALTO', 'Función privilegiada ejecutable por authenticated sin estar en 
      'elegir_acceso_al_salir', 'bloquear_mi_sesion', 'desbloquear_con_pin', 'olvidar_bloqueo_de_mi_sesion', 'mi_acceso',
      'crear_reto_acceso', 'registrar_passkey', 'borrar_passkey', 'registrar_ubicacion',
      'cobro_vincular_cliente', 'cobro_actualizar',
+     'situacion_cobro',
      'trabajadores_con_pin', 'mi_rol', 'es_gestor', 'puede_consultar', 'soy_trabajador', 'trabajo_en')
 union all
 -- 11. Solo vincular_mi_cuenta() liga una ficha de trabajador a una cuenta (si no, el empleador

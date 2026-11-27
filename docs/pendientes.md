@@ -10,7 +10,7 @@ Jemba, WhatsApp, avisos, horarios, Salir con PIN o huella, ubicación al checar 
       2026-11-16, probablemente pausado por inactividad. Mientras tanto nadie puede entrar ni checar en
       `checador.jemba.mx` y la verificación de cada lunes falla. En el plan gratuito, a los 90 días ya no se reactiva
       desde el panel.
-- [ ] **Paso a producción** (lo hace Claude una vez reactivada): migraciones 18 a 32 (incluye horarios, Salir con PIN o huella, ubicación al checar, diseño de correos, suscripciones con prueba de 14 días y cobro con Stripe), código de `pruebas` a `main`,
+- [ ] **Paso a producción** (lo hace Claude una vez reactivada): migraciones 18 a 33 (incluye horarios, Salir con PIN o huella, ubicación al checar, diseño de correos, suscripciones con prueba de 14 días, cobro con Stripe y restricciones por falta de pago), código de `pruebas` a `main`,
       manual 1.3 con sus cuatro hojas y verificación de producción (`verificar-produccion.yml`). El usuario pone en
       producción los secretos y variables de WhatsApp (§1.9) y avisos (§1.10); producción no necesita el bypass de
       Vercel.
@@ -27,8 +27,7 @@ Jemba, WhatsApp, avisos, horarios, Salir con PIN o huella, ubicación al checar 
 - [ ] **Revisión del abogado** del borrador (con sus notas al final) y llenar los datos entre corchetes: razón social,
       RFC, domicilio, correos de contacto y soporte, ciudad para tribunales y plazos.
 - [ ] **Lo que el borrador promete y la app aún no hace** (hacerlo antes de publicar los términos):
-      registrar la aceptación de los términos al crear la empresa (fecha, hora, cuenta y versión); la fase 3 de
-      `docs/cobro.md` (falta de pago); solo lectura y exportación durante el plazo de conservación después de cancelar,
+      registrar la aceptación de los términos al crear la empresa (fecha, hora, cuenta y versión); solo lectura y exportación durante el plazo de conservación después de cancelar,
       con aviso 30 días antes del borrado; el CFDI; y avisar por correo los cambios de precio o de términos.
 - [ ] **Avisos de privacidad** (borradores en `docs/legal/`): el de Jemba para clientes y usuarios del panel, y el
       modelo que cada empresa completa y entrega a su personal (con versión simplificada). Revisión del abogado (notas
@@ -38,6 +37,13 @@ Jemba, WhatsApp, avisos, horarios, Salir con PIN o huella, ubicación al checar 
       `/privacidad` y los términos en `/terminos` cuando estén revisados.
 
 ## Del usuario (en pruebas)
+
+- [ ] **Empresas de prueba sin tarjeta en checador-pruebas:** desde la fase 3 (2026-11-28), su prueba de 14 días
+      termina hacia el 10 de diciembre; 15 días después quedan en solo lectura y 30 días después se suspende el
+      registro. Para seguir usándolas, registra la tarjeta de prueba 4242 en cada una.
+- [ ] **Correos de Stripe por pago fallido:** en Stripe → Settings → Billing → Revenue recovery (o "Recuperación de
+      ingresos"), activar los correos al cliente cuando falla un cobro o vence la tarjeta. Checador no envía esos
+      correos; solo muestra el aviso en el panel.
 
 - [x] **Cobro activado en pruebas** (2026-11-28): variables en Vercel, secreto `cobro`, destino de avisos con los
       eventos de suscripción. Probado: tarjeta 4242 registrada en prueba y avisos entregados a la app.

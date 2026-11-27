@@ -177,11 +177,13 @@ export async function atender(m: MensajeEntrante, cfg: ConfigWhatsApp, ahora = n
   }
   if (ahoraS - m.enviadoEn > RETRASO_MAXIMO_S) return { texto: TEXTOS.tarde, botones: accionesValidas(est) };
 
-  const c = await rpc<{ hora_efectiva?: string; secuencia?: number; duplicado?: boolean }>("whatsapp_checar", {
+  const c = await rpc<{ hora_efectiva?: string; secuencia?: number; duplicado?: boolean; error?: string }>("whatsapp_checar", {
     p_tipo: intencion.tipo,
     p_id_cliente: idClienteDe(m.id),
     p_evidencia: evidencia,
   });
+  // RECHAZADO: la base no admite la checada (p. ej., registro suspendido por falta de pago) y dice por qué.
+  if (!c.ok && c.codigo === "RECHAZADO" && c.error) return { texto: c.error };
   if (!c.ok || !c.hora_efectiva) return { texto: TEXTOS.error };
   const zona = estado.zona_horaria ?? "America/Mexico_City";
   return conAviso(

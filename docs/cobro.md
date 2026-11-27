@@ -42,7 +42,7 @@ algunas personas, que es justo el incumplimiento que Checador ayuda a evitar.
    ruta `/api/stripe/webhook` (migración `20261203000001`; prueba `apps/web/e2e/cobro.e2e.mjs`). Activarlo en
    pruebas: `docs/publicacion.md` §1.14. Falta: el CFDI (PAC por elegir) y, para producción, activar la cuenta de
    Stripe y publicar términos del servicio y aviso de privacidad.
-3. **Restricciones por falta de pago (pendiente).** Solo cuando ya se pueda pagar:
+3. **Restricciones por falta de pago (hecha, 2026-11-28; migración `20261204000001`).**
 
    | Situación | Qué pasa |
    |---|---|
@@ -54,7 +54,25 @@ algunas personas, que es justo el incumplimiento que Checador ayuda a evitar.
    Los registros son prueba para ambas partes; nunca se retienen para presionar el pago. Esta
    política debe ir en los términos del servicio y revisarla un abogado.
 
+   Cómo está hecha:
+   - Las aplica la base de datos con disparadores en `eventos`, `trabajadores` y `acuerdos`, así que valen por
+     cualquier vía (panel, app, kiosco y WhatsApp). `situacion_cobro()` dice el nivel y las fechas de cada etapa.
+   - **Solo lectura:** sin altas, sin deshacer bajas, sin capturas ni correcciones del panel y sin generar acuerdos.
+     Siempre se permite: dar de baja, configurar, exportar, consultar, dar conformidad y firmar un acuerdo ya generado.
+   - **Suspendida:** además, no se registran checadas; la app, el kiosco y WhatsApp dicen el motivo. Una checada hecha
+     **sin conexión antes** de la suspensión se acepta aunque llegue después (no se pierde un registro real).
+   - **Cancelada:** suspendida desde que Stripe la cancela (al terminar el periodo pagado).
+   - **Prueba terminada sin tarjeta:** los mismos plazos, contados desde el fin de la prueba (decisión del
+     2026-11-28, pendiente de confirmar: ver abajo). Con tarjeta registrada no hay restricción; Stripe cobra al terminar.
+   - El panel muestra un aviso en todas sus páginas con lo que pasa y la fecha de la siguiente etapa.
+   - Pruebas: `supabase/tests/108_falta_de_pago.sql` y el paso 6 de `apps/web/e2e/cobro.e2e.mjs`.
+
 ## Pendientes de decisión
+
+- **Prueba terminada sin tarjeta:** hoy tiene los mismos 15 + 15 días que un pago vencido (casi un mes más de uso
+  gratis). Alternativa más estricta: solo lectura al día siguiente de terminar la prueba. Es una línea en
+  `_cobro_situacion()`.
+- **Suspender las checadas a los 30 días:** pregunta abierta para el abogado (nota 3 de los términos).
 
 - PAC para los CFDI (¿el que ya se usa en la empresa?).
 - Contacto de ventas para más de 40 personas (hoy la app enlaza a jemba.mx).

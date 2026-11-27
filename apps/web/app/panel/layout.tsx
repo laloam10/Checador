@@ -1,5 +1,6 @@
 import { CabeceraPanel, NavPanel } from "@/components/panel/NavPanel";
-import { objecionesPendientes, requierePanel } from "@/lib/panel";
+import { AvisoCobro, type SituacionCobro } from "@/components/panel/AvisoCobro";
+import { esGestor, objecionesPendientes, requierePanel } from "@/lib/panel";
 
 export const metadata = { title: "Checador · Panel" };
 
@@ -7,7 +8,10 @@ const ROL = { propietario: "Propietario", admin: "Administrador", supervisor: "S
 
 export default async function LayoutPanel({ children }: { children: React.ReactNode }) {
   const ctx = await requierePanel();
-  const objeciones = await objecionesPendientes(ctx);
+  const [objeciones, { data: situacion }] = await Promise.all([
+    objecionesPendientes(ctx),
+    ctx.supabase.rpc("situacion_cobro", { p_empresa: ctx.empresa.id }),
+  ]);
   return (
     <div className="panel">
       {/* Banda de marca (verde Jemba) a todo lo ancho; el contenido sigue centrado. */}
@@ -17,7 +21,10 @@ export default async function LayoutPanel({ children }: { children: React.ReactN
           <NavPanel objeciones={objeciones.length} />
         </div>
       </div>
-      <main className="panel-contenido">{children}</main>
+      <main className="panel-contenido">
+        {situacion && <AvisoCobro situacion={situacion as SituacionCobro} zonaHoraria={ctx.empresa.zonaHoraria} gestor={esGestor(ctx.rol)} />}
+        {children}
+      </main>
     </div>
   );
 }

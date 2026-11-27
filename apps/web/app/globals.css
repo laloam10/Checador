@@ -1219,3 +1219,13 @@ main.esqueleto-kiosco { min-height: 100vh; }
 .cobro-ciclos span { font-size: 0.82rem; color: var(--gris); }
 .cobro-administrar { margin-top: 0.6rem; display: grid; gap: 0.5rem; justify-items: start; }
 .suscripcion-estado .mensaje { margin: 0.2rem 0; }
+
+/* Panel: aviso por falta de pago (fase 3 de docs/cobro.md). */
+.aviso-cobro { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.8rem 1.2rem; margin: 0 0 1.2rem; padding: 0.9rem 1.1rem; border-radius: var(--radio); border: 1px solid; border-left-width: 5px; }
+.aviso-cobro strong { display: block; color: var(--noche); }
+.aviso-cobro > div { flex: 1 1 26rem; min-width: 0; }
+.aviso-cobro p { margin: 0.2rem 0 0; font-size: 0.9rem; color: var(--tinta); }
+.aviso-cobro .boton { text-decoration: none; white-space: nowrap; }
+.aviso-cobro-aviso { background: #fdf6e3; border-color: #ecd9a8; border-left-color: var(--acento); }
+.aviso-cobro-solo_lectura { background: #fdeee4; border-color: #f0c9b0; border-left-color: #c2591b; }
+.aviso-cobro-suspendida { background: var(--rojo-claro); border-color: rgb(180 35 24 / 0.2); border-left-color: var(--rojo); }
