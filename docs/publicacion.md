@@ -349,6 +349,39 @@ coordenadas de esa checada y puede poner sus cookies en el navegador de quien lo
 privacidad junto con la ubicación al checar.
 
 
+### 1.14 Cobro con Stripe (suscripción)
+
+Precio escalonado por persona activa y fases en `docs/cobro.md`. La app crea la sesión de pago de Stripe, el portal del
+cliente y ajusta la cantidad de personas con cada alta o baja; Stripe le avisa de cada cambio en la suscripción y la app
+lo guarda con un secreto de servicio (migraciones 30 a 32). Sin estas variables, Configuración → Suscripción dice que
+el pago llega pronto y no se cobra nada.
+
+1. **Producto y precios en Stripe:** `STRIPE_SECRET_KEY=sk_... node --no-warnings scripts/stripe-configurar.mjs`
+   (con `NODE_USE_ENV_PROXY=1` si hay un proxy de red). Crea el producto, los precios escalonados mensual y anual con
+   los tramos de `apps/web/lib/precios.ts`, el IVA de 16 % y el portal del cliente. Se puede repetir sin duplicar. En la
+   cuenta de prueba ya está hecho (2026-11-27). Con una llave de producción pide `--produccion`.
+2. **Llave:** Stripe → **Developers → API keys** → **Secret key**. Vercel → **Environment Variables** →
+   `STRIPE_SECRET_KEY` (en pruebas la de modo de prueba, `sk_test_…`, entorno Preview, rama `pruebas`).
+3. **Secreto de servicio `cobro`** (distinto a los demás): en Supabase → SQL Editor,
+   `select encode(extensions.gen_random_bytes(32), 'hex');` y luego
+   `select public.configurar_secreto_servicio('cobro', '<secreto>');`. El mismo secreto en Vercel como
+   `COBRO_SECRETO_SERVICIO`.
+4. **Avisos de Stripe:** Stripe → **Developers → Webhooks → Add destination** (o "Agregar endpoint"):
+   - URL: `https://checador-pruebas.vercel.app/api/stripe/webhook?x-vercel-protection-bypass=<secreto de bypass>`
+     (el mismo bypass de §1.9; producción no lo necesita: `https://checador.jemba.mx/api/stripe/webhook`).
+   - Eventos: `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated` y
+     `customer.subscription.deleted`.
+   - Copia el **Signing secret** (`whsec_…`) a Vercel como `STRIPE_WEBHOOK_SECRET`.
+5. Vuelve a desplegar.
+6. **Probar en pruebas:** Configuración → Suscripción → **Agregar tarjeta** → en la página de Stripe usa la tarjeta de
+   prueba `4242 4242 4242 4242`, cualquier fecha futura y cualquier CVC. Al volver debe decir "Tarjeta registrada: el
+   primer cobro será el …". **Administrar pago y facturas** abre el portal de Stripe.
+
+Ninguna de estas llaves lleva el prefijo `NEXT_PUBLIC_` ni se pega en chats o en el repositorio. Para producción:
+activar la cuenta de Stripe (datos de la empresa y cuenta bancaria), repetir 1 a 5 con las llaves de producción y
+secretos nuevos, y tener publicados los términos del servicio y el aviso de privacidad. La factura (CFDI) llega
+cuando se elija el PAC.
+
 ## 2. Vercel
 
 ### 2.1 Importar el proyecto

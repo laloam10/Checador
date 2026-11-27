@@ -6,6 +6,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { aHoraLocal, localAInstante } from "@checador/jornada";
 import { generarTextoAcuerdo } from "@/lib/acuerdo";
+import { sincronizarPersonas } from "@/lib/cobro";
 import { datosActuales, estadosAcuerdosEmpresa } from "@/lib/acuerdosDatos";
 import { trabajadorPorId } from "@/lib/datos";
 import { horarioDesdeFormulario } from "@/lib/horarios";
@@ -280,6 +281,7 @@ export async function guardarTrabajador(_: Estado, fd: FormData): Promise<Estado
     .select("id")
     .single();
   if (error) return fallo(traducir(error));
+  await sincronizarPersonas(ctx);
   refrescar();
   redirect(`/panel/trabajadores/${data.id}`);
 }
@@ -321,6 +323,7 @@ export async function importarTrabajadores(_: Estado, fd: FormData): Promise<Est
     .from("trabajadores")
     .insert(trabajadores.map((t) => ({ ...t, empresa_id: ctx.empresa.id })));
   if (error) return fallo(`No se dio de alta a nadie: ${traducir(error)}`);
+  await sincronizarPersonas(ctx);
   refrescar();
   return ok(
     `Se dio de alta a ${trabajadores.length} ${trabajadores.length === 1 ? "persona" : "personas"}. ` +
@@ -364,6 +367,7 @@ export async function darDeBaja(_: Estado, fd: FormData): Promise<Estado> {
     .eq("id", texto(fd, "trabajador_id"))
     .eq("empresa_id", ctx.empresa.id);
   if (error) return fallo(traducir(error));
+  await sincronizarPersonas(ctx);
   refrescar();
   return ok("Baja registrada. Sus registros se conservan (art. 804 LFT).");
 }
@@ -374,6 +378,7 @@ export async function revertirBaja(_: Estado, fd: FormData): Promise<Estado> {
   if (motivo.length < 5) return fallo("Explica por qué se deshace la baja.");
   const { error } = await ctx.supabase.rpc("revertir_baja", { p_trabajador: texto(fd, "trabajador_id"), p_motivo: motivo });
   if (error) return fallo(traducir(error));
+  await sincronizarPersonas(ctx);
   refrescar();
   return ok("Baja deshecha. La persona vuelve a estar activa; el cambio quedó en el historial.");
 }

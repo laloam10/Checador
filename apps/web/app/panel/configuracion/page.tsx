@@ -6,10 +6,12 @@ import { horariosDeEmpresa } from "@/lib/horariosDatos";
 import { FormAccion } from "@/components/panel/FormAccion";
 import { InterruptorRecordatorios } from "@/components/panel/InterruptorRecordatorios";
 import { SeccionSuscripcion, type DatosSuscripcion } from "@/components/panel/SeccionSuscripcion";
+import { configCobro } from "@/lib/cobro";
 import { NuevoHorario } from "@/components/panel/NuevoHorario";
 import { esGestor, requierePanel, ZONAS_MX } from "@/lib/panel";
 
-export default async function Configuracion() {
+export default async function Configuracion({ searchParams }: { searchParams: Promise<{ pago?: string }> }) {
+  const { pago } = await searchParams;
   const ctx = await requierePanel();
   const gestor = esGestor(ctx.rol);
   const { data: empresa } = await ctx.supabase
@@ -22,7 +24,7 @@ export default async function Configuracion() {
     horariosDeEmpresa(ctx.supabase, ctx.empresa.id),
     ctx.supabase.from("trabajadores").select("horario_id, sin_horario_fijo").eq("empresa_id", ctx.empresa.id).is("fecha_baja", null),
     // Solo propietarios y administradores la ven (RLS).
-    ctx.supabase.from("suscripciones").select("estado, prueba_hasta, periodo_fin").eq("empresa_id", ctx.empresa.id).maybeSingle<DatosSuscripcion>(),
+    ctx.supabase.from("suscripciones").select("estado, prueba_hasta, periodo_fin, pago_vencido_desde, ciclo, suscripcion_externa").eq("empresa_id", ctx.empresa.id).maybeSingle<DatosSuscripcion>(),
   ]);
   // Cuántas personas activas usa cada horario (las que no tienen uno propio usan el de la empresa).
   const usan = (id: string) =>
@@ -189,7 +191,13 @@ export default async function Configuracion() {
       {suscripcion && (
         <>
           <h2 id="suscripcion">Suscripción</h2>
-          <SeccionSuscripcion suscripcion={suscripcion} personas={personal?.length ?? 0} zonaHoraria={ctx.empresa.zonaHoraria} />
+          <SeccionSuscripcion
+            suscripcion={suscripcion}
+            personas={personal?.length ?? 0}
+            zonaHoraria={ctx.empresa.zonaHoraria}
+            cobroDisponible={configCobro() !== null}
+            aviso={pago === "listo" || pago === "cancelado" ? pago : undefined}
+          />
         </>
       )}
     </>

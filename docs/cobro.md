@@ -32,13 +32,16 @@ algunas personas, que es justo el incumplimiento que Checador ayuda a evitar.
 1. **Estado y prueba (hecha).** Tabla `suscripciones` (migración `20261201000001`), prueba de 14
    días automática y sección **Configuración → Suscripción** con el estado y el precio de ese mes
    con su desglose. No restringe nada.
-2. **Pago en línea y factura (pendiente).** Stripe Billing con precio por tramos
+2. **Pago en línea (hecho en modo de prueba, 2026-11-27; factura pendiente).** Stripe Billing con precio por tramos
    (`tiers_mode=graduated`), cantidad = personas activas, prorrateo y portal del cliente. Un
    aviso de Stripe (pago cobrado, fallido, cancelado) actualiza `suscripciones` con el secreto
    del servicio `cobro` (como WhatsApp y avisos; nunca la llave `service_role`) y pide el CFDI 4.0
    a un PAC por API, con los datos fiscales que el cliente capture en Configuración.
-   Requiere: cuenta de Stripe de la empresa vendedora, PAC elegido, y términos del servicio y
-   aviso de privacidad publicados.
+   Hecho: producto y precios en Stripe (`scripts/stripe-configurar.mjs`), contratar con tarjeta (con la prueba, el
+   primer cobro llega al terminar), portal del cliente, ajuste de personas con prorrateo en cada alta o baja y la
+   ruta `/api/stripe/webhook` (migración `20261203000001`; prueba `apps/web/e2e/cobro.e2e.mjs`). Activarlo en
+   pruebas: `docs/publicacion.md` §1.14. Falta: el CFDI (PAC por elegir) y, para producción, activar la cuenta de
+   Stripe y publicar términos del servicio y aviso de privacidad.
 3. **Restricciones por falta de pago (pendiente).** Solo cuando ya se pueda pagar:
 
    | Situación | Qué pasa |

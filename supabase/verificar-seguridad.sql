@@ -28,20 +28,25 @@ select 'ALTO', 'Privilegio de anon sobre tabla: ' || privilege_type, table_name:
  where table_schema = 'public' and grantee in ('anon', 'PUBLIC')
 union all
 -- 3. El rol anónimo no debe poder ejecutar funciones (las SECURITY DEFINER saltan RLS).
---    Única excepción: las del webhook de WhatsApp, que exigen el secreto de servicio
---    (el webhook no tiene sesión y la app no usa la llave service_role).
+--    Única excepción: las de los servicios (WhatsApp, avisos, acceso y cobro), que exigen el
+--    secreto de servicio (sus llamadas no tienen sesión y la app no usa la llave service_role).
 select 'ALTO', 'anon puede ejecutar la función', proname || '(' || args || ')'
   from funciones
  where has_function_privilege('anon', oid, 'EXECUTE')
    and proname not in ('whatsapp_estado', 'whatsapp_vincular', 'whatsapp_checar',
                        'whatsapp_semana', 'whatsapp_esperar_objecion', 'whatsapp_conformidad', 'whatsapp_permitir_reenvio',
      'avisos_por_enviar', 'avisos_registrar_envio', 'registrar_suscripcion_push', 'quitar_suscripcion_push',
-                       'avisos_por_enviar', 'avisos_registrar_envio', 'acceso_desbloquear_passkey')
+                       'avisos_por_enviar', 'avisos_registrar_envio', 'acceso_desbloquear_passkey',
+                       'cobro_vincular_cliente', 'cobro_actualizar')
 union all
 -- 3b. Las funciones del webhook deben verificar el secreto de servicio antes de hacer nada.
 select 'CRITICO', 'Función de WhatsApp sin verificación del secreto de servicio', proname || '(' || args || ')'
   from funciones
  where proname like 'whatsapp\_%' and prosrc not like '%_servicio_autorizado(''whatsapp'', p_secreto)%'
+union all
+select 'CRITICO', 'Función de cobro sin verificación del secreto de servicio', proname || '(' || args || ')'
+  from funciones
+ where proname like 'cobro\_%' and prosrc not like '%_servicio_autorizado(''cobro'', p_secreto)%'
 union all
 select 'CRITICO', 'Función de avisos sin verificación del secreto de servicio', proname || '(' || args || ')'
   from funciones
@@ -101,6 +106,7 @@ select 'ALTO', 'Función privilegiada ejecutable por authenticated sin estar en 
      'avisos_por_enviar', 'avisos_registrar_envio', 'registrar_suscripcion_push', 'quitar_suscripcion_push',
      'elegir_acceso_al_salir', 'bloquear_mi_sesion', 'desbloquear_con_pin', 'olvidar_bloqueo_de_mi_sesion', 'mi_acceso',
      'crear_reto_acceso', 'registrar_passkey', 'borrar_passkey', 'registrar_ubicacion',
+     'cobro_vincular_cliente', 'cobro_actualizar',
      'trabajadores_con_pin', 'mi_rol', 'es_gestor', 'puede_consultar', 'soy_trabajador', 'trabajo_en')
 union all
 -- 11. Solo vincular_mi_cuenta() liga una ficha de trabajador a una cuenta (si no, el empleador

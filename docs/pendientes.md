@@ -10,7 +10,7 @@ Jemba, WhatsApp, avisos, horarios, Salir con PIN o huella, ubicación al checar 
       2026-11-16, probablemente pausado por inactividad. Mientras tanto nadie puede entrar ni checar en
       `checador.jemba.mx` y la verificación de cada lunes falla. En el plan gratuito, a los 90 días ya no se reactiva
       desde el panel.
-- [ ] **Paso a producción** (lo hace Claude una vez reactivada): migraciones 18 a 31 (incluye horarios, Salir con PIN o huella, ubicación al checar, diseño de correos y suscripciones con prueba de 14 días), código de `pruebas` a `main`,
+- [ ] **Paso a producción** (lo hace Claude una vez reactivada): migraciones 18 a 32 (incluye horarios, Salir con PIN o huella, ubicación al checar, diseño de correos, suscripciones con prueba de 14 días y cobro con Stripe), código de `pruebas` a `main`,
       manual 1.3 con sus cuatro hojas y verificación de producción (`verificar-produccion.yml`). El usuario pone en
       producción los secretos y variables de WhatsApp (§1.9) y avisos (§1.10); producción no necesita el bypass de
       Vercel.
@@ -23,6 +23,11 @@ Jemba, WhatsApp, avisos, horarios, Salir con PIN o huella, ubicación al checar 
       31 y 32), cabecera de la ficha con indicadores y acuerdo plegado, app del trabajador (barra inferior, tarjeta del reloj, pendientes), fechas legibles en toda la app, Configuración por tarjetas, texto del acuerdo como documento, Trabajadores en el celular, Objeciones, Exportar, constancia PDF, correos, entrada y alta de la empresa, páginas de error y de carga, ventana para corregir o anular en la bitácora, gráfica de horas de la semana en el Tablero, pantalla de reposo del kiosco (reloj grande tras 45 s sin uso), Accesos en tarjetas con ventana para invitar y pasos del kiosco con QR (captura 09; el capturador ya usa el flujo nuevo), confirmación del kiosco al checar, pantalla "Tu cuenta aún no está vinculada a un empleador" con Volver a revisar (cambia su texto en el manual y la hoja del trabajador), y lo que se pula después. Regenerar con `docs/manual/fuente/capturas.cjs` y `generar.cjs`; para capturas con historial realista (varias semanas, objeciones, ubicación) está la empresa de ejemplo de `scripts/ejemplo/` (solo Supabase local).
 
 ## Del usuario (en pruebas)
+
+- [ ] **Activar el cobro en pruebas** (`docs/publicacion.md` §1.14): en Vercel (Preview, rama `pruebas`)
+      `STRIPE_SECRET_KEY` (sk_test), `COBRO_SECRETO_SERVICIO` (y el mismo en `configurar_secreto_servicio('cobro', …)`)
+      y `STRIPE_WEBHOOK_SECRET` del destino de avisos en Stripe con el bypass de Vercel. Después, probar
+      **Agregar tarjeta** con la tarjeta 4242 4242 4242 4242.
 
 - [x] **Guía rápida publicada en jemba.mx** (2026-11-26; con precios y calculadora desde el 2026-11-27) con
       `docs/publicar/guia-rapida-checador.html`. Sus botones

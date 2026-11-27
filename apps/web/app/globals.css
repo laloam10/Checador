@@ -1209,3 +1209,13 @@ main.esqueleto-kiosco { min-height: 100vh; }
 .guia-precios-notas { margin: 0.6rem 0.2rem 0; padding-left: 1.1rem; font-size: 0.84rem; color: var(--gris); line-height: 1.6; }
 .guia-precios-notas strong { color: var(--tinta); }
 @media (max-width: 40rem) { .guia-precios { grid-template-columns: 1fr; } }
+.cobro-contratar { display: grid; gap: 0.6rem; margin-top: 0.6rem; }
+.cobro-contratar .boton { justify-self: stretch; text-align: center; }
+.cobro-ciclos { border: none; margin: 0; padding: 0; display: grid; gap: 0.4rem; }
+.cobro-ciclos legend { font-weight: 600; font-size: 0.86rem; padding: 0; margin-bottom: 0.35rem; color: var(--noche); }
+.cobro-ciclos label { display: grid; grid-template-columns: auto 1fr; gap: 0 0.55rem; align-items: center; padding: 0.55rem 0.7rem; border: 1px solid var(--borde); border-radius: var(--radio-chico); background: var(--superficie); cursor: pointer; font-weight: 400; }
+.cobro-ciclos label.elegido { border-color: var(--marca); background: var(--marca-claro); box-shadow: inset 0 0 0 1px var(--marca); }
+.cobro-ciclos input { grid-row: span 2; margin: 0; accent-color: var(--marca); }
+.cobro-ciclos span { font-size: 0.82rem; color: var(--gris); }
+.cobro-administrar { margin-top: 0.6rem; display: grid; gap: 0.5rem; justify-items: start; }
+.suscripcion-estado .mensaje { margin: 0.2rem 0; }
